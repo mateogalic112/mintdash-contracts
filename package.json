@@ -1,7 +1,6 @@
 {
-  "name": "erc721-collection-template",
+  "name": "nft-studio-contracts",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "compile": "yarn hardhat compile",

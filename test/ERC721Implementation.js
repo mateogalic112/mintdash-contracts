@@ -89,96 +89,131 @@ describe('ERC721Implementation', function() {
           }),
       ).to.be.revertedWithCustomError(myCollection, 'NoMoreTokensLeft');
     });
-  });
 
-  describe('Whitelist mint phase', function() {
-    beforeEach(async function() {
-      await myCollection.toggleMinting();
-    });
+    describe('Whitelist mint', function() {
+      beforeEach(async function() {
+        await myCollection.toggleMinting();
+      });
 
-    it('should mint if caller is whitelisted', async function() {
-      expect(await myCollection.balanceOf(whitelisted1.address)).to.equal(0);
-      expect(await myCollection.amountMinted(whitelisted1.address)).to.equal(0);
+      it('should mint if caller is whitelisted', async function() {
+        expect(await myCollection.balanceOf(whitelisted1.address)).to.equal(0);
+        expect(await myCollection.amountMinted(whitelisted1.address)).to.equal(
+          0,
+        );
 
-      await myCollection
-        .connect(whitelisted1)
-        .mint(1, whitelistedProof1, { value: tokenPrice });
-
-      expect(await myCollection.balanceOf(whitelisted1.address)).to.equal(1);
-      expect(await myCollection.amountMinted(whitelisted1.address)).to.equal(1);
-    });
-
-    it('should not allow whitelisted caller to mint more than whitelist mint limit', async function() {
-      const wantedNumberOfTokens = whitelistMintLimit.add(1);
-
-      await expect(
-        myCollection
+        await myCollection
           .connect(whitelisted1)
-          .mint(wantedNumberOfTokens, whitelistedProof1, {
+          .mint(1, whitelistedProof1, { value: tokenPrice });
+
+        expect(await myCollection.balanceOf(whitelisted1.address)).to.equal(1);
+        expect(await myCollection.amountMinted(whitelisted1.address)).to.equal(
+          1,
+        );
+      });
+
+      it('should not allow whitelisted caller to mint more than whitelist mint limit', async function() {
+        const wantedNumberOfTokens = whitelistMintLimit.add(1);
+
+        await expect(
+          myCollection
+            .connect(whitelisted1)
+            .mint(wantedNumberOfTokens, whitelistedProof1, {
+              value: tokenPrice.mul(wantedNumberOfTokens),
+            }),
+        ).to.be.revertedWithCustomError(myCollection, 'MintLimitReached');
+      });
+
+      it('should not mint if caller is not whitelisted', async function() {
+        await expect(
+          myCollection.connect(notWhitelisted).mint(1, invalidProof, {
+            value: tokenPrice,
+          }),
+        ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
+      });
+
+      it('should not mint if not whitelisted caller uses proof of another whitelisted address', async function() {
+        await expect(
+          myCollection.connect(notWhitelisted).mint(1, whitelistedProof1, {
+            value: tokenPrice,
+          }),
+        ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
+      });
+
+      it('should not mint if whitelisted caller uses proof of another whitelisted address', async function() {
+        await expect(
+          myCollection.connect(whitelisted1).mint(1, whitelistedProof2, {
+            value: tokenPrice,
+          }),
+        ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
+      });
+    });
+
+    describe('Public mint', function() {
+      beforeEach(async function() {
+        await myCollection.toggleMinting();
+        // Allow public mint phase
+        await myCollection.toggleWhitelistOnly();
+      });
+
+      it('should mint if caller is any user', async function() {
+        await myCollection.connect(notWhitelisted).mint(publicMintLimit, [], {
+          value: tokenPrice.mul(publicMintLimit),
+        });
+      });
+
+      it('should not allow user to mint more than public mint limit', async function() {
+        const wantedNumberOfTokens = publicMintLimit.add(1);
+
+        await expect(
+          myCollection.connect(notWhitelisted).mint(wantedNumberOfTokens, [], {
             value: tokenPrice.mul(wantedNumberOfTokens),
           }),
-      ).to.be.revertedWithCustomError(myCollection, 'MintLimitReached');
-    });
+        ).to.be.revertedWithCustomError(myCollection, 'MintLimitReached');
+      });
 
-    it('should not mint if caller is not whitelisted', async function() {
-      await expect(
-        myCollection.connect(notWhitelisted).mint(1, invalidProof, {
-          value: tokenPrice,
-        }),
-      ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
-    });
+      it('should mint after airdrop', async function() {
+        expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(
+          0,
+        );
 
-    it('should not mint if not whitelisted caller uses proof of another whitelisted address', async function() {
-      await expect(
-        myCollection.connect(notWhitelisted).mint(1, whitelistedProof1, {
-          value: tokenPrice,
-        }),
-      ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
-    });
+        await myCollection.airdrop([notWhitelisted.address], [1]);
 
-    it('should not mint if whitelisted caller uses proof of another whitelisted address', async function() {
-      await expect(
-        myCollection.connect(whitelisted1).mint(1, whitelistedProof2, {
-          value: tokenPrice,
-        }),
-      ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
+        await myCollection.connect(notWhitelisted).mint(publicMintLimit, [], {
+          value: tokenPrice.mul(publicMintLimit),
+        });
+
+        expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(
+          publicMintLimit.add(1),
+        );
+      });
     });
   });
 
-  describe('Public mint phase', function() {
+  describe('Burn', function() {
     beforeEach(async function() {
       await myCollection.toggleMinting();
       // Allow public mint phase
       await myCollection.toggleWhitelistOnly();
     });
 
-    it('should mint if caller is any user', async function() {
-      await myCollection.connect(notWhitelisted).mint(publicMintLimit, [], {
-        value: tokenPrice.mul(publicMintLimit),
+    it('should burn token for owner', async function() {
+      await myCollection.connect(notWhitelisted).mint(1, [], {
+        value: tokenPrice.mul(1),
       });
-    });
+      expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(1);
 
-    it('should not allow user to mint more than public mint limit', async function() {
-      const wantedNumberOfTokens = publicMintLimit.add(1);
-
-      await expect(
-        myCollection.connect(notWhitelisted).mint(wantedNumberOfTokens, [], {
-          value: tokenPrice.mul(wantedNumberOfTokens),
-        }),
-      ).to.be.revertedWithCustomError(myCollection, 'MintLimitReached');
-    });
-
-    it('should mint after airdrop', async function() {
+      await myCollection.connect(notWhitelisted).burn(1);
       expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(0);
+    });
 
-      await myCollection.airdrop([notWhitelisted.address], [1]);
-
-      await myCollection.connect(notWhitelisted).mint(publicMintLimit, [], {
-        value: tokenPrice.mul(publicMintLimit),
+    it('should not burn if not owner', async function() {
+      await myCollection.connect(notWhitelisted).mint(1, [], {
+        value: tokenPrice.mul(1),
       });
 
-      expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(
-        publicMintLimit.add(1),
+      await expect(myCollection.burn(1)).to.be.revertedWithCustomError(
+        myCollection,
+        'TransferCallerNotOwnerNorApproved',
       );
     });
   });
@@ -368,6 +403,22 @@ describe('ERC721Implementation', function() {
           myCollection
             .connect(whitelisted1)
             .setRoyalties(whitelisted2.address, 2000),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+      });
+    });
+
+    describe('Set whitelist', function() {
+      it('should set whitelist correctly', async function() {
+        const root = `0x${getMerkleTreeRoot([owner.address])}`;
+        await myCollection.setWhitelist(root);
+
+        expect(await myCollection.merkleRoot()).to.equal(root);
+      });
+
+      it('should not allow to set whitelist if caller is not owner', async function() {
+        const root = `0x${getMerkleTreeRoot([owner.address])}`;
+        await expect(
+          myCollection.connect(whitelisted1).setWhitelist(root),
         ).to.be.revertedWith('Ownable: caller is not the owner');
       });
     });

@@ -46,8 +46,7 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
         external
         payable
     {
-        if (msg.sender != tx.origin) revert InvalidCaller();
-
+        // Revert if mint didn't start yet
         if (!saleConfig.mintActive) revert MintingDisabled();
 
         // Revert if total supply will exceed the limit
@@ -56,26 +55,25 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
         // Revert if not enough ETH is sent
         if (msg.value < saleConfig.tokenPrice * quantity) revert InvalidValueProvided();
 
-        uint256 finalTokenBalance;
-        unchecked {
-            // Get amount minted from owner auxiliary data
-            finalTokenBalance = _getAux(msg.sender) + quantity;
-        }
+        uint256 balanceAfterMint = _getAux(msg.sender) + quantity;
 
         if (saleConfig.whitelistMintActive) {
             // Revert if final token balance is above whitelist limit
-            if (finalTokenBalance > saleConfig.whitelistMintLimit) revert MintLimitReached();
+            if (balanceAfterMint > saleConfig.whitelistMintLimit) revert MintLimitReached();
 
             // Revert if merkle proof is not valid
             if (!MerkleProof.verifyCalldata(merkleProof, merkleRoot, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
         } else {
             // Revert if final token balance is above public limit
-            if (finalTokenBalance > saleConfig.publicMintLimit) revert MintLimitReached();
+            if (balanceAfterMint > saleConfig.publicMintLimit) revert MintLimitReached();
         }
 
-        // Revert if final token balance is above public limit
-        _setAux(msg.sender, uint64(finalTokenBalance));
-        _mint(msg.sender, quantity);
+        _setAux(msg.sender, uint64(balanceAfterMint));
+        _safeMint(msg.sender, quantity);
+    }
+
+    function burn(uint256 tokenId) external {
+        _burn(tokenId, true);
     }
 
     function airdrop(address[] calldata to, uint64[] calldata quantity)
@@ -95,8 +93,8 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
         if (_totalMinted() > saleConfig.tokenMaxSupply) revert NoMoreTokensLeft();
     }
 
-    function burn(uint256 tokenId) external {
-        _burn(tokenId, true);
+    function amountMinted(address user) external view returns (uint64) {
+        return _getAux(user);
     }
 
     function toggleMinting() external onlyOwner {
@@ -145,11 +143,17 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
         payable(msg.sender).transfer(address(this).balance);
     }
 
-    function amountMinted(address user) external view returns (uint64) {
-        // Returns amount minted from owner auxiliary data
-        return _getAux(user);
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC2981Upgradeable, ERC721AUpgradeable)
+        returns (bool)
+    {
+        return
+            ERC721AUpgradeable.supportsInterface(interfaceId) ||
+            ERC2981Upgradeable.supportsInterface(interfaceId);
     }
-
+    
     function _beforeTokenTransfers(
         address from,
         address to,
@@ -161,17 +165,6 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
         }
 
         super._beforeTokenTransfers(from, to, startTokenId, quantity);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC2981Upgradeable, ERC721AUpgradeable)
-        returns (bool)
-    {
-        return
-            ERC721AUpgradeable.supportsInterface(interfaceId) ||
-            ERC2981Upgradeable.supportsInterface(interfaceId);
     }
 
     function _baseURI() internal view override returns (string memory) {
