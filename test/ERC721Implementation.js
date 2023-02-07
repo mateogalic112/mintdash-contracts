@@ -57,8 +57,8 @@ describe('ERC721Implementation', function() {
     invalidProof = getMerkleProof(whitelist, notWhitelisted.address);
   });
 
-  describe('Mint', function() {
-    it('should not mint if minting is disabled', async function() {
+  describe('mint', function() {
+    it('reverts if minting is disabled', async function() {
       await expect(
         myCollection.connect(whitelisted1).mint(1, whitelistedProof1, {
           value: tokenPrice,
@@ -66,7 +66,7 @@ describe('ERC721Implementation', function() {
       ).to.be.revertedWithCustomError(myCollection, 'MintingDisabled');
     });
 
-    it('should not mint if not enough ETH is provided', async function() {
+    it('reverts if not enough ETH is provided', async function() {
       await myCollection.toggleMinting();
 
       await expect(
@@ -76,7 +76,7 @@ describe('ERC721Implementation', function() {
       ).to.be.revertedWithCustomError(myCollection, 'InvalidValueProvided');
     });
 
-    it('should not mint if there are no tokens left', async function() {
+    it('reverts if there are no tokens left', async function() {
       await myCollection.toggleMinting();
 
       const wantedNumberOfTokens = tokenMaxSupply.add(1);
@@ -95,7 +95,7 @@ describe('ERC721Implementation', function() {
         await myCollection.toggleMinting();
       });
 
-      it('should mint if caller is whitelisted', async function() {
+      it('mints if caller is whitelisted', async function() {
         expect(await myCollection.balanceOf(whitelisted1.address)).to.equal(0);
         expect(await myCollection.amountMinted(whitelisted1.address)).to.equal(
           0,
@@ -111,7 +111,7 @@ describe('ERC721Implementation', function() {
         );
       });
 
-      it('should not allow whitelisted caller to mint more than whitelist mint limit', async function() {
+      it('reverts above mint limit', async function() {
         const wantedNumberOfTokens = whitelistMintLimit.add(1);
 
         await expect(
@@ -123,7 +123,7 @@ describe('ERC721Implementation', function() {
         ).to.be.revertedWithCustomError(myCollection, 'MintLimitReached');
       });
 
-      it('should not mint if caller is not whitelisted', async function() {
+      it('reverts if caller is not whitelisted', async function() {
         await expect(
           myCollection.connect(notWhitelisted).mint(1, invalidProof, {
             value: tokenPrice,
@@ -131,15 +131,13 @@ describe('ERC721Implementation', function() {
         ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
       });
 
-      it('should not mint if not whitelisted caller uses proof of another whitelisted address', async function() {
+      it('reverts if not whitelisted caller uses invalid proof', async function() {
         await expect(
           myCollection.connect(notWhitelisted).mint(1, whitelistedProof1, {
             value: tokenPrice,
           }),
         ).to.be.revertedWithCustomError(myCollection, 'NotWhitelisted');
-      });
 
-      it('should not mint if whitelisted caller uses proof of another whitelisted address', async function() {
         await expect(
           myCollection.connect(whitelisted1).mint(1, whitelistedProof2, {
             value: tokenPrice,
@@ -155,13 +153,13 @@ describe('ERC721Implementation', function() {
         await myCollection.toggleWhitelistOnly();
       });
 
-      it('should mint if caller is any user', async function() {
+      it('mints', async function() {
         await myCollection.connect(notWhitelisted).mint(publicMintLimit, [], {
           value: tokenPrice.mul(publicMintLimit),
         });
       });
 
-      it('should not allow user to mint more than public mint limit', async function() {
+      it('revert user to mint more than public mint limit', async function() {
         const wantedNumberOfTokens = publicMintLimit.add(1);
 
         await expect(
@@ -171,7 +169,7 @@ describe('ERC721Implementation', function() {
         ).to.be.revertedWithCustomError(myCollection, 'MintLimitReached');
       });
 
-      it('should mint after airdrop', async function() {
+      it('mints after receiving airdrop', async function() {
         expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(
           0,
         );
@@ -189,14 +187,14 @@ describe('ERC721Implementation', function() {
     });
   });
 
-  describe('Burn', function() {
+  describe('burn', function() {
     beforeEach(async function() {
       await myCollection.toggleMinting();
       // Allow public mint phase
       await myCollection.toggleWhitelistOnly();
     });
 
-    it('should burn token for owner', async function() {
+    it('burns token for owner', async function() {
       await myCollection.connect(notWhitelisted).mint(1, [], {
         value: tokenPrice.mul(1),
       });
@@ -206,7 +204,7 @@ describe('ERC721Implementation', function() {
       expect(await myCollection.balanceOf(notWhitelisted.address)).to.equal(0);
     });
 
-    it('should not burn if not owner', async function() {
+    it('reverts if not owner', async function() {
       await myCollection.connect(notWhitelisted).mint(1, [], {
         value: tokenPrice.mul(1),
       });
@@ -218,27 +216,27 @@ describe('ERC721Implementation', function() {
     });
   });
 
-  describe('Interface support', function() {
-    it('supports ERC165 interface', async function() {
+  describe('supportsInterface', function() {
+    it('ERC165', async function() {
       expect(await myCollection.supportsInterface('0x01ffc9a7')).to.equal(true);
     });
 
-    it('supports ERC721 interface', async function() {
+    it('ERC721', async function() {
       expect(await myCollection.supportsInterface('0x80ac58cd')).to.equal(true);
     });
 
-    it('supports ERC721Metadata interface', async function() {
+    it('ERC721Metadata', async function() {
       expect(await myCollection.supportsInterface('0x5b5e139f')).to.equal(true);
     });
 
-    it('supports ERC2981 interface', async function() {
+    it('ERC2981', async function() {
       expect(await myCollection.supportsInterface('0x2a55205a')).to.equal(true);
     });
   });
 
-  describe('Only owner functions', function() {
-    describe('Config functions', function() {
-      it('should toggle minting', async function() {
+  describe('Owner functions', function() {
+    describe('Config', function() {
+      it('toggles minting', async function() {
         expect((await myCollection.saleConfig()).mintActive).to.equal(false);
 
         await myCollection.toggleMinting();
@@ -246,7 +244,7 @@ describe('ERC721Implementation', function() {
         expect((await myCollection.saleConfig()).mintActive).to.equal(true);
       });
 
-      it('should toggle whitelist mint', async function() {
+      it('toggles whitelist mint', async function() {
         expect((await myCollection.saleConfig()).whitelistMintActive).to.equal(
           true,
         );
@@ -258,19 +256,7 @@ describe('ERC721Implementation', function() {
         );
       });
 
-      it('should not allow to toggle minting if caller is not owner', async function() {
-        await expect(
-          myCollection.connect(whitelisted1).toggleMinting(),
-        ).to.be.revertedWith('Ownable: caller is not the owner');
-      });
-
-      it('should not allow to toggle whitelist mint if caller is not owner', async function() {
-        await expect(
-          myCollection.connect(whitelisted1).toggleWhitelistOnly(),
-        ).to.be.revertedWith('Ownable: caller is not the owner');
-      });
-
-      it('should toggle operator filterer', async function() {
+      it('toggles operator filterer', async function() {
         expect(await myCollection.isOperatorFiltererEnabled()).to.equal(false);
 
         await myCollection.toggleOperatorFilterer();
@@ -278,13 +264,7 @@ describe('ERC721Implementation', function() {
         expect(await myCollection.isOperatorFiltererEnabled()).to.equal(true);
       });
 
-      it('should not allow to toggle operator filterer if caller is not owner', async function() {
-        await expect(
-          myCollection.connect(whitelisted1).toggleOperatorFilterer(),
-        ).to.be.revertedWith('Ownable: caller is not the owner');
-      });
-
-      it('should set token price', async function() {
+      it('sets token price', async function() {
         const { tokenPrice } = await myCollection.saleConfig();
         expect(tokenPrice.toString()).to.equal('80000000000000000');
 
@@ -296,13 +276,7 @@ describe('ERC721Implementation', function() {
         expect(updatedTokenPrice.toString()).to.equal('10000000000000000');
       });
 
-      it('should not allow to set token price if caller is not owner', async function() {
-        await expect(
-          myCollection.connect(whitelisted1).setTokenPrice('10000000000000000'),
-        ).to.be.revertedWith('Ownable: caller is not the owner');
-      });
-
-      it('should set mint limits', async function() {
+      it('sets mint limits', async function() {
         await myCollection.setMintLimits(1337, 12, 19);
 
         const {
@@ -316,15 +290,31 @@ describe('ERC721Implementation', function() {
         expect(whitelistMintLimit).to.equal(19);
       });
 
-      it('should not allow to set mint limits if caller is not owner', async function() {
+      it('reverts if caller is not owner', async function() {
+        await expect(
+          myCollection.connect(whitelisted1).toggleMinting(),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+
+        await expect(
+          myCollection.connect(whitelisted1).toggleWhitelistOnly(),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+
+        await expect(
+          myCollection.connect(whitelisted1).toggleOperatorFilterer(),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+
+        await expect(
+          myCollection.connect(whitelisted1).setTokenPrice('10000000000000000'),
+        ).to.be.revertedWith('Ownable: caller is not the owner');
+
         await expect(
           myCollection.connect(whitelisted1).setMintLimits(1337, 12, 19),
         ).to.be.revertedWith('Ownable: caller is not the owner');
       });
     });
 
-    describe('Airdrop tokens', function() {
-      it('should airdrop tokens correctly', async function() {
+    describe('airdrop', function() {
+      it('airdrops', async function() {
         const to = [whitelisted1.address, notWhitelisted.address];
         const quantity = [3, 4];
 
@@ -334,7 +324,7 @@ describe('ERC721Implementation', function() {
         expect(await myCollection.balanceOf(to[1])).to.equal(4);
       });
 
-      it('should not allow to airdrop more tokens than token max supply', async function() {
+      it('reverts if airdroping more tokens than token max supply', async function() {
         const to = [
           whitelisted1.address,
           notWhitelisted.address,
@@ -347,7 +337,7 @@ describe('ERC721Implementation', function() {
         ).to.be.revertedWithCustomError(myCollection, 'NoMoreTokensLeft');
       });
 
-      it('should not allow to airdrop if caller is not owner', async function() {
+      it('reverts if caller is not owner', async function() {
         const to = [whitelisted1.address, notWhitelisted.address];
         const quantity = [3, 4];
 
@@ -357,8 +347,8 @@ describe('ERC721Implementation', function() {
       });
     });
 
-    describe('Base URI', function() {
-      it('should set base URI correctly', async function() {
+    describe('setBaseURI', function() {
+      it('sets baseURI', async function() {
         await myCollection.airdrop([whitelisted1.address], [1]);
 
         expect(await myCollection.tokenURI(1)).to.equal(
@@ -374,7 +364,7 @@ describe('ERC721Implementation', function() {
         );
       });
 
-      it('should not allow to set base URI if caller is not owner', async function() {
+      it('reverts if caller is not owner', async function() {
         await expect(
           myCollection
             .connect(whitelisted1)
@@ -385,8 +375,8 @@ describe('ERC721Implementation', function() {
       });
     });
 
-    describe('Set royalties', function() {
-      it('should set royalties correctly', async function() {
+    describe('setRoyalties', function() {
+      it('sets royalties', async function() {
         await myCollection.setRoyalties(whitelisted1.address, 4000);
 
         const [royaltyReceiver, royaltyAmount] = await myCollection.royaltyInfo(
@@ -398,7 +388,7 @@ describe('ERC721Implementation', function() {
         expect(royaltyAmount).to.equal(1000 * 0.4);
       });
 
-      it('should not allow to set royalties if caller is not owner', async function() {
+      it('reverts if caller is not owner', async function() {
         await expect(
           myCollection
             .connect(whitelisted1)
@@ -407,15 +397,15 @@ describe('ERC721Implementation', function() {
       });
     });
 
-    describe('Set whitelist', function() {
-      it('should set whitelist correctly', async function() {
+    describe('setWhitelist', function() {
+      it('sets whitelist correctly', async function() {
         const root = `0x${getMerkleTreeRoot([owner.address])}`;
         await myCollection.setWhitelist(root);
 
         expect(await myCollection.merkleRoot()).to.equal(root);
       });
 
-      it('should not allow to set whitelist if caller is not owner', async function() {
+      it('reverts if caller is not owner', async function() {
         const root = `0x${getMerkleTreeRoot([owner.address])}`;
         await expect(
           myCollection.connect(whitelisted1).setWhitelist(root),
@@ -423,8 +413,8 @@ describe('ERC721Implementation', function() {
       });
     });
 
-    describe('Withdraw funds', function() {
-      it('should withdraw funds to the owner', async function() {
+    describe('withdrawAllFunds', function() {
+      it('withdraws', async function() {
         await myCollection.toggleMinting();
         await myCollection.toggleWhitelistOnly();
         await myCollection.connect(whitelisted1).mint(1, whitelistedProof1, {
@@ -444,7 +434,7 @@ describe('ERC721Implementation', function() {
         );
       });
 
-      it('should not allow to withdraw funds if caller is not owner', async function() {
+      it('reverts if caller is not owner', async function() {
         await expect(
           myCollection.connect(whitelisted1).withdrawAllFunds(),
         ).to.be.revertedWith('Ownable: caller is not the owner');

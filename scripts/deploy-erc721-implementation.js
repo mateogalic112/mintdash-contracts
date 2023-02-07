@@ -2,7 +2,10 @@ const { ethers } = require('hardhat');
 
 async function main() {
   const [deployer] = await ethers.getSigners();
-  console.log('Deploying contract with the account: ', deployer.address);
+  console.log(
+    '🔥 Deploying ERC721Implementation with the account: ',
+    deployer.address,
+  );
 
   const ERC721Implementation = await ethers.getContractFactory(
     'ERC721Implementation',
@@ -11,10 +14,7 @@ async function main() {
   await implementation.deployed();
   await implementation.initialize('Blank NFT Studio', 'BLANK');
 
-  console.log(
-    'Success! ERC721Implementation was deployed to: ',
-    implementation.address,
-  );
+  console.log('🚀 ERC721Implementation deployed to: ', implementation.address);
 }
 
 main()
