@@ -1,13 +1,13 @@
-require("@nomicfoundation/hardhat-chai-matchers");
-require("@nomiclabs/hardhat-etherscan");
-require("hardhat-gas-reporter");
-require("hardhat-contract-sizer");
-require("solidity-coverage");
-require("dotenv").config();
+require('@nomicfoundation/hardhat-chai-matchers');
+require('@nomiclabs/hardhat-etherscan');
+require('hardhat-gas-reporter');
+require('hardhat-contract-sizer');
+require('solidity-coverage');
+require('dotenv').config();
 
 module.exports = {
   solidity: {
-    version: "0.8.17",
+    version: '0.8.18',
     settings: {
       optimizer: {
         enabled: true,
@@ -34,7 +34,7 @@ module.exports = {
   },
   gasReporter: {
     enabled: true,
-    currency: "USD",
+    currency: 'USD',
     gasPrice: 100,
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
