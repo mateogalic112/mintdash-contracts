@@ -5,12 +5,12 @@ import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
 import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
 import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "operator-filter-registry/src/DefaultOperatorFilterer.sol";
+import "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
 
 contract ERC721DropImplementation is 
     ERC721AUpgradeable, 
     ERC2981Upgradeable, 
-    DefaultOperatorFilterer, 
+    DefaultOperatorFiltererUpgradeable, 
     OwnableUpgradeable 
 {
     string public baseURI;
@@ -45,6 +45,7 @@ contract ERC721DropImplementation is
         __ERC721A_init(_name, _symbol);
         __Ownable_init();
         __ERC2981_init();
+        __DefaultOperatorFilterer_init();
     }
 
     function mint(uint256 quantity, bytes32[] calldata merkleProof)
