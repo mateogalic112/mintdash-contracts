@@ -7,7 +7,12 @@ import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol"
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "operator-filter-registry/src/DefaultOperatorFilterer.sol";
 
-contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, DefaultOperatorFilterer, OwnableUpgradeable {
+contract ERC721DropImplementation is 
+    ERC721AUpgradeable, 
+    ERC2981Upgradeable, 
+    DefaultOperatorFilterer, 
+    OwnableUpgradeable 
+{
     string public baseURI;
     bytes32 public merkleRoot;
     bool public isOperatorFiltererEnabled;
@@ -28,7 +33,7 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
     error MintingDisabled();
     error NoMoreTokensLeft();
     error InvalidValueProvided();
-    error MintLimitReached();
+    error MintLimitExceeded();
     error NotWhitelisted();
     error ContractSealed();
 
@@ -59,13 +64,13 @@ contract ERC721Implementation is ERC721AUpgradeable, ERC2981Upgradeable, Default
 
         if (saleConfig.whitelistMintActive) {
             // Revert if final token balance is above whitelist limit
-            if (balanceAfterMint > saleConfig.whitelistMintLimit) revert MintLimitReached();
+            if (balanceAfterMint > saleConfig.whitelistMintLimit) revert MintLimitExceeded();
 
             // Revert if merkle proof is not valid
             if (!MerkleProof.verifyCalldata(merkleProof, merkleRoot, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
         } else {
             // Revert if final token balance is above public limit
-            if (balanceAfterMint > saleConfig.publicMintLimit) revert MintLimitReached();
+            if (balanceAfterMint > saleConfig.publicMintLimit) revert MintLimitExceeded();
         }
 
         _setAux(msg.sender, uint64(balanceAfterMint));

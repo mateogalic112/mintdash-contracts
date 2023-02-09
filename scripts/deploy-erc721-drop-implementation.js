@@ -3,18 +3,21 @@ const { ethers } = require('hardhat');
 async function main() {
   const [deployer] = await ethers.getSigners();
   console.log(
-    '🔥 Deploying ERC721Implementation with the account: ',
+    '🔥 Deploying ERC721DropImplementation with the account: ',
     deployer.address,
   );
 
-  const ERC721Implementation = await ethers.getContractFactory(
-    'ERC721Implementation',
+  const ERC721DropImplementation = await ethers.getContractFactory(
+    'ERC721DropImplementation',
   );
-  const implementation = await ERC721Implementation.deploy();
+  const implementation = await ERC721DropImplementation.deploy();
   await implementation.deployed();
   await implementation.initialize('Blank NFT Studio', 'BLANK');
 
-  console.log('🚀 ERC721Implementation deployed to: ', implementation.address);
+  console.log(
+    '🚀 ERC721DropImplementation deployed to: ',
+    implementation.address,
+  );
 }
 
 main()
