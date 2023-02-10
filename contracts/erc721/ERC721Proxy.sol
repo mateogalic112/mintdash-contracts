@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-
-pragma solidity 0.8.18;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -10,9 +9,9 @@ contract ERC721Proxy is Proxy {
     
     constructor(string memory name, string memory symbol) {
         assert(_IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
-        StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = 0x90769206c42Cda9f7420847B0162eEbEA09dD425;
+        StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = 0x05b9dAD3A76EED6041766645374148E7E73177af;
         Address.functionDelegateCall(
-            0x90769206c42Cda9f7420847B0162eEbEA09dD425,
+            0x05b9dAD3A76EED6041766645374148E7E73177af,
             abi.encodeWithSignature("initialize(string,string)", name, symbol)
         );
     }
