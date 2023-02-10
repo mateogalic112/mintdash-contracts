@@ -17,8 +17,8 @@ contract ERC721DropImplementation is
     OwnableUpgradeable,
     IERC721DropImplementation
 {
-    PublicMintStage public publicMint;
-    AllowlistMintStage public allowlistMint;
+    PublicMintStage public publicMintStage;
+    AllowlistMintStage public allowlistMintStage;
 
     uint256 public maxSupply;
     string public baseURI;
@@ -45,13 +45,13 @@ contract ERC721DropImplementation is
         payable 
     {
         // Ensure that public mint stage is active
-        _checkStageActive(publicMint.startTime, publicMint.endTime);
+        _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
 
         // Ensure correct mint quantity
-        _checkMintQuantity(quantity, publicMint.mintLimitPerWallet);
+        _checkMintQuantity(quantity, publicMintStage.mintLimitPerWallet);
 
          // Ensure enough ETH is provided
-        _checkFunds(msg.value, quantity, publicMint.mintPrice);
+        _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
 
         _mintBase(msg.sender, quantity, PUBLIC_STAGE_INDEX);
     }
@@ -61,15 +61,15 @@ contract ERC721DropImplementation is
         payable
     {
         // Ensure that allowlist mint stage is active
-        _checkStageActive(allowlistMint.startTime, allowlistMint.endTime);
+        _checkStageActive(allowlistMintStage.startTime, allowlistMintStage.endTime);
 
          // Ensure correct mint quantity
-        _checkMintQuantity(quantity, allowlistMint.mintLimitPerWallet);
+        _checkMintQuantity(quantity, allowlistMintStage.mintLimitPerWallet);
 
         // Ensure enough ETH is provided
-        _checkFunds(msg.value, quantity, allowlistMint.mintPrice);
+        _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
-        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMint.merkleRoot, keccak256(abi.encodePacked(msg.sender)))){
+        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(msg.sender)))){
             revert InvalidProof();
         }
 
@@ -107,7 +107,7 @@ contract ERC721DropImplementation is
         external 
         onlyOwner 
     {
-        publicMint = publicMintStageData;
+        publicMintStage = publicMintStageData;
 
         emit PublicMintStageUpdated(publicMintStageData);
     }
@@ -116,7 +116,7 @@ contract ERC721DropImplementation is
         external 
         onlyOwner 
     {
-        allowlistMint = allowlistMintStageData;
+        allowlistMintStage = allowlistMintStageData;
 
         emit AllowlistMintStageUpdated(allowlistMintStageData);
     }
