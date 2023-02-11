@@ -28,7 +28,7 @@ contract ERC721DropImplementation is
     bool public operatorFiltererEnabled;
 
     uint256 internal constant PUBLIC_STAGE_INDEX = 0;
-    uint256 internal constant ALLOWLIST_STAGE_INDEX = 0;
+    uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
 
     function initialize(
         string memory _name,
@@ -179,6 +179,13 @@ contract ERC721DropImplementation is
         provenanceHash = newProvenanceHash;
 
         emit ProvenanceHashUpdated(newProvenanceHash);
+    }
+
+    function updatePayoutAddress(address newPayoutAddress)
+        external
+        onlyOwner 
+    {
+        payoutAddress = newPayoutAddress;
     }
 
     function withdrawAllFunds() 
