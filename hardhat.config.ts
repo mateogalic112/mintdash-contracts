@@ -1,11 +1,13 @@
-require('@nomicfoundation/hardhat-chai-matchers');
-require('@nomiclabs/hardhat-etherscan');
-require('hardhat-gas-reporter');
-require('hardhat-contract-sizer');
-require('solidity-coverage');
-require('dotenv').config();
+import '@nomicfoundation/hardhat-chai-matchers';
+import '@nomiclabs/hardhat-etherscan';
+import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
+import 'solidity-coverage';
+import dotenv from 'dotenv';
 
-module.exports = {
+dotenv.config();
+
+const config = {
   solidity: {
     version: '0.8.17',
     settings: {
@@ -39,3 +41,5 @@ module.exports = {
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
 };
+
+export default config;

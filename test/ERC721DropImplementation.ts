@@ -1,0 +1,266 @@
+import { expect } from 'chai';
+import { ethers } from 'hardhat';
+import { getMerkleProof, getMerkleTreeRoot } from './helpers/merkleTree';
+import { defaultBytes32 } from './helpers/consts';
+import { Contract, Signer } from 'ethers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+
+describe('ERC721DropImplementation', function() {
+  let collection: Contract;
+  let tokenPrice;
+
+  let owner: SignerWithAddress,
+    allowlistUser: SignerWithAddress,
+    allowlistUser2: SignerWithAddress,
+    userWithoutAllowlist: SignerWithAddress,
+    randomUser: SignerWithAddress;
+
+  const initialMaxSupply = 4000;
+  const initialBaseURI =
+    'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5/';
+
+  const initialRoyaltiesRecipient =
+    '0xE5F135b20F496189FB6C915bABc53e0A70Ff6A1f';
+  const initialRoyaltiesFee = 1000;
+
+  beforeEach(async function() {
+    [
+      owner,
+      allowlistUser,
+      allowlistUser2,
+      userWithoutAllowlist,
+      randomUser,
+    ] = await ethers.getSigners();
+
+    const whitelist = [
+      owner.address,
+      allowlistUser.address,
+      allowlistUser2.address,
+    ];
+
+    const ERC721DropImplementation = await ethers.getContractFactory(
+      'ERC721DropImplementation',
+    );
+    collection = await ERC721DropImplementation.deploy();
+    await collection.deployed();
+
+    // Initialize
+    await collection.initialize('Blank Studio Collection', 'BSC');
+
+    // Configure royalties
+    await collection.updateRoyalties(
+      initialRoyaltiesRecipient,
+      initialRoyaltiesFee,
+    );
+
+    // Configure base URI
+    await collection.updateBaseURI(initialBaseURI);
+
+    // Configure max supply
+    await collection.updateMaxSupply(initialMaxSupply);
+  });
+
+  describe('updatePublicMintStage', () => {
+    it('updates', async () => {
+      // Check current config
+      const currentConfig = await collection.publicMintStage();
+      expect(currentConfig.mintPrice).to.equal(0);
+      expect(currentConfig.startTime).to.equal(0);
+      expect(currentConfig.endTime).to.equal(0);
+      expect(currentConfig.mintLimitPerWallet).to.equal(0);
+
+      // Update config
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287, // 0.1 ETH
+        endTime: 1686043287, // 0.1 ETH
+        mintLimitPerWallet: 5,
+      };
+      await collection.updatePublicMintStage(newConfigData);
+
+      // Check updated config
+      const updatedConfig = await collection.publicMintStage();
+      expect(updatedConfig.mintPrice).to.equal(newConfigData.mintPrice);
+      expect(updatedConfig.startTime).to.equal(newConfigData.startTime);
+      expect(updatedConfig.endTime).to.equal(newConfigData.endTime);
+      expect(updatedConfig.mintLimitPerWallet).to.equal(
+        newConfigData.mintLimitPerWallet,
+      );
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(randomUser).updatePublicMintStage({
+          mintPrice: '100000000000000000', // 0.1 ETH
+          startTime: 1676043287, // 0.1 ETH
+          endTime: 1686043287, // 0.1 ETH
+          mintLimitPerWallet: 5,
+        }),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateAllowlistMintStage', () => {
+    it('updates', async () => {
+      // Check current config
+      const currentConfig = await collection.allowlistMintStage();
+      expect(currentConfig.mintPrice).to.equal(0);
+      expect(currentConfig.startTime).to.equal(0);
+      expect(currentConfig.endTime).to.equal(0);
+      expect(currentConfig.mintLimitPerWallet).to.equal(0);
+      expect(currentConfig.merkleRoot).to.equal(defaultBytes32);
+
+      // Update config
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287, // 0.1 ETH
+        endTime: 1686043287, // 0.1 ETH
+        mintLimitPerWallet: 5,
+        merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+      };
+      await collection.updateAllowlistMintStage(newConfigData);
+
+      // Check updated config
+      const updatedConfig = await collection.allowlistMintStage();
+      expect(updatedConfig.mintPrice).to.equal(newConfigData.mintPrice);
+      expect(updatedConfig.startTime).to.equal(newConfigData.startTime);
+      expect(updatedConfig.endTime).to.equal(newConfigData.endTime);
+      expect(updatedConfig.mintLimitPerWallet).to.equal(
+        newConfigData.mintLimitPerWallet,
+      );
+      expect(updatedConfig.merkleRoot).to.equal(newConfigData.merkleRoot);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(randomUser).updateAllowlistMintStage({
+          mintPrice: '100000000000000000', // 0.1 ETH
+          startTime: 1676043287, // 0.1 ETH
+          endTime: 1686043287, // 0.1 ETH
+          mintLimitPerWallet: 5,
+          merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+        }),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateMaxSupply', () => {
+    it('updates', async () => {
+      // Check current max supply
+      expect(await collection.maxSupply()).to.eq(initialMaxSupply);
+
+      // Update max supply
+      const newMaxSupply = 10000;
+      await collection.updateMaxSupply(newMaxSupply);
+
+      // Check updated max supply
+      expect(await collection.maxSupply()).to.eq(newMaxSupply);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(randomUser).updateMaxSupply(1500),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateOperatorFilterer', () => {
+    it('updates', async () => {
+      // Check current state
+      expect(await collection.operatorFiltererEnabled()).to.eq(false);
+
+      // Enable operator filterer
+      await collection.updateOperatorFilterer(true);
+
+      // Check updated max supply
+      expect(await collection.operatorFiltererEnabled()).to.eq(true);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(randomUser).updateOperatorFilterer(true),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateBaseURI', () => {
+    it('updates', async () => {
+      // Check current base URI
+      expect(await collection.baseURI()).to.eq(initialBaseURI);
+
+      // Update base URI
+      const newBaseURI = 'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/';
+      await collection.updateBaseURI(newBaseURI);
+
+      // Check updated base URI
+      expect(await collection.baseURI()).to.eq(newBaseURI);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection
+          .connect(randomUser)
+          .updateBaseURI(
+            'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/',
+          ),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateRoyalties', () => {
+    it('updates', async () => {
+      // Check royalty info for token with ID 1
+      const [receiver, amount] = await collection.royaltyInfo(
+        1,
+        ethers.utils.parseUnits('1', 'ether'),
+      );
+
+      expect(receiver).to.eq(initialRoyaltiesRecipient);
+      expect(amount).to.eq(ethers.utils.parseUnits('0.1', 'ether'));
+
+      // Update base URI
+      const newReceiver = randomUser.address;
+      const newFeeNumerator = 5000;
+      await collection.updateRoyalties(newReceiver, newFeeNumerator);
+
+      // Check new royalty info for token with ID 1
+      const [updatedReceiver, updatedAmount] = await collection.royaltyInfo(
+        1,
+        ethers.utils.parseUnits('1', 'ether'),
+      );
+
+      expect(updatedReceiver).to.eq(newReceiver);
+      expect(updatedAmount).to.eq(ethers.utils.parseUnits('0.5', 'ether'));
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection
+          .connect(randomUser)
+          .updateRoyalties(randomUser.address, 1000),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateProvenanceHash', () => {
+    it('updates', async () => {
+      // Check provenance hash
+      expect(await collection.provenanceHash()).to.eq(defaultBytes32);
+
+      // Update provenance hash
+      const newProvenanceHash = ethers.utils.id('image data');
+      await collection.updateProvenanceHash(newProvenanceHash);
+
+      // Check updated provenance hash
+      expect(await collection.provenanceHash()).to.eq(newProvenanceHash);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection
+          .connect(randomUser)
+          .updateProvenanceHash(ethers.utils.id('image data')),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+});
