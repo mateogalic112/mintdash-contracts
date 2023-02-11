@@ -13,6 +13,7 @@ describe('ERC721DropImplementation', function() {
       whitelisted1,
       whitelisted2,
       notWhitelisted,
+      user,
     ] = await ethers.getSigners();
 
     const whitelist = [
@@ -77,6 +78,61 @@ describe('ERC721DropImplementation', function() {
       );
     });
 
-    it('reverts if caller is not contract owner', async () => {});
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(user).updatePublicMintStage({
+          mintPrice: '100000000000000000', // 0.1 ETH
+          startTime: 1676043287, // 0.1 ETH
+          endTime: 1686043287, // 0.1 ETH
+          mintLimitPerWallet: 5,
+        }),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updateAllowlistMintStage', () => {
+    it('updates', async () => {
+      // Check current config
+      const currentConfig = await collection.allowlistMintStage();
+      expect(currentConfig.mintPrice).to.equal(0);
+      expect(currentConfig.startTime).to.equal(0);
+      expect(currentConfig.endTime).to.equal(0);
+      expect(currentConfig.mintLimitPerWallet).to.equal(0);
+      expect(currentConfig.merkleRoot).to.equal(
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+      );
+      // Update config
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287, // 0.1 ETH
+        endTime: 1686043287, // 0.1 ETH
+        mintLimitPerWallet: 5,
+        mintLimitPerWallet: 5,
+        merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+      };
+      await collection.updateAllowlistMintStage(newConfigData);
+
+      // Check updated config
+      const updatedConfig = await collection.allowlistMintStage();
+      expect(updatedConfig.mintPrice).to.equal(newConfigData.mintPrice);
+      expect(updatedConfig.startTime).to.equal(newConfigData.startTime);
+      expect(updatedConfig.endTime).to.equal(newConfigData.endTime);
+      expect(updatedConfig.mintLimitPerWallet).to.equal(
+        newConfigData.mintLimitPerWallet,
+      );
+      expect(updatedConfig.merkleRoot).to.equal(newConfigData.merkleRoot);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(user).updateAllowlistMintStage({
+          mintPrice: '100000000000000000', // 0.1 ETH
+          startTime: 1676043287, // 0.1 ETH
+          endTime: 1686043287, // 0.1 ETH
+          mintLimitPerWallet: 5,
+          merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+        }),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
   });
 });
