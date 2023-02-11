@@ -1,13 +1,14 @@
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
+import { Contract } from 'ethers';
+import { time } from '@nomicfoundation/hardhat-network-helpers';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
+
 import { getMerkleProof, getMerkleTreeRoot } from './helpers/merkleTree';
 import { defaultBytes32 } from './helpers/consts';
-import { Contract, Signer } from 'ethers';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 describe('ERC721DropImplementation', function() {
   let collection: Contract;
-  let tokenPrice;
 
   let owner: SignerWithAddress,
     allowlistUser: SignerWithAddress,
@@ -58,6 +59,98 @@ describe('ERC721DropImplementation', function() {
 
     // Configure max supply
     await collection.updateMaxSupply(initialMaxSupply);
+  });
+
+  describe('Public mint stage', () => {
+    beforeEach(async () => {
+      const currentTimestamp = await time.latest();
+
+      // Configure public stage
+      await collection.updatePublicMintStage({
+        mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
+        startTime: currentTimestamp, // start right away
+        endTime: currentTimestamp + 86400, // last 24 hours
+        mintLimitPerWallet: 3,
+      });
+      // Increase time by 1 hour
+      await time.increase(3600);
+    });
+
+    it('mints', async () => {
+      // Mint 3 tokens
+      await collection.mintPublic(3, {
+        value: ethers.utils.parseUnits('0.3', 'ether'), // 3 * 0.1 ETH
+      });
+
+      // Check account token balance
+      expect(await collection.balanceOf(owner.address)).to.eq(3);
+    });
+
+    it('emits Minted event', async () => {
+      await expect(
+        collection.mintPublic(3, {
+          value: ethers.utils.parseUnits('0.3', 'ether'), // 3 * 0.1 ETH
+        }),
+      )
+        .to.emit(collection, 'Minted')
+        .withArgs(owner.address, 3, 0);
+    });
+
+    it('reverts if not enough ETH is provided', async () => {
+      await expect(
+        collection.mintPublic(3, {
+          value: ethers.utils.parseUnits('0.2', 'ether'),
+        }),
+      ).to.revertedWithCustomError(collection, 'IncorrectFundsProvided');
+    });
+
+    it('reverts if over mint limit per wallet', async () => {
+      // Revert if over limit in single transaction
+      await expect(
+        collection.mintPublic(4, {
+          value: ethers.utils.parseUnits('0.4', 'ether'),
+        }),
+      ).to.revertedWithCustomError(
+        collection,
+        'MintQuantityExceedsWalletLimit',
+      );
+
+      // Revert if over limit in multiple transactons
+      await collection.mintPublic(1, {
+        value: ethers.utils.parseUnits('0.1', 'ether'),
+      });
+
+      await expect(
+        collection.mintPublic(3, {
+          value: ethers.utils.parseUnits('0.3', 'ether'),
+        }),
+      ).to.revertedWithCustomError(
+        collection,
+        'MintQuantityExceedsWalletLimit',
+      );
+    });
+
+    it('reverts if over max supply', async () => {
+      // Update max supply
+      await collection.updateMaxSupply(2);
+
+      await expect(
+        collection.mintPublic(3, {
+          value: ethers.utils.parseUnits('0.3', 'ether'),
+        }),
+      ).to.revertedWithCustomError(collection, 'MintQuantityExceedsMaxSupply');
+    });
+
+    it('reverts if not active', async () => {
+      // Travel 30 hours in the future
+      await time.increase(30 * 3600);
+
+      await expect(
+        collection.mintPublic(3, {
+          value: ethers.utils.parseUnits('0.3', 'ether'),
+        }),
+      ).to.revertedWithCustomError(collection, 'StageNotActive');
+    });
   });
 
   describe('updatePublicMintStage', () => {
@@ -261,6 +354,27 @@ describe('ERC721DropImplementation', function() {
           .connect(randomUser)
           .updateProvenanceHash(ethers.utils.id('image data')),
       ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('withdrawAllFunds', () => {
+    it('withdraws', () => {});
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(randomUser).withdrawAllFunds(),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+    it('reverts if contract balance is zero', async () => {
+      await expect(collection.withdrawAllFunds()).to.be.revertedWithCustomError(
+        collection,
+        'NothingToWithdraw',
+      );
+    });
+    it('reverts if payout address is zero address', async () => {
+      await expect(collection.withdrawAllFunds()).to.be.revertedWithCustomError(
+        collection,
+        'InvalidPayoutAddress',
+      );
     });
   });
 });

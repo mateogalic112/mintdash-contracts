@@ -23,6 +23,7 @@ contract ERC721DropImplementation is
     uint256 public maxSupply;
     string public baseURI;
     bytes32 public provenanceHash;
+    address public payoutAddress;
 
     bool public operatorFiltererEnabled;
 
@@ -184,8 +185,15 @@ contract ERC721DropImplementation is
         external 
         onlyOwner 
     {
-        require(address(this).balance > 0, "No amount to withdraw");
-        payable(msg.sender).transfer(address(this).balance);
+        if(address(this).balance == 0){
+            revert NothingToWithdraw();
+        }
+
+        if(payoutAddress == address(0)){
+            revert InvalidPayoutAddress();
+        }
+
+        payable(payoutAddress).transfer(address(this).balance);
     }
 
     function supportsInterface(bytes4 interfaceId)

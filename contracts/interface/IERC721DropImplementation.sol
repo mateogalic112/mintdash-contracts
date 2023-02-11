@@ -40,6 +40,16 @@ interface IERC721DropImplementation {
     error CannotExceedMaxSupplyOfUint64();
 
     /**
+     * @dev Revert if the contract balance is zero when withdrawing funds
+    */
+    error NothingToWithdraw();
+
+    /**
+     * @dev Revert if the payout address is zero address
+    */
+    error InvalidPayoutAddress();
+
+    /**
      * @dev Emit an event when token is minted.
     */
     event Minted(address indexed recipient, uint256 indexed quantity, uint256 indexed stageIndex);
