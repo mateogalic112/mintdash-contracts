@@ -17,6 +17,7 @@ contract ERC721DropImplementation is
     OwnableUpgradeable,
     IERC721DropImplementation
 {
+
     PublicMintStage public publicMintStage;
     AllowlistMintStage public allowlistMintStage;
 
