@@ -9,9 +9,9 @@ contract ERC721Proxy is Proxy {
     
     constructor(string memory name, string memory symbol) {
         assert(_IMPLEMENTATION_SLOT == bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1));
-        StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = 0x05b9dAD3A76EED6041766645374148E7E73177af;
+        StorageSlot.getAddressSlot(_IMPLEMENTATION_SLOT).value = 0x3a5Ca42770Ef7ebAa63bbd917d27AAe52E4aF58e;
         Address.functionDelegateCall(
-            0x05b9dAD3A76EED6041766645374148E7E73177af,
+            0x3a5Ca42770Ef7ebAa63bbd917d27AAe52E4aF58e,
             abi.encodeWithSignature("initialize(string,string)", name, symbol)
         );
     }

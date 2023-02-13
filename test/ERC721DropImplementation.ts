@@ -26,6 +26,23 @@ describe('ERC721DropImplementation', function() {
     '0xE5F135b20F496189FB6C915bABc53e0A70Ff6A1f';
   const initialRoyaltiesFee = 1000;
 
+  const activatePublicStageAndMaxMint = async () => {
+    // Setup public mint stage
+    const currentTimestamp = await time.latest();
+    await collection.updatePublicMintStage({
+      mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
+      startTime: currentTimestamp, // start right away
+      endTime: currentTimestamp + 86400, // last 24 hours
+      mintLimitPerWallet: 3,
+    });
+    await time.increase(3600);
+
+    // Mint few tokens
+    await collection.mintPublic(3, {
+      value: ethers.utils.parseUnits('0.3', 'ether'),
+    });
+  };
+
   beforeEach(async function() {
     [
       owner,
@@ -149,6 +166,24 @@ describe('ERC721DropImplementation', function() {
         }),
       ).to.revertedWithCustomError(collection, 'StageNotActive');
     });
+
+    it("reverts if stage didn't start", async () => {
+      const currentTimestamp = await time.latest();
+
+      // Configure public stage
+      await collection.updatePublicMintStage({
+        mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
+        startTime: currentTimestamp + 86400, // start in 24 hours
+        endTime: currentTimestamp + 186400,
+        mintLimitPerWallet: 2,
+      });
+
+      await expect(
+        collection.mintPublic(1, {
+          value: ethers.utils.parseUnits('0.1', 'ether'),
+        }),
+      ).to.revertedWithCustomError(collection, 'StageNotActive');
+    });
   });
 
   describe('Allowlist mint stage', () => {
@@ -253,7 +288,7 @@ describe('ERC721DropImplementation', function() {
       ).to.revertedWithCustomError(collection, 'MintQuantityExceedsMaxSupply');
     });
 
-    it('reverts if not active', async () => {
+    it('reverts if stage ended', async () => {
       // Travel 30 hours in the future
       await time.increase(30 * 3600);
 
@@ -266,11 +301,36 @@ describe('ERC721DropImplementation', function() {
       ).to.revertedWithCustomError(collection, 'StageNotActive');
     });
 
+    it("reverts if stage didn't start", async () => {
+      const currentTimestamp = await time.latest();
+
+      // Configure allowlist stage
+      await collection.updateAllowlistMintStage({
+        mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
+        startTime: currentTimestamp + 86400, // start in 24 hours
+        endTime: currentTimestamp + 186400,
+        mintLimitPerWallet: 2,
+        merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+      });
+
+      await expect(
+        collection
+          .connect(allowlistUser)
+          .mintAllowlist(1, getMerkleProof(allowlist, allowlistUser.address), {
+            value: ethers.utils.parseUnits('0.1', 'ether'), // 3 * 0.1 ETH
+          }),
+      ).to.revertedWithCustomError(collection, 'StageNotActive');
+    });
+
     it('reverts if not on allowlist', async () => {
       await expect(
-        collection.mintAllowlist(1, getMerkleProof(allowlist, owner.address), {
-          value: ethers.utils.parseUnits('0.1', 'ether'), // 3 * 0.1 ETH
-        }),
+        collection.mintAllowlist(
+          1,
+          getMerkleProof(allowlist, userWithoutAllowlist.address),
+          {
+            value: ethers.utils.parseUnits('0.1', 'ether'), // 3 * 0.1 ETH
+          },
+        ),
       ).to.revertedWithCustomError(collection, 'InvalidProof');
     });
 
@@ -323,6 +383,21 @@ describe('ERC721DropImplementation', function() {
         }),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
+
+    it('emits PublicMintStageUpdated', async () => {
+      // Update config
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287,
+        endTime: 1686043287,
+        mintLimitPerWallet: 5,
+      };
+
+      await expect(collection.updatePublicMintStage(newConfigData)).to.emit(
+        collection,
+        'PublicMintStageUpdated',
+      );
+    });
   });
 
   describe('updateAllowlistMintStage', () => {
@@ -367,6 +442,22 @@ describe('ERC721DropImplementation', function() {
         }),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
+
+    it('emits AllowlistMintStageUpdated', async () => {
+      // Update config
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287, // 0.1 ETH
+        endTime: 1686043287, // 0.1 ETH
+        mintLimitPerWallet: 5,
+        merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+      };
+
+      await expect(collection.updateAllowlistMintStage(newConfigData)).to.emit(
+        collection,
+        'AllowlistMintStageUpdated',
+      );
+    });
   });
 
   describe('updateMaxSupply', () => {
@@ -387,6 +478,21 @@ describe('ERC721DropImplementation', function() {
         collection.connect(randomUser).updateMaxSupply(1500),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
+
+    it('reverts if max supply exceeds uint64', async () => {
+      await expect(
+        collection.updateMaxSupply('18446744073709551616'),
+      ).to.be.revertedWithCustomError(
+        collection,
+        'CannotExceedMaxSupplyOfUint64',
+      );
+    });
+
+    it('emits MaxSupplyUpdated', async () => {
+      await expect(collection.updateMaxSupply(500))
+        .to.be.emit(collection, 'MaxSupplyUpdated')
+        .withArgs(500);
+    });
   });
 
   describe('updateOperatorFilterer', () => {
@@ -405,6 +511,12 @@ describe('ERC721DropImplementation', function() {
       await expect(
         collection.connect(randomUser).updateOperatorFilterer(true),
       ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('emits OperatorFiltererEnabledUpdated', async () => {
+      await expect(collection.updateOperatorFilterer(true))
+        .to.emit(collection, 'OperatorFiltererEnabledUpdated')
+        .withArgs(true);
     });
   });
 
@@ -429,6 +541,28 @@ describe('ERC721DropImplementation', function() {
             'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/',
           ),
       ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('emits BatchMetadataUpdate if tokens exist', async () => {
+      // Mint tokens
+      await activatePublicStageAndMaxMint();
+
+      await expect(
+        collection.updateBaseURI(
+          'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/',
+        ),
+      )
+        .to.emit(collection, 'BatchMetadataUpdate')
+        .withArgs(1, 3);
+    });
+
+    it('emits BaseURIUpdated', async () => {
+      // Update base URI
+      const newBaseURI = 'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/';
+
+      await expect(collection.updateBaseURI(newBaseURI))
+        .to.emit(collection, 'BaseURIUpdated')
+        .withArgs(newBaseURI);
     });
   });
 
@@ -509,29 +643,9 @@ describe('ERC721DropImplementation', function() {
   });
 
   describe('withdrawAllFunds', () => {
-    const fundContract = async () => {
-      // Setup public mint stage
-      const currentTimestamp = await time.latest();
-      await collection.updatePublicMintStage({
-        mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
-        startTime: currentTimestamp, // start right away
-        endTime: currentTimestamp + 86400, // last 24 hours
-        mintLimitPerWallet: 3,
-      });
-      await time.increase(3600);
-
-      // Mint few tokens
-      await collection.mintPublic(3, {
-        value: ethers.utils.parseUnits('0.3', 'ether'),
-      });
-
-      await collection.connect(allowlistUser).mintPublic(3, {
-        value: ethers.utils.parseUnits('0.3', 'ether'),
-      });
-    };
     it('withdraws', async () => {
       // Fund contract
-      await fundContract();
+      await activatePublicStageAndMaxMint();
 
       // Setup payout address
       await collection.updatePayoutAddress(allowlistUser2.address);
@@ -539,7 +653,7 @@ describe('ERC721DropImplementation', function() {
       // Withdraw and check balance change
       await expect(() => collection.withdrawAllFunds()).to.changeEtherBalance(
         allowlistUser2,
-        ethers.utils.parseUnits('0.6', 'ether'),
+        ethers.utils.parseUnits('0.3', 'ether'),
       );
     });
 
@@ -558,7 +672,7 @@ describe('ERC721DropImplementation', function() {
 
     it('reverts if payout address is zero address', async () => {
       // Fund contract
-      await fundContract();
+      await activatePublicStageAndMaxMint();
 
       await expect(collection.withdrawAllFunds()).to.be.revertedWithCustomError(
         collection,
