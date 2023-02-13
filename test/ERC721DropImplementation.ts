@@ -5,7 +5,7 @@ import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import { getMerkleProof, getMerkleTreeRoot } from './helpers/merkleTree';
-import { defaultBytes32 } from './helpers/consts';
+import { NULL_BYTES32, NULL_ADDRESS } from './helpers/consts';
 
 describe('ERC721DropImplementation', function() {
   let collection: Contract;
@@ -333,7 +333,7 @@ describe('ERC721DropImplementation', function() {
       expect(currentConfig.startTime).to.equal(0);
       expect(currentConfig.endTime).to.equal(0);
       expect(currentConfig.mintLimitPerWallet).to.equal(0);
-      expect(currentConfig.merkleRoot).to.equal(defaultBytes32);
+      expect(currentConfig.merkleRoot).to.equal(NULL_BYTES32);
 
       // Update config
       const newConfigData = {
@@ -470,7 +470,7 @@ describe('ERC721DropImplementation', function() {
   describe('updateProvenanceHash', () => {
     it('updates', async () => {
       // Check provenance hash
-      expect(await collection.provenanceHash()).to.eq(defaultBytes32);
+      expect(await collection.provenanceHash()).to.eq(NULL_BYTES32);
 
       // Update provenance hash
       const newProvenanceHash = ethers.utils.id('image data');
@@ -485,6 +485,25 @@ describe('ERC721DropImplementation', function() {
         collection
           .connect(randomUser)
           .updateProvenanceHash(ethers.utils.id('image data')),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+  });
+
+  describe('updatePayoutAddress', () => {
+    it('updates', async () => {
+      // Check payout address
+      expect(await collection.payoutAddress()).to.eq(NULL_ADDRESS);
+
+      // Update payout address
+      await collection.updatePayoutAddress(owner.address);
+
+      // Check updated provenance hash
+      expect(await collection.payoutAddress()).to.eq(owner.address);
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      await expect(
+        collection.connect(randomUser).updatePayoutAddress(randomUser.address),
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
   });

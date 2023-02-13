@@ -1,5 +1,6 @@
 import '@nomicfoundation/hardhat-chai-matchers';
 import '@nomiclabs/hardhat-etherscan';
+import '@primitivefi/hardhat-dodoc';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 import 'solidity-coverage';
@@ -39,6 +40,10 @@ const config = {
     currency: 'USD',
     gasPrice: 25,
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+  },
+  dodoc: {
+    runOnCompile: true,
+    include: ['ERC721DropImplementation'],
   },
 };
 
