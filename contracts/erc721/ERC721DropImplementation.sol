@@ -1,41 +1,34 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.18;
+pragma solidity 0.8.17;
 
-import 'erc721a-upgradeable/contracts/ERC721AUpgradeable.sol';
-import '@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol';
+import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
+
+import { PublicMintStage, AllowlistMintStage } from "../lib/ERC721DropStructs.sol";
+import { IERC721DropImplementation } from "../interface/IERC721DropImplementation.sol";
 
 contract ERC721DropImplementation is 
     ERC721AUpgradeable, 
     ERC2981Upgradeable, 
     DefaultOperatorFiltererUpgradeable, 
-    OwnableUpgradeable 
+    OwnableUpgradeable,
+    IERC721DropImplementation
 {
+    PublicMintStage public publicMintStage;
+    AllowlistMintStage public allowlistMintStage;
+
+    uint256 public maxSupply;
     string public baseURI;
-    bytes32 public merkleRoot;
-    bool public isOperatorFiltererEnabled;
+    bytes32 public provenanceHash;
+    address public payoutAddress;
 
-    struct SaleConfig {
-        bool mintActive;
-        bool whitelistMintActive;
+    bool public operatorFiltererEnabled;
 
-        uint64 tokenPrice;
-        uint64 tokenMaxSupply;
-        uint64 publicMintLimit;
-        uint64 whitelistMintLimit;
-    }
-
-    SaleConfig public saleConfig;
-
-    error InvalidCaller();
-    error MintingDisabled();
-    error NoMoreTokensLeft();
-    error InvalidValueProvided();
-    error MintLimitExceeded();
-    error NotWhitelisted();
-    error ContractSealed();
+    uint256 internal constant PUBLIC_STAGE_INDEX = 0;
+    uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
 
     function initialize(
         string memory _name,
@@ -48,34 +41,40 @@ contract ERC721DropImplementation is
         __DefaultOperatorFilterer_init();
     }
 
-    function mint(uint256 quantity, bytes32[] calldata merkleProof)
+    function mintPublic(uint256 quantity) 
+        external 
+        payable 
+    {
+        // Ensure that public mint stage is active
+        _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
+
+        // Ensure correct mint quantity
+        _checkMintQuantity(quantity, publicMintStage.mintLimitPerWallet);
+
+         // Ensure enough ETH is provided
+        _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
+
+        _mintBase(msg.sender, quantity, PUBLIC_STAGE_INDEX);
+    }
+
+    function mintAllowlist(uint256 quantity, bytes32[] calldata merkleProof) 
         external
         payable
     {
-        // Revert if mint didn't start yet
-        if (!saleConfig.mintActive) revert MintingDisabled();
+        // Ensure that allowlist mint stage is active
+        _checkStageActive(allowlistMintStage.startTime, allowlistMintStage.endTime);
 
-        // Revert if total supply will exceed the limit
-        if (_totalMinted() + quantity > saleConfig.tokenMaxSupply) revert NoMoreTokensLeft();
+         // Ensure correct mint quantity
+        _checkMintQuantity(quantity, allowlistMintStage.mintLimitPerWallet);
 
-        // Revert if not enough ETH is sent
-        if (msg.value < saleConfig.tokenPrice * quantity) revert InvalidValueProvided();
+        // Ensure enough ETH is provided
+        _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
-        uint256 balanceAfterMint = _getAux(msg.sender) + quantity;
-
-        if (saleConfig.whitelistMintActive) {
-            // Revert if final token balance is above whitelist limit
-            if (balanceAfterMint > saleConfig.whitelistMintLimit) revert MintLimitExceeded();
-
-            // Revert if merkle proof is not valid
-            if (!MerkleProof.verifyCalldata(merkleProof, merkleRoot, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
-        } else {
-            // Revert if final token balance is above public limit
-            if (balanceAfterMint > saleConfig.publicMintLimit) revert MintLimitExceeded();
+        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(msg.sender)))){
+            revert InvalidProof();
         }
 
-        _setAux(msg.sender, uint64(balanceAfterMint));
-        _safeMint(msg.sender, quantity);
+        _mintBase(msg.sender, quantity, ALLOWLIST_STAGE_INDEX);
     }
 
     function burn(uint256 tokenId) external {
@@ -96,57 +95,112 @@ contract ERC721DropImplementation is
             }
         }
 
-        if (_totalMinted() > saleConfig.tokenMaxSupply) revert NoMoreTokensLeft();
+        if (_totalMinted() > maxSupply) {
+            revert MintQuantityExceedsMaxSupply();
+        } 
     }
 
     function amountMinted(address user) external view returns (uint64) {
         return _getAux(user);
     }
 
-    function toggleMinting() external onlyOwner {
-        saleConfig.mintActive = !saleConfig.mintActive;
+    function updatePublicMintStage(PublicMintStage calldata publicMintStageData) 
+        external 
+        onlyOwner 
+    {
+        publicMintStage = publicMintStageData;
+
+        emit PublicMintStageUpdated(publicMintStageData);
     }
 
-    function toggleWhitelistOnly() external onlyOwner {
-        saleConfig.whitelistMintActive = !saleConfig.whitelistMintActive;
+    function updateAllowlistMintStage(AllowlistMintStage calldata allowlistMintStageData) 
+        external 
+        onlyOwner 
+    {
+        allowlistMintStage = allowlistMintStageData;
+
+        emit AllowlistMintStageUpdated(allowlistMintStageData);
     }
 
-    function toggleOperatorFilterer() external onlyOwner{
-        isOperatorFiltererEnabled = !isOperatorFiltererEnabled;
+    function updateMaxSupply(uint256 newMaxSupply) 
+        external 
+        onlyOwner
+    {
+        // Ensure the max supply does not exceed the maximum value of uint64.
+        if (newMaxSupply > 2**64 - 1) {
+            revert CannotExceedMaxSupplyOfUint64();
+        }
+
+        maxSupply = newMaxSupply;
+
+        emit MaxSupplyUpdated(newMaxSupply);
     }
 
-    function setTokenPrice(uint64 tokenPrice) external onlyOwner {
-        saleConfig.tokenPrice = tokenPrice;
+    function updateOperatorFilterer(bool enabled) 
+        external 
+        onlyOwner
+    {
+        operatorFiltererEnabled = enabled;
+
+        emit OperatorFiltererEnabledUpdated(enabled);
     }
 
-    function setWhitelist(bytes32 _merkleRoot) external onlyOwner {
-        merkleRoot = _merkleRoot;
-    }
-
-    function setMintLimits(
-        uint64 tokenMaxSupply,
-        uint64 publicMintLimit,
-        uint64 whitelistMintLimit
-    ) external onlyOwner {
-        saleConfig.tokenMaxSupply = tokenMaxSupply;
-        saleConfig.publicMintLimit = publicMintLimit;
-        saleConfig.whitelistMintLimit = whitelistMintLimit;
-    }
-
-    function setBaseURI(string calldata newUri) external onlyOwner {
+    function updateBaseURI(string calldata newUri) 
+        external
+        onlyOwner 
+    {
         baseURI = newUri;
+
+        if (totalSupply() != 0) {
+            emit BatchMetadataUpdate(1, _nextTokenId() - 1);
+        }
+
+        emit BaseURIUpdated(newUri);
     }
 
-    function setRoyalties(address receiver, uint96 feeNumerator)
+    function updateRoyalties(address receiver, uint96 feeNumerator)
         external
         onlyOwner
     {
         _setDefaultRoyalty(receiver, feeNumerator);
+
+        emit RoyaltiesUpdated(receiver, feeNumerator);
     }
 
-    function withdrawAllFunds() external onlyOwner {
-        require(address(this).balance > 0, "No amount to withdraw");
-        payable(msg.sender).transfer(address(this).balance);
+    function updateProvenanceHash(bytes32 newProvenanceHash) 
+        external
+        onlyOwner 
+    {
+        // Ensure mint did not start
+        if (_totalMinted() > 0) {
+            revert ProvenanceHashCannotBeUpdatedAfterMintStarted();
+        }
+
+        provenanceHash = newProvenanceHash;
+
+        emit ProvenanceHashUpdated(newProvenanceHash);
+    }
+
+    function updatePayoutAddress(address newPayoutAddress)
+        external
+        onlyOwner 
+    {
+        payoutAddress = newPayoutAddress;
+    }
+
+    function withdrawAllFunds() 
+        external 
+        onlyOwner 
+    {
+        if(address(this).balance == 0){
+            revert NothingToWithdraw();
+        }
+
+        if(payoutAddress == address(0)){
+            revert InvalidPayoutAddress();
+        }
+
+        payable(payoutAddress).transfer(address(this).balance);
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -160,17 +214,67 @@ contract ERC721DropImplementation is
             ERC2981Upgradeable.supportsInterface(interfaceId);
     }
     
-    function _beforeTokenTransfers(
-        address from,
-        address to,
-        uint256 startTokenId,
-        uint256 quantity
-    ) internal virtual override{
-        if(isOperatorFiltererEnabled){
+    function setApprovalForAll(address operator, bool approved) 
+        public 
+        override 
+    {
+        super.setApprovalForAll(operator, approved);
+    }
+
+    function approve(address operator, uint256 tokenId) 
+        public 
+        payable 
+        override 
+    {
+
+        if(operatorFiltererEnabled){
          _checkFilterOperator(msg.sender);
         }
+        super.approve(operator, tokenId);
+    }
 
-        super._beforeTokenTransfers(from, to, startTokenId, quantity);
+    function transferFrom(address from, address to, uint256 tokenId) 
+        public 
+        payable 
+        override 
+    {
+        if (from != msg.sender && operatorFiltererEnabled) {
+            _checkFilterOperator(msg.sender);
+        }
+        super.transferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId) 
+        public 
+        payable 
+        override  
+    {
+         if (from != msg.sender && operatorFiltererEnabled) {
+            _checkFilterOperator(msg.sender);
+        }
+        super.safeTransferFrom(from, to, tokenId);
+    }
+
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data)
+        payable 
+        public
+        override
+    {
+         if (from != msg.sender && operatorFiltererEnabled) {
+            _checkFilterOperator(msg.sender);
+        }
+        super.safeTransferFrom(from, to, tokenId, data);
+    }
+
+    function _mintBase(address recipient, uint256 quantity, uint256 mintStageIndex)
+        internal
+    {
+        uint256 balanceAfterMint = _getAux(recipient) + quantity;
+
+        _setAux(recipient, uint64(balanceAfterMint));
+        _safeMint(recipient, quantity);
+
+        emit Minted(recipient, quantity, mintStageIndex);
     }
 
     function _baseURI() internal view override returns (string memory) {
@@ -179,5 +283,44 @@ contract ERC721DropImplementation is
 
     function _startTokenId() internal pure override returns (uint256) {
         return 1;
+    }
+    
+    function _checkFunds(uint256 funds, uint256 quantity, uint256 tokenPrice) internal pure {
+        // Ensure enough ETH is sent
+        if (funds < tokenPrice * quantity) {
+            revert IncorrectFundsProvided();
+        }
+    }
+
+    function _checkMintQuantity(uint256 quantity, uint256 walletLimit) internal view {
+        // Ensure max supply is not exceeded
+        if (_totalMinted() + quantity > maxSupply){
+            revert MintQuantityExceedsMaxSupply();
+        }
+
+        // Ensure wallet limit is not exceeded
+        uint256 balanceAfterMint = _getAux(msg.sender) + quantity;
+        if (balanceAfterMint > walletLimit){
+             revert MintQuantityExceedsWalletLimit();
+        }
+    }
+
+    function _checkStageActive(uint256 startTime, uint256 endTime) 
+        internal 
+        view 
+    {
+        if (
+            _cast(block.timestamp < startTime) |
+                _cast(block.timestamp > endTime) ==
+            1
+        ) {
+            revert StageNotActive(block.timestamp, startTime, endTime);
+        }
+    }
+
+    function _cast(bool b) internal pure returns (uint256 u) {
+        assembly {
+            u := b
+        }
     }
 }

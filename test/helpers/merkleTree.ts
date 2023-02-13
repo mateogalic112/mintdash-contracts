@@ -1,7 +1,7 @@
-const { MerkleTree } = require('merkletreejs');
-const keccak256 = require('keccak256');
+import { MerkleTree } from 'merkletreejs';
+import keccak256 from 'keccak256';
 
-const getMerkleProof = (whitelist, addr) => {
+const getMerkleProof = (whitelist: string[], addr: string) => {
   const leaves = whitelist.map(addr => keccak256(addr));
   const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
   const leaf = keccak256(addr);
@@ -9,11 +9,11 @@ const getMerkleProof = (whitelist, addr) => {
   return proof;
 };
 
-const getMerkleTreeRoot = whitelist => {
+const getMerkleTreeRoot = (whitelist: string[]) => {
   const leaves = whitelist.map(addr => keccak256(addr));
   const tree = new MerkleTree(leaves, keccak256, { sortPairs: true });
   const root = tree.getRoot().toString('hex');
   return root;
 };
 
-module.exports = { getMerkleProof, getMerkleTreeRoot };
+export { getMerkleProof, getMerkleTreeRoot };
