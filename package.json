@@ -6,7 +6,10 @@
     "compile": "yarn hardhat compile",
     "test": "yarn hardhat test --typecheck",
     "size": "yarn hardhat size-contracts",
-    "coverage": "yarn hardhat coverage --network hardhat"
+    "lint:sol": "yarn solhint ‘contracts/**/*.sol’",
+    "lint:ts": "yarn eslint .",
+    "coverage": "yarn hardhat coverage --network hardhat",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.1",
@@ -23,12 +26,16 @@
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
     "chai": "4.3.7",
     "dotenv": "^16.0.3",
+    "eslint": "^8.34.0",
     "ethers": "5.7.2",
     "hardhat": "^2.12.7",
     "hardhat-contract-sizer": "^2.7.0",
     "hardhat-gas-reporter": "^1.0.9",
+    "husky": "^8.0.3",
     "keccak256": "^1.0.6",
     "merkletreejs": "^0.3.9",
     "solhint": "^3.3.8",
