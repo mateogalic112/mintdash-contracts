@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -21,6 +21,8 @@ contract ERC721DropImplementation is
     PublicMintStage public publicMintStage;
     AllowlistMintStage public allowlistMintStage;
 
+    mapping(address payer => bool allowed) public allowedPayers;
+
     uint256 public maxSupply;
     string public baseURI;
     bytes32 public provenanceHash;
@@ -30,6 +32,8 @@ contract ERC721DropImplementation is
 
     uint256 internal constant PUBLIC_STAGE_INDEX = 0;
     uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
+
+    uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
 
     function initialize(
         string memory _name,
@@ -42,40 +46,64 @@ contract ERC721DropImplementation is
         __DefaultOperatorFilterer_init();
     }
 
-    function mintPublic(uint256 quantity) 
+    function mintPublic(address recipient, uint256 quantity) 
         external 
         payable 
     {
+         // Get the minter address. Default to msg.sender.
+        address minter = recipient != address(0)
+            ? recipient
+            : msg.sender;
+
+        // Ensure the payer is allowed if not caller
+        if (minter != msg.sender) {
+            if (!allowedPayers[msg.sender]) {
+                revert PayerNotAllowed();
+            }
+        }
+
         // Ensure that public mint stage is active
         _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
 
         // Ensure correct mint quantity
-        _checkMintQuantity(quantity, publicMintStage.mintLimitPerWallet);
+        _checkMintQuantity(quantity, publicMintStage.mintLimitPerWallet, UNLIMITED_MAX_SUPPLY_FOR_STAGE);
 
          // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
 
-        _mintBase(msg.sender, quantity, PUBLIC_STAGE_INDEX);
+        _mintBase(minter, quantity, PUBLIC_STAGE_INDEX);
     }
 
-    function mintAllowlist(uint256 quantity, bytes32[] calldata merkleProof) 
+    function mintAllowlist(address recipient, uint256 quantity, bytes32[] calldata merkleProof) 
         external
         payable
     {
+         // Get the minter address. Default to msg.sender.
+        address minter = recipient != address(0)
+            ? recipient
+            : msg.sender;
+
+        // Ensure the payer is allowed if not caller
+        if (minter != msg.sender) {
+            if (!allowedPayers[msg.sender]) {
+                revert PayerNotAllowed();
+            }
+        }
+
         // Ensure that allowlist mint stage is active
         _checkStageActive(allowlistMintStage.startTime, allowlistMintStage.endTime);
 
          // Ensure correct mint quantity
-        _checkMintQuantity(quantity, allowlistMintStage.mintLimitPerWallet);
+        _checkMintQuantity(quantity, allowlistMintStage.mintLimitPerWallet, allowlistMintStage.maxSupplyForStage);
 
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
-        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(msg.sender)))){
+        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(minter)))){
             revert InvalidProof();
         }
 
-        _mintBase(msg.sender, quantity, ALLOWLIST_STAGE_INDEX);
+        _mintBase(minter, quantity, ALLOWLIST_STAGE_INDEX);
     }
 
     function burn(uint256 tokenId) external {
@@ -189,6 +217,13 @@ contract ERC721DropImplementation is
         payoutAddress = newPayoutAddress;
     }
 
+     function updatePayer(address payer, bool isAllowed)
+        external
+        onlyOwner 
+    {
+        allowedPayers[payer] = isAllowed;
+    }
+
     function withdrawAllFunds() 
         external 
         onlyOwner 
@@ -293,7 +328,7 @@ contract ERC721DropImplementation is
         }
     }
 
-    function _checkMintQuantity(uint256 quantity, uint256 walletLimit) internal view {
+    function _checkMintQuantity(uint256 quantity, uint256 walletLimit, uint256 maxSupplyForStage) internal view {
         // Ensure max supply is not exceeded
         if (_totalMinted() + quantity > maxSupply){
             revert MintQuantityExceedsMaxSupply();
@@ -303,6 +338,11 @@ contract ERC721DropImplementation is
         uint256 balanceAfterMint = _getAux(msg.sender) + quantity;
         if (balanceAfterMint > walletLimit){
              revert MintQuantityExceedsWalletLimit();
+        }
+
+         // Ensure max supply for stage is not exceeded
+        if (quantity + totalSupply() > maxSupplyForStage) {
+            revert MintQuantityExceedsMaxSupplyForStage();
         }
     }
 

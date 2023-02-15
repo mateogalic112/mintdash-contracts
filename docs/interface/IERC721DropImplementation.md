@@ -68,7 +68,7 @@ Burns a token.
 ### mintAllowlist
 
 ```solidity
-function mintAllowlist(uint256 quantity, bytes32[] merkleProof) external payable
+function mintAllowlist(address recipient, uint256 quantity, bytes32[] merkleProof) external payable
 ```
 
 Mint an allowlist stage.
@@ -79,13 +79,14 @@ Mint an allowlist stage.
 
 | Name | Type | Description |
 |---|---|---|
+| recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 | merkleProof | bytes32[] | Valid Merkle proof. |
 
 ### mintPublic
 
 ```solidity
-function mintPublic(uint256 quantity) external payable
+function mintPublic(address recipient, uint256 quantity) external payable
 ```
 
 Mint a public stage.
@@ -96,6 +97,7 @@ Mint a public stage.
 
 | Name | Type | Description |
 |---|---|---|
+| recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
 ### updateAllowlistMintStage
@@ -162,13 +164,30 @@ Enabled or disables operator filter for Opensea royalties enforcement.
 |---|---|---|
 | enabled | bool | If operator filter is enabled. |
 
+### updatePayer
+
+```solidity
+function updatePayer(address payer, bool isAllowed) external nonpayable
+```
+
+Updates allowed payers.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payer | address | If payer is allowed. |
+| isAllowed | bool | undefined |
+
 ### updateProvenanceHash
 
 ```solidity
 function updateProvenanceHash(bytes32 newProvenanceHash) external nonpayable
 ```
 
-Updated provenance hash. This function will revert after the first item has been minted.
+Updates provenance hash. This function will revert after the first item has been minted.
 
 
 
@@ -433,6 +452,17 @@ error MintQuantityExceedsMaxSupply()
 *Revert if mint quantity exceeds max supply of the collection.*
 
 
+### MintQuantityExceedsMaxSupplyForStage
+
+```solidity
+error MintQuantityExceedsMaxSupplyForStage()
+```
+
+
+
+*Revert if mint quantity exceeds max supply for stage.*
+
+
 ### MintQuantityExceedsWalletLimit
 
 ```solidity
@@ -453,6 +483,17 @@ error NothingToWithdraw()
 
 
 *Revert if the contract balance is zero when withdrawing funds*
+
+
+### PayerNotAllowed
+
+```solidity
+error PayerNotAllowed()
+```
+
+
+
+*Revert if the payout address is zero address*
 
 
 ### ProvenanceHashCannotBeUpdatedAfterMintStarted

@@ -27,10 +27,32 @@ Mints tokens to addresses.
 | to | address[] | List of addresses to receive tokens. |
 | quantity | uint64[] | List of quantities to assign to each address. |
 
+### allowedPayers
+
+```solidity
+function allowedPayers(address payer) external view returns (bool allowed)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payer | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| allowed | bool | undefined |
+
 ### allowlistMintStage
 
 ```solidity
-function allowlistMintStage() external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, bytes32 merkleRoot)
+function allowlistMintStage() external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
 ```
 
 
@@ -46,6 +68,7 @@ function allowlistMintStage() external view returns (uint80 mintPrice, uint48 st
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
+| maxSupplyForStage | uint40 | undefined |
 | merkleRoot | bytes32 | undefined |
 
 ### amountMinted
@@ -224,7 +247,7 @@ function maxSupply() external view returns (uint256)
 ### mintAllowlist
 
 ```solidity
-function mintAllowlist(uint256 quantity, bytes32[] merkleProof) external payable
+function mintAllowlist(address recipient, uint256 quantity, bytes32[] merkleProof) external payable
 ```
 
 Mint an allowlist stage.
@@ -235,13 +258,14 @@ Mint an allowlist stage.
 
 | Name | Type | Description |
 |---|---|---|
+| recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 | merkleProof | bytes32[] | Valid Merkle proof. |
 
 ### mintPublic
 
 ```solidity
-function mintPublic(uint256 quantity) external payable
+function mintPublic(address recipient, uint256 quantity) external payable
 ```
 
 Mint a public stage.
@@ -252,6 +276,7 @@ Mint a public stage.
 
 | Name | Type | Description |
 |---|---|---|
+| recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
 ### name
@@ -646,6 +671,23 @@ Enabled or disables operator filter for Opensea royalties enforcement.
 |---|---|---|
 | enabled | bool | If operator filter is enabled. |
 
+### updatePayer
+
+```solidity
+function updatePayer(address payer, bool isAllowed) external nonpayable
+```
+
+Updates allowed payers.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payer | address | If payer is allowed. |
+| isAllowed | bool | undefined |
+
 ### updatePayoutAddress
 
 ```solidity
@@ -668,7 +710,7 @@ function updatePayoutAddress(address newPayoutAddress) external nonpayable
 function updateProvenanceHash(bytes32 newProvenanceHash) external nonpayable
 ```
 
-Updated provenance hash. This function will revert after the first item has been minted.
+Updates provenance hash. This function will revert after the first item has been minted.
 
 
 
@@ -734,7 +776,7 @@ event AllowlistMintStageUpdated(AllowlistMintStage indexed data)
 
 
 
-
+*Emit an event when allowlist mint stage configuration is updated.*
 
 #### Parameters
 
@@ -750,7 +792,7 @@ event Approval(address indexed owner, address indexed approved, uint256 indexed 
 
 
 
-
+*Emitted when `owner` enables `approved` to manage the `tokenId` token.*
 
 #### Parameters
 
@@ -768,7 +810,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 
 
 
-
+*Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.*
 
 #### Parameters
 
@@ -786,7 +828,7 @@ event BaseURIUpdated(string indexed baseURI)
 
 
 
-
+*Emit an event when base URI of the collection is updated.*
 
 #### Parameters
 
@@ -802,14 +844,14 @@ event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId)
 
 
 
-
+*Emit an event for token metadata reveals/updates,      according to EIP-4906.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| _fromTokenId  | uint256 | undefined |
-| _toTokenId  | uint256 | undefined |
+| _fromTokenId  | uint256 | The start token id. |
+| _toTokenId  | uint256 | The end token id. |
 
 ### ConsecutiveTransfer
 
@@ -819,7 +861,7 @@ event ConsecutiveTransfer(uint256 indexed fromTokenId, uint256 toTokenId, addres
 
 
 
-
+*Emitted when tokens in `fromTokenId` to `toTokenId` (inclusive) is transferred from `from` to `to`, as defined in the [ERC2309](https://eips.ethereum.org/EIPS/eip-2309) standard. See {_mintERC2309} for more details.*
 
 #### Parameters
 
@@ -838,7 +880,7 @@ event Initialized(uint8 version)
 
 
 
-
+*Triggered when the contract has been initialized or reinitialized.*
 
 #### Parameters
 
@@ -854,7 +896,7 @@ event MaxSupplyUpdated(uint256 indexed maxSupply)
 
 
 
-
+*Emit an event when max supply of the collection is updated.*
 
 #### Parameters
 
@@ -870,7 +912,7 @@ event Minted(address indexed recipient, uint256 indexed quantity, uint256 indexe
 
 
 
-
+*Emit an event when token is minted.*
 
 #### Parameters
 
@@ -888,7 +930,7 @@ event OperatorFiltererEnabledUpdated(bool indexed enabled)
 
 
 
-
+*Emit an event when operator filterer is enabled or disabled.*
 
 #### Parameters
 
@@ -921,7 +963,7 @@ event ProvenanceHashUpdated(bytes32 indexed provenanceHash)
 
 
 
-
+*Emit an event when provenance hash is updated.*
 
 #### Parameters
 
@@ -937,7 +979,7 @@ event PublicMintStageUpdated(PublicMintStage indexed data)
 
 
 
-
+*Emit an event when public mint stage configuration is updated.*
 
 #### Parameters
 
@@ -953,7 +995,7 @@ event RoyaltiesUpdated(address indexed receiver, uint96 indexed feeNumerator)
 
 
 
-
+*Emit an event when royalties are updated.*
 
 #### Parameters
 
@@ -970,7 +1012,7 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 
-
+*Emitted when `tokenId` token is transferred from `from` to `to`.*
 
 #### Parameters
 
@@ -1083,6 +1125,17 @@ error MintQuantityExceedsMaxSupply()
 *Revert if mint quantity exceeds max supply of the collection.*
 
 
+### MintQuantityExceedsMaxSupplyForStage
+
+```solidity
+error MintQuantityExceedsMaxSupplyForStage()
+```
+
+
+
+*Revert if mint quantity exceeds max supply for stage.*
+
+
 ### MintQuantityExceedsWalletLimit
 
 ```solidity
@@ -1163,6 +1216,17 @@ error OwnershipNotInitializedForExtraData()
 The `extraData` cannot be set on an unintialized ownership slot.
 
 
+
+
+### PayerNotAllowed
+
+```solidity
+error PayerNotAllowed()
+```
+
+
+
+*Revert if the payout address is zero address*
 
 
 ### ProvenanceHashCannotBeUpdatedAfterMintStarted

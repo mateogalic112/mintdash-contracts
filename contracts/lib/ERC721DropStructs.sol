@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 /**
  * @notice A struct for configuration of public mint stage.
@@ -25,12 +25,14 @@ struct PublicMintStage {
  * @param endTIme                  The end time of the stage, must not be zero.
  * @param mintLimitPerWallet       Maximum total number of mints a user is
  *                                 allowed.
- * @param merkleRoot                Merkle root of all allowed addresses.
+ * @param maxSupplyForStage        Maximum allowed supply to be minted in this stage.
+ * @param merkleRoot               Merkle root of all allowed addresses.
  */
 struct AllowlistMintStage {
     uint80 mintPrice; 
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;
+    uint40 maxSupplyForStage;
     bytes32 merkleRoot;
 }

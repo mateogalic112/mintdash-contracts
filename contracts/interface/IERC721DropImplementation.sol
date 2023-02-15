@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity 0.8.18;
 
 import { PublicMintStage, AllowlistMintStage } from "../lib/ERC721DropStructs.sol";
 
@@ -30,6 +30,11 @@ interface IERC721DropImplementation {
     error MintQuantityExceedsMaxSupply();
 
     /**
+    * @dev Revert if mint quantity exceeds max supply for stage.
+    */
+    error MintQuantityExceedsMaxSupplyForStage();
+
+    /**
     * @dev Revert if provenance hash is being updated after tokens have been minted.
     */
     error ProvenanceHashCannotBeUpdatedAfterMintStarted();
@@ -48,6 +53,11 @@ interface IERC721DropImplementation {
      * @dev Revert if the payout address is zero address
     */
     error InvalidPayoutAddress();
+
+    /**
+     * @dev Revert if the payout address is zero address
+    */
+    error PayerNotAllowed();
 
     /**
      * @dev Emit an event when token is minted.
@@ -101,17 +111,19 @@ interface IERC721DropImplementation {
     /**
      * @notice Mint a public stage.
      *
+     * @param recipient Recipient of tokens.
      * @param quantity Number of tokens to mint.
      */
-    function mintPublic(uint256 quantity) external payable;
+    function mintPublic(address recipient, uint256 quantity) external payable;
 
     /**
      * @notice Mint an allowlist stage.
      *
+     * @param recipient Recipient of tokens.
      * @param quantity Number of tokens to mint.
      * @param merkleProof Valid Merkle proof.
      */
-    function mintAllowlist(uint256 quantity, bytes32[] calldata merkleProof) external payable;
+    function mintAllowlist(address recipient, uint256 quantity, bytes32[] calldata merkleProof) external payable;
     
     /**
      * @notice Burns a token.
@@ -179,12 +191,20 @@ interface IERC721DropImplementation {
     function updateRoyalties(address receiver, uint96 feeNumerator) external;
 
     /**
-     * @notice Updated provenance hash.
+     * @notice Updates provenance hash.
                This function will revert after the first item has been minted.
      *
      * @param newProvenanceHash The new provenance hash to set.
      */
     function updateProvenanceHash(bytes32 newProvenanceHash) external;
+
+    /**
+     * @notice Updates allowed payers.
+     *
+     * @param payer Payer to be updated.
+     * @param payer If payer is allowed.
+     */
+    function updatePayer(address payer, bool isAllowed) external;
 
     /**
      * @notice Withdraws all funds from the contract.
