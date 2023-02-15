@@ -449,7 +449,7 @@ describe('ERC721DropImplementation', function() {
         mintPrice: '100000000000000000', // 0.1 ETH
         startTime: 1676043287, // 0.1 ETH
         endTime: 1686043287, // 0.1 ETH
-        mintLimitPerWallet: 5,
+        mintLimitPerWallet: 0,
         merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
       };
 
