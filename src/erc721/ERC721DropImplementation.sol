@@ -310,7 +310,7 @@ contract ERC721DropImplementation is
         if(newPayoutAddress == address(0)){
             revert PayoutAddressCannotBeZeroAddress();
         }
-        
+
         payoutAddress = newPayoutAddress;
     }
 
@@ -448,15 +448,15 @@ contract ERC721DropImplementation is
         view 
     {
         if (
-            _cast(block.timestamp < startTime) |
-                _cast(block.timestamp > endTime) ==
+            _toUint256(block.timestamp < startTime) |
+                _toUint256(block.timestamp > endTime) ==
             1
         ) {
             revert StageNotActive(block.timestamp, startTime, endTime);
         }
     }
 
-    function _cast(bool b) internal pure returns (uint256 u) {
+    function _toUint256(bool b) internal pure returns (uint256 u) {
         assembly {
             u := b
         }
