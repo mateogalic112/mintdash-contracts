@@ -1201,7 +1201,7 @@ error InvalidPayoutAddress()
 
 
 
-*Revert if the payout address is zero address*
+*Revert if the payout address is zero address.*
 
 
 ### MintERC2309QuantityExceedsLimit
@@ -1278,7 +1278,7 @@ error NothingToWithdraw()
 
 
 
-*Revert if the contract balance is zero when withdrawing funds*
+*Revert if the contract balance is zero when withdrawing funds.*
 
 
 ### OperatorNotAllowed
@@ -1327,7 +1327,18 @@ error PayerNotAllowed()
 
 
 
-*Revert if the payout address is zero address*
+*Revert if the payout address is zero address.*
+
+
+### PayoutAddressCannotBeZeroAddress
+
+```solidity
+error PayoutAddressCannotBeZeroAddress()
+```
+
+
+
+*Revert if payout address is zero address when updating payout address.*
 
 
 ### ProvenanceHashCannotBeUpdatedAfterMintStarted
@@ -1358,6 +1369,17 @@ error StageNotActive(uint256 blockTimestamp, uint256 startTime, uint256 endTime)
 | blockTimestamp | uint256 | undefined |
 | startTime | uint256 | undefined |
 | endTime | uint256 | undefined |
+
+### TokenGatedNftContractCannotBeZeroAddress
+
+```solidity
+error TokenGatedNftContractCannotBeZeroAddress()
+```
+
+
+
+*Revert if NFT contract is zero address when updating token gated mint stage.*
+
 
 ### TokenGatedNotTokenOwner
 

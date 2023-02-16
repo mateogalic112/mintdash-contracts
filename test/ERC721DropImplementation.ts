@@ -5,7 +5,7 @@ import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
 import { getMerkleProof, getMerkleTreeRoot } from './helpers/merkleTree';
-import { NULL_BYTES32, NULL_ADDRESS } from './helpers/consts';
+import { ZERO_ADDRESS, ZERO_BYTES32 } from './helpers/consts';
 
 describe('ERC721DropImplementation', function() {
   let collection: Contract;
@@ -796,7 +796,7 @@ describe('ERC721DropImplementation', function() {
       expect(currentConfig.startTime).to.equal(0);
       expect(currentConfig.endTime).to.equal(0);
       expect(currentConfig.mintLimitPerWallet).to.equal(0);
-      expect(currentConfig.merkleRoot).to.equal(NULL_BYTES32);
+      expect(currentConfig.merkleRoot).to.equal(ZERO_BYTES32);
 
       // Update config
       const newConfigData = {
@@ -1062,7 +1062,7 @@ describe('ERC721DropImplementation', function() {
   describe('updateProvenanceHash', () => {
     it('updates', async () => {
       // Check provenance hash
-      expect(await collection.provenanceHash()).to.eq(NULL_BYTES32);
+      expect(await collection.provenanceHash()).to.eq(ZERO_BYTES32);
 
       // Update provenance hash
       const newProvenanceHash = ethers.utils.id('image data');
@@ -1084,7 +1084,7 @@ describe('ERC721DropImplementation', function() {
   describe('updatePayoutAddress', () => {
     it('updates', async () => {
       // Check payout address
-      expect(await collection.payoutAddress()).to.eq(NULL_ADDRESS);
+      expect(await collection.payoutAddress()).to.eq(ZERO_ADDRESS);
 
       // Update payout address
       await collection.updatePayoutAddress(owner.address);
@@ -1097,6 +1097,15 @@ describe('ERC721DropImplementation', function() {
       await expect(
         collection.connect(randomUser).updatePayoutAddress(randomUser.address),
       ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('reverts if payout address is zero address', async () => {
+      await expect(
+        collection.updatePayoutAddress(ZERO_ADDRESS),
+      ).to.be.revertedWithCustomError(
+        collection,
+        'PayoutAddressCannotBeZeroAddress',
+      );
     });
   });
 

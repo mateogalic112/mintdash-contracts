@@ -235,6 +235,10 @@ contract ERC721DropImplementation is
         external 
         onlyOwner 
     {
+        if (nftContract == address(0)) {
+            revert TokenGatedNftContractCannotBeZeroAddress();
+        }
+
         tokenGatedMintStages[nftContract] = tokenGatedMintStageData;
 
         emit TokenGatedMintStageUpdated(nftContract, tokenGatedMintStageData);
@@ -303,6 +307,10 @@ contract ERC721DropImplementation is
         external
         onlyOwner 
     {
+        if(newPayoutAddress == address(0)){
+            revert PayoutAddressCannotBeZeroAddress();
+        }
+        
         payoutAddress = newPayoutAddress;
     }
 

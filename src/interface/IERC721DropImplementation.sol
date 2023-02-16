@@ -23,6 +23,7 @@ interface IERC721DropImplementation {
     * @dev Revert if token id is already redeemed for token gated mint stage.
     */
     error TokenGatedTokenAlreadyRedeemed();
+
     /**
     * @dev Revert if supplied ETH value is not valid for the mint.
     */
@@ -54,19 +55,29 @@ interface IERC721DropImplementation {
     error CannotExceedMaxSupplyOfUint64();
 
     /**
-     * @dev Revert if the contract balance is zero when withdrawing funds
+     * @dev Revert if the contract balance is zero when withdrawing funds.
     */
     error NothingToWithdraw();
 
     /**
-     * @dev Revert if the payout address is zero address
+     * @dev Revert if the payout address is zero address.
     */
     error InvalidPayoutAddress();
 
     /**
-     * @dev Revert if the payout address is zero address
+     * @dev Revert if the payout address is zero address.
     */
     error PayerNotAllowed();
+
+    /**
+     * @dev Revert if NFT contract is zero address when updating token gated mint stage.
+    */
+    error TokenGatedNftContractCannotBeZeroAddress();
+
+    /**
+     * @dev Revert if payout address is zero address when updating payout address.
+    */
+    error PayoutAddressCannotBeZeroAddress();
 
     /**
      * @dev Emit an event when token is minted.
