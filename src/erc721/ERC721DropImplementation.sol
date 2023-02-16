@@ -7,7 +7,8 @@ import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol"
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
 
-import { PublicMintStage, AllowlistMintStage } from "../lib/ERC721DropStructs.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { PublicMintStage, AllowlistMintStage, TokenGatedMintStage } from "../lib/ERC721DropStructs.sol";
 import { IERC721DropImplementation } from "../interface/IERC721DropImplementation.sol";
 
 contract ERC721DropImplementation is 
@@ -20,8 +21,12 @@ contract ERC721DropImplementation is
 
     PublicMintStage public publicMintStage;
     AllowlistMintStage public allowlistMintStage;
+    mapping(address nftContract => TokenGatedMintStage mintStage) public tokenGatedMintStages;
+    mapping(address nftContract => mapping(uint256 tokenId => bool redeemed)) private _tokenGatedTokenRedeems;
 
     mapping(address payer => bool allowed) public allowedPayers;
+    mapping(address minter => mapping(address nftContract=> mapping(uint256 tokenId => bool redeemed)))
+        private _tokenHolderRedeemed;
 
     uint256 public maxSupply;
     string public baseURI;
@@ -32,6 +37,7 @@ contract ERC721DropImplementation is
 
     uint256 internal constant PUBLIC_STAGE_INDEX = 0;
     uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
+    uint256 internal constant TOKEN_GATED_STAGE_INDEX = 2;
 
     uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
 
@@ -100,13 +106,75 @@ contract ERC721DropImplementation is
         _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
         if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(minter)))){
-            revert InvalidProof();
+            revert AllowlistStageInvalidProof();
         }
 
         _mintBase(minter, quantity, ALLOWLIST_STAGE_INDEX);
     }
 
-    function burn(uint256 tokenId) external {
+     function mintTokenGated(address recipient, address nftContract, uint256[] calldata tokenIds) 
+        external
+        payable
+    {
+         // Get the minter address. Default to msg.sender.
+        address minter = recipient != address(0)
+            ? recipient
+            : msg.sender;
+
+        // Ensure the payer is allowed if not caller
+        if (minter != msg.sender) {
+            if (!allowedPayers[msg.sender]) {
+                revert PayerNotAllowed();
+            }
+        }
+
+        // Get token gated mint stage for NFT contract
+        TokenGatedMintStage memory tokenGatedMintStage = tokenGatedMintStages[nftContract];
+
+        // For easier access
+        uint256 quantity = tokenIds.length;
+
+        // Ensure that token holder mint stage is active
+        _checkStageActive(tokenGatedMintStage.startTime, tokenGatedMintStage.endTime);
+
+        // Ensure correct mint quantity
+        _checkMintQuantity(quantity, tokenGatedMintStage.mintLimitPerWallet, tokenGatedMintStage.maxSupplyForStage);
+
+        // Ensure enough ETH is provided
+        _checkFunds(msg.value, quantity, tokenGatedMintStage.mintPrice);
+
+        // Iterate through each tokenIds to make sure it's not already claimed
+        for (uint256 i = 0; i < quantity;) {
+            // For easier and cheaper access.
+            uint256 tokenId = tokenIds[i];
+
+            // Check that the minter is the owner of the tokenId.
+            if (IERC721(nftContract).ownerOf(tokenId) != minter) {
+                revert TokenGatedNotTokenOwner();
+            }
+
+            // For easier and cheaper access.
+            mapping(uint256 => bool) storage redeemedTokenIds = _tokenGatedTokenRedeems[nftContract];
+
+            // Check that the token id has not already been redeemed.
+            if (redeemedTokenIds[tokenId]) {
+                revert TokenGatedTokenAlreadyRedeemed();
+            }
+
+            // Mark the token id as redeemed.
+            redeemedTokenIds[tokenId] = true;
+
+            unchecked {
+                ++i;
+            }
+        }
+        
+        _mintBase(minter, quantity, TOKEN_GATED_STAGE_INDEX);
+    }
+
+    function burn(uint256 tokenId) 
+        external 
+    {
         _burn(tokenId, true);
     }
 
@@ -129,8 +197,20 @@ contract ERC721DropImplementation is
         } 
     }
 
-    function amountMinted(address user) external view returns (uint64) {
+    function getAmountMinted(address user) 
+        external 
+        view 
+        returns (uint64) 
+    {
         return _getAux(user);
+    }
+
+    function getTokenGatedIsRedeemed(address nftContract, uint256 tokenId) 
+        external 
+        view 
+        returns (bool) 
+    {
+        return _tokenGatedTokenRedeems[nftContract][tokenId];
     }
 
     function updatePublicMintStage(PublicMintStage calldata publicMintStageData) 
@@ -149,6 +229,15 @@ contract ERC721DropImplementation is
         allowlistMintStage = allowlistMintStageData;
 
         emit AllowlistMintStageUpdated(allowlistMintStageData);
+    }
+
+    function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage calldata tokenGatedMintStageData) 
+        external 
+        onlyOwner 
+    {
+        tokenGatedMintStages[nftContract] = tokenGatedMintStageData;
+
+        emit TokenGatedMintStageUpdated(nftContract, tokenGatedMintStageData);
     }
 
     function updateMaxSupply(uint256 newMaxSupply) 

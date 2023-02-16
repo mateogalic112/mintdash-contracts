@@ -76,7 +76,7 @@ describe('ERC721DropImplementation', function() {
     await collection.updateMaxSupply(initialMaxSupply);
   });
 
-  describe('Public mint stage', () => {
+  describe('mintPublic', () => {
     beforeEach(async () => {
       const currentTimestamp = await time.latest();
 
@@ -208,7 +208,7 @@ describe('ERC721DropImplementation', function() {
     });
   });
 
-  describe('Allowlist mint stage', () => {
+  describe('mintAllowlist', () => {
     beforeEach(async () => {
       const currentTimestamp = await time.latest();
 
@@ -487,7 +487,7 @@ describe('ERC721DropImplementation', function() {
             value: ethers.utils.parseUnits('0.1', 'ether'), // 3 * 0.1 ETH
           },
         ),
-      ).to.revertedWithCustomError(collection, 'InvalidProof');
+      ).to.revertedWithCustomError(collection, 'AllowlistStageInvalidProof');
     });
 
     it('reverts if using proof from other user on the allowlist', async () => {
@@ -502,7 +502,234 @@ describe('ERC721DropImplementation', function() {
               value: ethers.utils.parseUnits('0.1', 'ether'), // 3 * 0.1 ETH
             },
           ),
-      ).to.revertedWithCustomError(collection, 'InvalidProof');
+      ).to.revertedWithCustomError(collection, 'AllowlistStageInvalidProof');
+    });
+  });
+
+  describe('mintTokenGated', () => {
+    let testERC721: Contract;
+
+    beforeEach(async () => {
+      // Deploy test NFT collection
+      const TestERC721 = await ethers.getContractFactory('TestERC721');
+      testERC721 = await TestERC721.deploy();
+      await testERC721.deployed();
+
+      // Mint 5 NFTS to owner
+      await testERC721.mint(owner.address, 5);
+
+      // Configure public stage
+      const currentTimestamp = await time.latest();
+      await collection.updateTokenGatedMintStage(testERC721.address, {
+        mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
+        startTime: currentTimestamp, // start right away
+        endTime: currentTimestamp + 86400, // last 24 hours
+        mintLimitPerWallet: 3,
+        maxSupplyForStage: 100,
+      });
+
+      // Increase time by 1 hour
+      await time.increase(3600);
+    });
+
+    it('mints', async () => {
+      // Mint 3 tokens
+      await collection.mintTokenGated(
+        owner.address,
+        testERC721.address,
+        [1, 2, 3],
+        {
+          value: ethers.utils.parseUnits('0.3', 'ether'), // 3 * 0.1 ETH
+        },
+      );
+
+      // Check account token balance
+      expect(await collection.balanceOf(owner.address)).to.eq(3);
+    });
+
+    it('mints with allowed payer', async () => {
+      // Setup payer
+      await collection.updatePayer(randomUser.address, true);
+
+      // Mint 3 tokens to owner address with payer
+      await collection
+        .connect(randomUser)
+        .mintTokenGated(owner.address, testERC721.address, [1, 2, 3], {
+          value: ethers.utils.parseUnits('0.3', 'ether'), // 3 * 0.1 ETH
+        });
+
+      // Check account token balance
+      expect(await collection.balanceOf(owner.address)).to.eq(3);
+      expect(await collection.balanceOf(randomUser.address)).to.eq(0);
+    });
+
+    it('emits Minted event', async () => {
+      await expect(
+        collection.mintTokenGated(
+          owner.address,
+          testERC721.address,
+          [1, 2, 3],
+          {
+            value: ethers.utils.parseUnits('0.3', 'ether'), // 3 * 0.1 ETH
+          },
+        ),
+      )
+        .to.emit(collection, 'Minted')
+        .withArgs(owner.address, 3, 2);
+    });
+
+    it('reverts if not owner of the token', async () => {
+      await expect(
+        collection
+          .connect(randomUser)
+          .mintTokenGated(randomUser.address, testERC721.address, [1, 2, 3], {
+            value: ethers.utils.parseUnits('0.3', 'ether'),
+          }),
+      ).to.revertedWithCustomError(collection, 'TokenGatedNotTokenOwner');
+    });
+
+    it('reverts if token is already redeemed', async () => {
+      // Redeem for 2 NFTs
+      await collection.mintTokenGated(
+        owner.address,
+        testERC721.address,
+        [1, 2],
+        {
+          value: ethers.utils.parseUnits('0.2', 'ether'),
+        },
+      );
+
+      await expect(
+        collection.mintTokenGated(owner.address, testERC721.address, [1], {
+          value: ethers.utils.parseUnits('0.2', 'ether'),
+        }),
+      ).to.revertedWithCustomError(
+        collection,
+        'TokenGatedTokenAlreadyRedeemed',
+      );
+    });
+
+    it('reverts with unallowed payer', async () => {
+      await expect(
+        collection
+          .connect(randomUser)
+          .mintTokenGated(owner.address, testERC721.address, [1, 2, 3], {
+            value: ethers.utils.parseUnits('0.3', 'ether'), // 3 * 0.1 ETH
+          }),
+      ).to.revertedWithCustomError(collection, 'PayerNotAllowed');
+    });
+
+    it('reverts if not enough ETH is provided', async () => {
+      await expect(
+        collection.mintTokenGated(
+          owner.address,
+          testERC721.address,
+          [1, 2, 3],
+          {
+            value: ethers.utils.parseUnits('0.2', 'ether'),
+          },
+        ),
+      ).to.revertedWithCustomError(collection, 'IncorrectFundsProvided');
+    });
+
+    it('reverts if over mint limit per wallet', async () => {
+      // Revert if over limit in single transaction
+      await expect(
+        collection.mintTokenGated(
+          owner.address,
+          testERC721.address,
+          [1, 2, 3, 4],
+          {
+            value: ethers.utils.parseUnits('0.4', 'ether'),
+          },
+        ),
+      ).to.revertedWithCustomError(
+        collection,
+        'MintQuantityExceedsWalletLimit',
+      );
+
+      // Revert if over limit in multiple transactons
+      await collection.mintTokenGated(owner.address, testERC721.address, [1], {
+        value: ethers.utils.parseUnits('0.1', 'ether'),
+      });
+
+      await expect(
+        collection.mintTokenGated(
+          owner.address,
+          testERC721.address,
+          [2, 3, 4],
+          {
+            value: ethers.utils.parseUnits('0.3', 'ether'),
+          },
+        ),
+      ).to.revertedWithCustomError(
+        collection,
+        'MintQuantityExceedsWalletLimit',
+      );
+    });
+
+    it('reverts if over max supply', async () => {
+      // Update max supply
+      await collection.updateMaxSupply(2);
+
+      await expect(
+        collection.mintTokenGated(
+          owner.address,
+          testERC721.address,
+          [1, 2, 3],
+          {
+            value: ethers.utils.parseUnits('0.3', 'ether'),
+          },
+        ),
+      ).to.revertedWithCustomError(collection, 'MintQuantityExceedsMaxSupply');
+    });
+
+    it('reverts if stage ended', async () => {
+      // Travel 30 hours in the future
+      await time.increase(30 * 3600);
+
+      await expect(
+        collection.mintTokenGated(
+          owner.address,
+          testERC721.address,
+          [1, 2, 3],
+          {
+            value: ethers.utils.parseUnits('0.3', 'ether'),
+          },
+        ),
+      ).to.revertedWithCustomError(collection, 'StageNotActive');
+    });
+
+    it("reverts if stage didn't start", async () => {
+      const currentTimestamp = await time.latest();
+
+      // Configure public stage
+      await collection.updateTokenGatedMintStage(testERC721.address, {
+        mintPrice: ethers.utils.parseUnits('0.1', 'ether'),
+        startTime: currentTimestamp + 86400, // start in 24 hours
+        endTime: currentTimestamp + 186400,
+        mintLimitPerWallet: 2,
+        maxSupplyForStage: 1000,
+      });
+
+      await expect(
+        collection.mintTokenGated(owner.address, testERC721.address, [1], {
+          value: ethers.utils.parseUnits('0.1', 'ether'),
+        }),
+      ).to.revertedWithCustomError(collection, 'StageNotActive');
+    });
+  });
+
+  describe('getAmountMinted', () => {
+    it('returns', async () => {
+      // Check current state
+      expect(await collection.getAmountMinted(owner.address)).to.eq(0);
+
+      // Mint 3 NFTs
+      await activatePublicStageAndMaxMint();
+
+      // Check updated state
+      expect(await collection.getAmountMinted(owner.address)).eq(3);
     });
   });
 
@@ -621,6 +848,73 @@ describe('ERC721DropImplementation', function() {
         collection,
         'AllowlistMintStageUpdated',
       );
+    });
+  });
+
+  describe('updateTokenGatedMintStage', () => {
+    it('updates', async () => {
+      // Check current config
+      const randomAddress = randomUser.address;
+      const currentConfig = await collection.tokenGatedMintStages(
+        randomAddress,
+      );
+      expect(currentConfig.mintPrice).to.equal(0);
+      expect(currentConfig.startTime).to.equal(0);
+      expect(currentConfig.endTime).to.equal(0);
+      expect(currentConfig.mintLimitPerWallet).to.equal(0);
+
+      // Update config
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287, // 0.1 ETH
+        endTime: 1686043287, // 0.1 ETH
+        mintLimitPerWallet: 5,
+        maxSupplyForStage: 4000,
+      };
+      await collection.updateTokenGatedMintStage(randomAddress, newConfigData);
+
+      // Check updated config
+      const updatedConfig = await collection.tokenGatedMintStages(
+        randomAddress,
+      );
+      expect(updatedConfig.mintPrice).to.equal(newConfigData.mintPrice);
+      expect(updatedConfig.startTime).to.equal(newConfigData.startTime);
+      expect(updatedConfig.endTime).to.equal(newConfigData.endTime);
+      expect(updatedConfig.mintLimitPerWallet).to.equal(
+        newConfigData.mintLimitPerWallet,
+      );
+    });
+
+    it('reverts if caller is not contract owner', async () => {
+      const randomAddress = randomUser.address;
+
+      await expect(
+        collection
+          .connect(randomUser)
+          .updateTokenGatedMintStage(randomAddress, {
+            mintPrice: '100000000000000000', // 0.1 ETH
+            startTime: 1676043287, // 0.1 ETH
+            endTime: 1686043287, // 0.1 ETH
+            mintLimitPerWallet: 5,
+            maxSupplyForStage: 4000,
+          }),
+      ).to.be.revertedWith('Ownable: caller is not the owner');
+    });
+
+    it('emits TokenGatedMintStageUpdated', async () => {
+      // Update config
+      const randomAddress = randomUser.address;
+      const newConfigData = {
+        mintPrice: '100000000000000000', // 0.1 ETH
+        startTime: 1676043287, // 0.1 ETH
+        endTime: 1686043287, // 0.1 ETH
+        mintLimitPerWallet: 5,
+        maxSupplyForStage: 4000,
+      };
+
+      await expect(
+        collection.updateTokenGatedMintStage(randomAddress, newConfigData),
+      ).to.emit(collection, 'TokenGatedMintStageUpdated');
     });
   });
 

@@ -71,28 +71,6 @@ function allowlistMintStage() external view returns (uint80 mintPrice, uint48 st
 | maxSupplyForStage | uint40 | undefined |
 | merkleRoot | bytes32 | undefined |
 
-### amountMinted
-
-```solidity
-function amountMinted(address user) external view returns (uint64)
-```
-
-Returns number of tokens minted for address.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| user | address | The address of user to check minted amount for. |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | uint64 | undefined |
-
 ### approve
 
 ```solidity
@@ -165,6 +143,28 @@ Burns a token.
 |---|---|---|
 | tokenId | uint256 | Id of the token to burn. |
 
+### getAmountMinted
+
+```solidity
+function getAmountMinted(address user) external view returns (uint64)
+```
+
+Returns number of tokens minted for address.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| user | address | The address of user to check minted amount for. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint64 | undefined |
+
 ### getApproved
 
 ```solidity
@@ -186,6 +186,29 @@ function getApproved(uint256 tokenId) external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined |
+
+### getTokenGatedIsRedeemed
+
+```solidity
+function getTokenGatedIsRedeemed(address nftContract, uint256 tokenId) external view returns (bool)
+```
+
+Returns if token is redeemed for NFT contract.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| nftContract | address | The token gated nft contract. |
+| tokenId | uint256 | The token gated token ID to check. |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | bool | undefined |
 
 ### initialize
 
@@ -278,6 +301,24 @@ Mint a public stage.
 |---|---|---|
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
+
+### mintTokenGated
+
+```solidity
+function mintTokenGated(address recipient, address nftContract, uint256[] tokenIds) external payable
+```
+
+Mint an token gated stage.
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recipient | address | Recipient of tokens. |
+| nftContract | address | NFT collection to redeem for. |
+| tokenIds | uint256[] | Token Ids to redeem. |
 
 ### name
 
@@ -534,6 +575,32 @@ function symbol() external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
+### tokenGatedMintStages
+
+```solidity
+function tokenGatedMintStages(address nftContract) external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| nftContract | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| mintPrice | uint80 | undefined |
+| startTime | uint48 | undefined |
+| endTime | uint48 | undefined |
+| mintLimitPerWallet | uint16 | undefined |
+| maxSupplyForStage | uint40 | undefined |
+
 ### tokenURI
 
 ```solidity
@@ -753,6 +820,23 @@ Updates royalties for the collection.
 | receiver | address | New address of the royalties receiver. |
 | feeNumerator | uint96 | Royalties amount %. |
 
+### updateTokenGatedMintStage
+
+```solidity
+function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage tokenGatedMintStageData) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| nftContract | address | undefined |
+| tokenGatedMintStageData | TokenGatedMintStage | undefined |
+
 ### withdrawAllFunds
 
 ```solidity
@@ -771,7 +855,7 @@ Withdraws all funds from the contract. This function will revert if contract bal
 ### AllowlistMintStageUpdated
 
 ```solidity
-event AllowlistMintStageUpdated(AllowlistMintStage indexed data)
+event AllowlistMintStageUpdated(AllowlistMintStage data)
 ```
 
 
@@ -782,7 +866,7 @@ event AllowlistMintStageUpdated(AllowlistMintStage indexed data)
 
 | Name | Type | Description |
 |---|---|---|
-| data `indexed` | AllowlistMintStage | undefined |
+| data  | AllowlistMintStage | undefined |
 
 ### Approval
 
@@ -974,7 +1058,7 @@ event ProvenanceHashUpdated(bytes32 indexed provenanceHash)
 ### PublicMintStageUpdated
 
 ```solidity
-event PublicMintStageUpdated(PublicMintStage indexed data)
+event PublicMintStageUpdated(PublicMintStage data)
 ```
 
 
@@ -985,7 +1069,7 @@ event PublicMintStageUpdated(PublicMintStage indexed data)
 
 | Name | Type | Description |
 |---|---|---|
-| data `indexed` | PublicMintStage | undefined |
+| data  | PublicMintStage | undefined |
 
 ### RoyaltiesUpdated
 
@@ -1003,6 +1087,23 @@ event RoyaltiesUpdated(address indexed receiver, uint96 indexed feeNumerator)
 |---|---|---|
 | receiver `indexed` | address | undefined |
 | feeNumerator `indexed` | uint96 | undefined |
+
+### TokenGatedMintStageUpdated
+
+```solidity
+event TokenGatedMintStageUpdated(address indexed nftContract, TokenGatedMintStage data)
+```
+
+
+
+*Emit an event when token gated mint stage configuration is updated for NFT contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| nftContract `indexed` | address | undefined |
+| data  | TokenGatedMintStage | undefined |
 
 ### Transfer
 
@@ -1025,6 +1126,17 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 ## Errors
+
+### AllowlistStageInvalidProof
+
+```solidity
+error AllowlistStageInvalidProof()
+```
+
+
+
+*Revert if supplied merkle proof is not valid for allowlist mint stage.*
+
 
 ### ApprovalCallerNotOwnerNorApproved
 
@@ -1090,17 +1202,6 @@ error InvalidPayoutAddress()
 
 
 *Revert if the payout address is zero address*
-
-
-### InvalidProof
-
-```solidity
-error InvalidProof()
-```
-
-
-
-*Revert if supplied merkle proof is not valid for allowlist mint.*
 
 
 ### MintERC2309QuantityExceedsLimit
@@ -1257,6 +1358,28 @@ error StageNotActive(uint256 blockTimestamp, uint256 startTime, uint256 endTime)
 | blockTimestamp | uint256 | undefined |
 | startTime | uint256 | undefined |
 | endTime | uint256 | undefined |
+
+### TokenGatedNotTokenOwner
+
+```solidity
+error TokenGatedNotTokenOwner()
+```
+
+
+
+*Revert if minter is not token owner for token gated mint stage.*
+
+
+### TokenGatedTokenAlreadyRedeemed
+
+```solidity
+error TokenGatedTokenAlreadyRedeemed()
+```
+
+
+
+*Revert if token id is already redeemed for token gated mint stage.*
+
 
 ### TransferCallerNotOwnerNorApproved
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import { PublicMintStage, AllowlistMintStage } from "../lib/ERC721DropStructs.sol";
+import { PublicMintStage, AllowlistMintStage, TokenGatedMintStage } from "../lib/ERC721DropStructs.sol";
 
 interface IERC721DropImplementation {
     /**
@@ -10,10 +10,19 @@ interface IERC721DropImplementation {
     error StageNotActive(uint256 blockTimestamp, uint256 startTime, uint256 endTime);
 
     /**
-    * @dev Revert if supplied merkle proof is not valid for allowlist mint.
+    * @dev Revert if supplied merkle proof is not valid for allowlist mint stage.
     */
-    error InvalidProof();
+    error AllowlistStageInvalidProof();
 
+    /**
+    * @dev Revert if minter is not token owner for token gated mint stage.
+    */
+    error TokenGatedNotTokenOwner();
+
+    /**
+    * @dev Revert if token id is already redeemed for token gated mint stage.
+    */
+    error TokenGatedTokenAlreadyRedeemed();
     /**
     * @dev Revert if supplied ETH value is not valid for the mint.
     */
@@ -92,13 +101,18 @@ interface IERC721DropImplementation {
      /**
      * @dev Emit an event when public mint stage configuration is updated.
      */
-    event PublicMintStageUpdated(PublicMintStage indexed data);
+    event PublicMintStageUpdated(PublicMintStage data);
 
     /**
      * @dev Emit an event when allowlist mint stage configuration is updated.
      */
-    event AllowlistMintStageUpdated(AllowlistMintStage indexed data);
+    event AllowlistMintStageUpdated(AllowlistMintStage data);
 
+    /**
+     * @dev Emit an event when token gated mint stage configuration is updated for NFT contract.
+     */
+    event TokenGatedMintStageUpdated(address indexed nftContract, TokenGatedMintStage data);
+    
     /**
      * @dev Emit an event for token metadata reveals/updates,
      *      according to EIP-4906.
@@ -125,6 +139,15 @@ interface IERC721DropImplementation {
      */
     function mintAllowlist(address recipient, uint256 quantity, bytes32[] calldata merkleProof) external payable;
     
+     /**
+     * @notice Mint an token gated stage.
+     *
+     * @param recipient Recipient of tokens.
+     * @param nftContract NFT collection to redeem for.
+     * @param tokenIds Token Ids to redeem.
+     */
+    function mintTokenGated(address recipient, address nftContract, uint256[] calldata tokenIds) external payable;
+
     /**
      * @notice Burns a token.
      *
@@ -145,7 +168,15 @@ interface IERC721DropImplementation {
      *
      * @param user The address of user to check minted amount for.
      */
-    function amountMinted(address user) external view returns (uint64);
+    function getAmountMinted(address user) external view returns (uint64);
+
+    /**
+     * @notice Returns if token is redeemed for NFT contract.
+     *
+     * @param nftContract The token gated nft contract.
+     * @param tokenId The token gated token ID to check.
+     */
+    function getTokenGatedIsRedeemed(address nftContract, uint256 tokenId) external view returns (bool);
 
      /**
      * @notice Updates configuration for public mint stage.
@@ -160,6 +191,14 @@ interface IERC721DropImplementation {
      * @param allowlistMintStageData The new allowlist mint stage data to set.
      */
     function updateAllowlistMintStage(AllowlistMintStage calldata allowlistMintStageData) external;
+
+    /**
+     * @notice Updates configuration for token gated mint stage.
+     *
+     * @param nftContract Gated NFT contract address to be updated.
+     * @param tokenGatedMintStageData The new token gated mint stage data to set.
+     */
+    function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage calldata tokenGatedMintStageData) external;
 
     /**
      * @notice Updates configuration for allowlist mint stage.
