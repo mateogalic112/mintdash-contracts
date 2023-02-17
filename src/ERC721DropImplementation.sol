@@ -405,7 +405,7 @@ contract ERC721DropImplementation is
         uint256 balanceAfterMint = _getAux(recipient) + quantity;
 
         _setAux(recipient, uint64(balanceAfterMint));
-        _safeMint(recipient, quantity);
+        _mint(recipient, quantity);
 
         emit Minted(recipient, quantity, mintStageIndex);
     }
