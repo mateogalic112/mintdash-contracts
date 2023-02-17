@@ -143,6 +143,24 @@ Burns a token.
 |---|---|---|
 | tokenId | uint256 | Id of the token to burn. |
 
+### defaultRoyaltyInfo
+
+```solidity
+function defaultRoyaltyInfo() external view returns (address receiver, uint96 royaltyFraction)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| receiver | address | undefined |
+| royaltyFraction | uint96 | undefined |
+
 ### getAmountMinted
 
 ```solidity

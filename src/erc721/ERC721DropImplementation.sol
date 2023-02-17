@@ -3,13 +3,14 @@ pragma solidity 0.8.18;
 
 import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
 
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { PublicMintStage, AllowlistMintStage, TokenGatedMintStage } from "../lib/ERC721DropStructs.sol";
 import { IERC721DropImplementation } from "../interface/IERC721DropImplementation.sol";
+
+import "../royalties/ERC2981Upgradeable.sol";
 
 contract ERC721DropImplementation is 
     ERC721AUpgradeable, 
@@ -105,7 +106,7 @@ contract ERC721DropImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
-        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(minter)))){
+        if (!MerkleProof.verify(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(minter)))){
             revert AllowlistStageInvalidProof();
         }
 

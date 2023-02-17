@@ -1048,6 +1048,12 @@ describe('ERC721DropImplementation', function() {
 
       expect(updatedReceiver).to.eq(newReceiver);
       expect(updatedAmount).to.eq(ethers.utils.parseUnits('0.5', 'ether'));
+
+      // Check new default royalties
+      const defaultRoyalties = await collection.defaultRoyaltyInfo();
+
+      expect(defaultRoyalties.receiver).to.eq(newReceiver);
+      expect(defaultRoyalties.royaltyFraction).to.eq(newFeeNumerator);
     });
 
     it('reverts if caller is not contract owner', async () => {
