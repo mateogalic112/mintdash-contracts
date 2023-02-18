@@ -2,4 +2,4 @@
 
 ## ERC721Drop
 
-Docs are available [here](docs/erc721/ERC721DropImplementation.md).
+Docs are available [here](./docs/ERC721DropImplementation.md).
