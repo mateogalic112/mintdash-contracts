@@ -14,7 +14,8 @@ describe('ERC721DropImplementation', function() {
     allowlistUser: SignerWithAddress,
     allowlistUser2: SignerWithAddress,
     userWithoutAllowlist: SignerWithAddress,
-    randomUser: SignerWithAddress;
+    randomUser: SignerWithAddress,
+    admin: SignerWithAddress;
 
   let allowlist: string[];
 
@@ -50,6 +51,7 @@ describe('ERC721DropImplementation', function() {
       allowlistUser2,
       userWithoutAllowlist,
       randomUser,
+      admin,
     ] = await ethers.getSigners();
 
     allowlist = [allowlistUser.address, allowlistUser2.address];
@@ -61,7 +63,11 @@ describe('ERC721DropImplementation', function() {
     await collection.deployed();
 
     // Initialize
-    await collection.initialize('Blank Studio Collection', 'BSC');
+    await collection.initialize(
+      'Blank Studio Collection',
+      'BSC',
+      admin.address,
+    );
 
     // Configure royalties
     await collection.updateRoyalties(
@@ -769,7 +775,7 @@ describe('ERC721DropImplementation', function() {
           endTime: 1686043287,
           mintLimitPerWallet: 5,
         }),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('emits PublicMintStageUpdated', async () => {
@@ -830,7 +836,7 @@ describe('ERC721DropImplementation', function() {
           maxSupplyForStage: 4000,
           merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
         }),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('emits AllowlistMintStageUpdated', async () => {
@@ -898,7 +904,7 @@ describe('ERC721DropImplementation', function() {
             mintLimitPerWallet: 5,
             maxSupplyForStage: 4000,
           }),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('emits TokenGatedMintStageUpdated', async () => {
@@ -934,7 +940,7 @@ describe('ERC721DropImplementation', function() {
     it('reverts if caller is not contract owner', async () => {
       await expect(
         collection.connect(randomUser).updateMaxSupply(1500),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('reverts if max supply exceeds uint64', async () => {
@@ -968,7 +974,7 @@ describe('ERC721DropImplementation', function() {
     it('reverts if caller is not contract owner', async () => {
       await expect(
         collection.connect(randomUser).updateOperatorFilterer(true),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('emits OperatorFiltererEnabledUpdated', async () => {
@@ -998,7 +1004,7 @@ describe('ERC721DropImplementation', function() {
           .updateBaseURI(
             'ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/',
           ),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('emits BatchMetadataUpdate if tokens exist', async () => {
@@ -1061,7 +1067,7 @@ describe('ERC721DropImplementation', function() {
         collection
           .connect(randomUser)
           .updateRoyalties(randomUser.address, 1000),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
   });
 
@@ -1083,7 +1089,7 @@ describe('ERC721DropImplementation', function() {
         collection
           .connect(randomUser)
           .updateProvenanceHash(ethers.utils.id('image data')),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
   });
 
@@ -1102,7 +1108,7 @@ describe('ERC721DropImplementation', function() {
     it('reverts if caller is not contract owner', async () => {
       await expect(
         collection.connect(randomUser).updatePayoutAddress(randomUser.address),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('reverts if payout address is zero address', async () => {
@@ -1130,7 +1136,7 @@ describe('ERC721DropImplementation', function() {
     it('reverts if caller is not contract owner', async () => {
       await expect(
         collection.connect(randomUser).updatePayer(randomUser.address, true),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
   });
 
@@ -1152,7 +1158,7 @@ describe('ERC721DropImplementation', function() {
     it('reverts if caller is not contract owner', async () => {
       await expect(
         collection.connect(randomUser).withdrawAllFunds(),
-      ).to.be.revertedWith('Ownable: caller is not the owner');
+      ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
     });
 
     it('reverts if contract balance is zero', async () => {

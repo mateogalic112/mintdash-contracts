@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.18;
 
-import "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
+import { ERC721AUpgradeable } from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
+import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import { DefaultOperatorFiltererUpgradeable } from "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import { PublicMintStage, AllowlistMintStage, TokenGatedMintStage } from "./lib/ERC721DropStructs.sol";
 import { IERC721DropImplementation } from "./interface/IERC721DropImplementation.sol";
-import "./ERC2981Upgradeable.sol";
+import { ERC2981Upgradeable } from "./ERC2981Upgradeable.sol";
+import { AdministratedUpgradable } from "./AdministratedUpgradable.sol";
 
 contract ERC721DropImplementation is 
     ERC721AUpgradeable, 
     ERC2981Upgradeable, 
     DefaultOperatorFiltererUpgradeable, 
-    OwnableUpgradeable,
+    AdministratedUpgradable,
+    ReentrancyGuardUpgradeable,
     IERC721DropImplementation
 {
-
     PublicMintStage public publicMintStage;
     AllowlistMintStage public allowlistMintStage;
     mapping(address nftContract => TokenGatedMintStage mintStage) public tokenGatedMintStages;
@@ -43,13 +44,15 @@ contract ERC721DropImplementation is
 
     function initialize(
         string memory _name,
-        string memory _symbol
+        string memory _symbol,
+        address administrator
     ) initializerERC721A initializer external 
     {
         __ERC721A_init(_name, _symbol);
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();
+        __Administrated_init_unchained(administrator);
     }
 
     function mintPublic(address recipient, uint256 quantity) 
@@ -180,7 +183,7 @@ contract ERC721DropImplementation is
 
     function airdrop(address[] calldata to, uint64[] calldata quantity)
         external
-        onlyOwner
+        onlyOwnerOrAdministrator
     {
         address[] memory recipients = to;
 
@@ -215,7 +218,7 @@ contract ERC721DropImplementation is
 
     function updatePublicMintStage(PublicMintStage calldata publicMintStageData) 
         external 
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         publicMintStage = publicMintStageData;
 
@@ -224,7 +227,7 @@ contract ERC721DropImplementation is
 
     function updateAllowlistMintStage(AllowlistMintStage calldata allowlistMintStageData) 
         external 
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         allowlistMintStage = allowlistMintStageData;
 
@@ -233,7 +236,7 @@ contract ERC721DropImplementation is
 
     function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage calldata tokenGatedMintStageData) 
         external 
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         if (nftContract == address(0)) {
             revert TokenGatedNftContractCannotBeZeroAddress();
@@ -246,7 +249,7 @@ contract ERC721DropImplementation is
 
     function updateMaxSupply(uint256 newMaxSupply) 
         external 
-        onlyOwner
+        onlyOwnerOrAdministrator
     {
         // Ensure the max supply does not exceed the maximum value of uint64.
         if (newMaxSupply > 2**64 - 1) {
@@ -260,7 +263,7 @@ contract ERC721DropImplementation is
 
     function updateOperatorFilterer(bool enabled) 
         external 
-        onlyOwner
+        onlyOwnerOrAdministrator
     {
         operatorFiltererEnabled = enabled;
 
@@ -269,7 +272,7 @@ contract ERC721DropImplementation is
 
     function updateBaseURI(string calldata newUri) 
         external
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         baseURI = newUri;
 
@@ -282,7 +285,7 @@ contract ERC721DropImplementation is
 
     function updateRoyalties(address receiver, uint96 feeNumerator)
         external
-        onlyOwner
+        onlyOwnerOrAdministrator
     {
         _setDefaultRoyalty(receiver, feeNumerator);
 
@@ -291,7 +294,7 @@ contract ERC721DropImplementation is
 
     function updateProvenanceHash(bytes32 newProvenanceHash) 
         external
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         // Ensure mint did not start
         if (_totalMinted() > 0) {
@@ -305,7 +308,7 @@ contract ERC721DropImplementation is
 
     function updatePayoutAddress(address newPayoutAddress)
         external
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         if(newPayoutAddress == address(0)){
             revert PayoutAddressCannotBeZeroAddress();
@@ -316,14 +319,14 @@ contract ERC721DropImplementation is
 
      function updatePayer(address payer, bool isAllowed)
         external
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         allowedPayers[payer] = isAllowed;
     }
 
     function withdrawAllFunds() 
         external 
-        onlyOwner 
+        onlyOwnerOrAdministrator 
     {
         if(address(this).balance == 0){
             revert NothingToWithdraw();
@@ -401,6 +404,7 @@ contract ERC721DropImplementation is
 
     function _mintBase(address recipient, uint256 quantity, uint256 mintStageIndex)
         internal
+        nonReentrant
     {
         uint256 balanceAfterMint = _getAux(recipient) + quantity;
 

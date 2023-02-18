@@ -10,6 +10,23 @@
 
 ## Methods
 
+### administrator
+
+```solidity
+function administrator() external view returns (address)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
 ### airdrop
 
 ```solidity
@@ -231,7 +248,7 @@ Returns if token is redeemed for NFT contract.
 ### initialize
 
 ```solidity
-function initialize(string _name, string _symbol) external nonpayable
+function initialize(string _name, string _symbol, address administrator) external nonpayable
 ```
 
 
@@ -244,6 +261,7 @@ function initialize(string _name, string _symbol) external nonpayable
 |---|---|---|
 | _name | string | undefined |
 | _symbol | string | undefined |
+| administrator | address | undefined |
 
 ### isApprovedForAll
 
@@ -465,6 +483,17 @@ function publicMintStage() external view returns (uint80 mintPrice, uint48 start
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
 
+### renounceAdministration
+
+```solidity
+function renounceAdministration() external nonpayable
+```
+
+
+
+
+
+
 ### renounceOwnership
 
 ```solidity
@@ -657,6 +686,22 @@ function totalSupply() external view returns (uint256)
 | Name | Type | Description |
 |---|---|---|
 | _0 | uint256 | undefined |
+
+### transferAdministration
+
+```solidity
+function transferAdministration(address newAdmin) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newAdmin | address | undefined |
 
 ### transferFrom
 
@@ -869,6 +914,23 @@ Withdraws all funds from the contract. This function will revert if contract bal
 
 
 ## Events
+
+### AdministrationTransferred
+
+```solidity
+event AdministrationTransferred(address indexed previousAdmin, address indexed newAdmin)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| previousAdmin `indexed` | address | undefined |
+| newAdmin `indexed` | address | undefined |
 
 ### AllowlistMintStageUpdated
 
@@ -1211,6 +1273,17 @@ error IncorrectFundsProvided()
 *Revert if supplied ETH value is not valid for the mint.*
 
 
+### InvalidAdministratorAddress
+
+```solidity
+error InvalidAdministratorAddress()
+```
+
+
+
+
+
+
 ### InvalidPayoutAddress
 
 ```solidity
@@ -1297,6 +1370,28 @@ error NothingToWithdraw()
 
 
 *Revert if the contract balance is zero when withdrawing funds.*
+
+
+### OnlyAdministrator
+
+```solidity
+error OnlyAdministrator()
+```
+
+
+
+
+
+
+### OnlyOwnerOrAdministrator
+
+```solidity
+error OnlyOwnerOrAdministrator()
+```
+
+
+
+
 
 
 ### OperatorNotAllowed
