@@ -5,7 +5,11 @@ async function main() {
   console.log('🔥 Deploying ERC721Proxy with the account: ', deployer.address);
 
   const ERC721Proxy = await ethers.getContractFactory('ERC721Proxy');
-  const proxy = await ERC721Proxy.deploy('Blank NFT Studio Demo', 'BLANK');
+  const proxy = await ERC721Proxy.deploy(
+    'Funky Cats',
+    'CATS',
+    '0xFE89b64D4B0f4913a3862958918E3370101917DB',
+  );
   await proxy.deployed();
 
   console.log('🚀 ERC721Proxy deployed to: ', proxy.address);

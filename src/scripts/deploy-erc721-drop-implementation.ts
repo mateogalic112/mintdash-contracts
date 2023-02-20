@@ -12,7 +12,11 @@ async function main() {
   );
   const implementation = await ERC721DropImplementation.deploy();
   await implementation.deployed();
-  await implementation.initialize('Blank NFT Studio', 'BLANK');
+  await implementation.initialize(
+    'Blank NFT Studio',
+    'BLANK',
+    '0xFE89b64D4B0f4913a3862958918E3370101917DB',
+  );
 
   console.log(
     '🚀 ERC721DropImplementation deployed to: ',
