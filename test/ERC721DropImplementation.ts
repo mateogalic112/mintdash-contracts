@@ -767,7 +767,7 @@ describe('ERC721DropImplementation', function() {
       );
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).updatePublicMintStage({
           mintPrice: '100000000000000000', // 0.1 ETH
@@ -826,7 +826,7 @@ describe('ERC721DropImplementation', function() {
       expect(updatedConfig.merkleRoot).to.equal(newConfigData.merkleRoot);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).updateAllowlistMintStage({
           mintPrice: '100000000000000000', // 0.1 ETH
@@ -891,7 +891,7 @@ describe('ERC721DropImplementation', function() {
       );
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       const randomAddress = randomUser.address;
 
       await expect(
@@ -937,7 +937,7 @@ describe('ERC721DropImplementation', function() {
       expect(await collection.maxSupply()).to.eq(newMaxSupply);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).updateMaxSupply(1500),
       ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
@@ -971,7 +971,7 @@ describe('ERC721DropImplementation', function() {
       expect(await collection.operatorFiltererEnabled()).to.eq(true);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).updateOperatorFilterer(true),
       ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
@@ -997,7 +997,7 @@ describe('ERC721DropImplementation', function() {
       expect(await collection.baseURI()).to.eq(newBaseURI);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection
           .connect(randomUser)
@@ -1062,7 +1062,7 @@ describe('ERC721DropImplementation', function() {
       expect(defaultRoyalties.royaltyFraction).to.eq(newFeeNumerator);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection
           .connect(randomUser)
@@ -1084,7 +1084,7 @@ describe('ERC721DropImplementation', function() {
       expect(await collection.provenanceHash()).to.eq(newProvenanceHash);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection
           .connect(randomUser)
@@ -1105,7 +1105,7 @@ describe('ERC721DropImplementation', function() {
       expect(await collection.payoutAddress()).to.eq(owner.address);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).updatePayoutAddress(randomUser.address),
       ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
@@ -1133,7 +1133,7 @@ describe('ERC721DropImplementation', function() {
       expect(await collection.allowedPayers(randomUser.address)).to.eq(true);
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).updatePayer(randomUser.address, true),
       ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
@@ -1155,7 +1155,7 @@ describe('ERC721DropImplementation', function() {
       );
     });
 
-    it('reverts if caller is not contract owner', async () => {
+    it('reverts if caller is not contract owner or administrator', async () => {
       await expect(
         collection.connect(randomUser).withdrawAllFunds(),
       ).to.be.revertedWithCustomError(collection, 'OnlyOwnerOrAdministrator');
