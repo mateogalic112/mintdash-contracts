@@ -5,7 +5,6 @@ import { ERC721AUpgradeable } from "erc721a-upgradeable/contracts/ERC721AUpgrade
 import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import { DefaultOperatorFiltererUpgradeable } from "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import { PublicMintStage, AllowlistMintStage, TokenGatedMintStage } from "./lib/ERC721DropStructs.sol";
 import { IERC721DropImplementation } from "./interface/IERC721DropImplementation.sol";
@@ -17,7 +16,6 @@ contract ERC721DropImplementation is
     ERC2981Upgradeable, 
     DefaultOperatorFiltererUpgradeable, 
     AdministratedUpgradable,
-    ReentrancyGuardUpgradeable,
     IERC721DropImplementation
 {
     PublicMintStage public publicMintStage;
@@ -71,6 +69,10 @@ contract ERC721DropImplementation is
             }
         }
 
+        if(tx.origin != msg.sender) {
+            revert PayerNotAllowed();
+        }
+
         // Ensure that public mint stage is active
         _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
 
@@ -108,7 +110,7 @@ contract ERC721DropImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
-        if (!MerkleProof.verify(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(minter)))){
+        if (!MerkleProof.verifyCalldata(merkleProof, allowlistMintStage.merkleRoot, keccak256(abi.encodePacked(minter)))){
             revert AllowlistStageInvalidProof();
         }
 
@@ -404,7 +406,6 @@ contract ERC721DropImplementation is
 
     function _mintBase(address recipient, uint256 quantity, uint256 mintStageIndex)
         internal
-        nonReentrant
     {
         uint256 balanceAfterMint = _getAux(recipient) + quantity;
 
