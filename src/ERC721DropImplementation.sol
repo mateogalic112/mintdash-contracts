@@ -3,19 +3,25 @@ pragma solidity 0.8.18;
 
 import { ERC721AUpgradeable } from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import { DefaultOperatorFiltererUpgradeable } from "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
+
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import { PublicMintStage, AllowlistMintStage, TokenGatedMintStage } from "./lib/ERC721DropStructs.sol";
+
+import { AdministratedUpgradable } from "./mixins/AdministratedUpgradable.sol";
+import { ERC721ContractMetadata } from "./mixins/ERC721ContractMetadata.sol";
+import { Airdrop } from "./mixins/Airdrop.sol";
+import { PrimarySale } from "./mixins/PrimarySale.sol";
+import { OperatorFilterToggle } from "./mixins/OperatorFilterToggle.sol";
+
 import { IERC721DropImplementation } from "./interface/IERC721DropImplementation.sol";
-import { ERC2981Upgradeable } from "./ERC2981Upgradeable.sol";
-import { AdministratedUpgradable } from "./AdministratedUpgradable.sol";
 
 contract ERC721DropImplementation is 
-    ERC721AUpgradeable, 
-    ERC2981Upgradeable, 
-    DefaultOperatorFiltererUpgradeable, 
     AdministratedUpgradable,
+    ERC721ContractMetadata,
+    Airdrop,
+    PrimarySale,
+    OperatorFilterToggle,
     IERC721DropImplementation
 {
     PublicMintStage public publicMintStage;
@@ -27,13 +33,6 @@ contract ERC721DropImplementation is
     mapping(address minter => mapping(address nftContract=> mapping(uint256 tokenId => bool redeemed)))
         private _tokenHolderRedeemed;
 
-    uint256 public maxSupply;
-    string public baseURI;
-    bytes32 public provenanceHash;
-    address public payoutAddress;
-
-    bool public operatorFiltererEnabled;
-
     uint256 internal constant PUBLIC_STAGE_INDEX = 0;
     uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
     uint256 internal constant TOKEN_GATED_STAGE_INDEX = 2;
@@ -44,7 +43,7 @@ contract ERC721DropImplementation is
         string memory _name,
         string memory _symbol,
         address administrator
-    ) initializerERC721A initializer external 
+    ) external initializerERC721A initializer  
     {
         __ERC721A_init(_name, _symbol);
         __Ownable_init();
@@ -117,7 +116,7 @@ contract ERC721DropImplementation is
         _mintBase(minter, quantity, ALLOWLIST_STAGE_INDEX);
     }
 
-     function mintTokenGated(address recipient, address nftContract, uint256[] calldata tokenIds) 
+    function mintTokenGated(address recipient, address nftContract, uint256[] calldata tokenIds) 
         external
         payable
     {
@@ -177,39 +176,6 @@ contract ERC721DropImplementation is
         _mintBase(minter, quantity, TOKEN_GATED_STAGE_INDEX);
     }
 
-    function burn(uint256 tokenId) 
-        external 
-    {
-        _burn(tokenId, true);
-    }
-
-    function airdrop(address[] calldata to, uint64[] calldata quantity)
-        external
-        onlyOwnerOrAdministrator
-    {
-        address[] memory recipients = to;
-
-        for (uint64 i = 0; i < recipients.length; ) {
-            _mint(recipients[i], quantity[i]);
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        if (_totalMinted() > maxSupply) {
-            revert MintQuantityExceedsMaxSupply();
-        } 
-    }
-
-    function getAmountMinted(address user) 
-        external 
-        view 
-        returns (uint64) 
-    {
-        return _getAux(user);
-    }
-
     function getTokenGatedIsRedeemed(address nftContract, uint256 tokenId) 
         external 
         view 
@@ -249,221 +215,61 @@ contract ERC721DropImplementation is
         emit TokenGatedMintStageUpdated(nftContract, tokenGatedMintStageData);
     }
 
-    function updateMaxSupply(uint256 newMaxSupply) 
-        external 
-        onlyOwnerOrAdministrator
+    function setApprovalForAll(address operator, bool approved) 
+       public 
+       override 
     {
-        // Ensure the max supply does not exceed the maximum value of uint64.
-        if (newMaxSupply > 2**64 - 1) {
-            revert CannotExceedMaxSupplyOfUint64();
-        }
-
-        maxSupply = newMaxSupply;
-
-        emit MaxSupplyUpdated(newMaxSupply);
+       super.setApprovalForAll(operator, approved);
     }
 
-    function updateOperatorFilterer(bool enabled) 
-        external 
-        onlyOwnerOrAdministrator
+    function approve(address operator, uint256 tokenId) 
+       public 
+       payable 
+       override
     {
-        operatorFiltererEnabled = enabled;
-
-        emit OperatorFiltererEnabledUpdated(enabled);
+       if(operatorFiltererEnabled){
+        _checkFilterOperator(msg.sender);
+       }
+       super.approve(operator, tokenId);
     }
 
-    function updateBaseURI(string calldata newUri) 
-        external
-        onlyOwnerOrAdministrator 
+    function transferFrom(address from, address to, uint256 tokenId) 
+       public 
+       payable 
+       override 
     {
-        baseURI = newUri;
-
-        if (totalSupply() != 0) {
-            emit BatchMetadataUpdate(1, _nextTokenId() - 1);
-        }
-
-        emit BaseURIUpdated(newUri);
+       if (from != msg.sender && operatorFiltererEnabled) {
+           _checkFilterOperator(msg.sender);
+       }
+       super.transferFrom(from, to, tokenId);
     }
 
-    function updateRoyalties(address receiver, uint96 feeNumerator)
-        external
-        onlyOwnerOrAdministrator
+    function safeTransferFrom(address from, address to, uint256 tokenId) 
+       public 
+       payable 
+       override  
     {
-        _setDefaultRoyalty(receiver, feeNumerator);
-
-        emit RoyaltiesUpdated(receiver, feeNumerator);
+        if (from != msg.sender && operatorFiltererEnabled) {
+           _checkFilterOperator(msg.sender);
+       }
+       super.safeTransferFrom(from, to, tokenId);
     }
 
-    function updateProvenanceHash(bytes32 newProvenanceHash) 
-        external
-        onlyOwnerOrAdministrator 
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data)
+       public
+       payable 
+       override
     {
-        // Ensure mint did not start
-        if (_totalMinted() > 0) {
-            revert ProvenanceHashCannotBeUpdatedAfterMintStarted();
-        }
-
-        provenanceHash = newProvenanceHash;
-
-        emit ProvenanceHashUpdated(newProvenanceHash);
+        if (from != msg.sender && operatorFiltererEnabled) {
+           _checkFilterOperator(msg.sender);
+       }
+       super.safeTransferFrom(from, to, tokenId, data);
     }
 
-    function updatePayoutAddress(address newPayoutAddress)
-        external
-        onlyOwnerOrAdministrator 
-    {
-        if(newPayoutAddress == address(0)){
-            revert PayoutAddressCannotBeZeroAddress();
-        }
-
-        payoutAddress = newPayoutAddress;
-    }
-
-     function updatePayer(address payer, bool isAllowed)
+    function updatePayer(address payer, bool isAllowed)
         external
         onlyOwnerOrAdministrator 
     {
         allowedPayers[payer] = isAllowed;
-    }
-
-    function withdrawAllFunds() 
-        external 
-        onlyOwnerOrAdministrator 
-    {
-        if(address(this).balance == 0){
-            revert NothingToWithdraw();
-        }
-
-        if(payoutAddress == address(0)){
-            revert InvalidPayoutAddress();
-        }
-
-        payable(payoutAddress).transfer(address(this).balance);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        override(ERC2981Upgradeable, ERC721AUpgradeable)
-        returns (bool)
-    {
-        return
-            ERC721AUpgradeable.supportsInterface(interfaceId) ||
-            ERC2981Upgradeable.supportsInterface(interfaceId);
-    }
-    
-    function setApprovalForAll(address operator, bool approved) 
-        public 
-        override 
-    {
-        super.setApprovalForAll(operator, approved);
-    }
-
-    function approve(address operator, uint256 tokenId) 
-        public 
-        payable 
-        override 
-    {
-
-        if(operatorFiltererEnabled){
-         _checkFilterOperator(msg.sender);
-        }
-        super.approve(operator, tokenId);
-    }
-
-    function transferFrom(address from, address to, uint256 tokenId) 
-        public 
-        payable 
-        override 
-    {
-        if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.transferFrom(from, to, tokenId);
-    }
-
-    function safeTransferFrom(address from, address to, uint256 tokenId) 
-        public 
-        payable 
-        override  
-    {
-         if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.safeTransferFrom(from, to, tokenId);
-    }
-
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data)
-        payable 
-        public
-        override
-    {
-         if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.safeTransferFrom(from, to, tokenId, data);
-    }
-
-    function _mintBase(address recipient, uint256 quantity, uint256 mintStageIndex)
-        internal
-    {
-        uint256 balanceAfterMint = _getAux(recipient) + quantity;
-
-        _setAux(recipient, uint64(balanceAfterMint));
-        _mint(recipient, quantity);
-
-        emit Minted(recipient, quantity, mintStageIndex);
-    }
-
-    function _baseURI() internal view override returns (string memory) {
-        return baseURI;
-    }
-
-    function _startTokenId() internal pure override returns (uint256) {
-        return 1;
-    }
-    
-    function _checkFunds(uint256 funds, uint256 quantity, uint256 tokenPrice) internal pure {
-        // Ensure enough ETH is sent
-        if (funds < tokenPrice * quantity) {
-            revert IncorrectFundsProvided();
-        }
-    }
-
-    function _checkMintQuantity(uint256 quantity, uint256 walletLimit, uint256 maxSupplyForStage) internal view {
-        // Ensure max supply is not exceeded
-        if (_totalMinted() + quantity > maxSupply){
-            revert MintQuantityExceedsMaxSupply();
-        }
-
-        // Ensure wallet limit is not exceeded
-        uint256 balanceAfterMint = _getAux(msg.sender) + quantity;
-        if (balanceAfterMint > walletLimit){
-             revert MintQuantityExceedsWalletLimit();
-        }
-
-         // Ensure max supply for stage is not exceeded
-        if (quantity + totalSupply() > maxSupplyForStage) {
-            revert MintQuantityExceedsMaxSupplyForStage();
-        }
-    }
-
-    function _checkStageActive(uint256 startTime, uint256 endTime) 
-        internal 
-        view 
-    {
-        if (
-            _toUint256(block.timestamp < startTime) |
-                _toUint256(block.timestamp > endTime) ==
-            1
-        ) {
-            revert StageNotActive(block.timestamp, startTime, endTime);
-        }
-    }
-
-    function _toUint256(bool b) internal pure returns (uint256 u) {
-        assembly {
-            u := b
-        }
     }
 }

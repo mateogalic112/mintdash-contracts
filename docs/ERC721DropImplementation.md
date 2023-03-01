@@ -824,7 +824,7 @@ Updates allowed payers.
 function updatePayoutAddress(address newPayoutAddress) external nonpayable
 ```
 
-
+Updates payout address
 
 
 
@@ -832,7 +832,7 @@ function updatePayoutAddress(address newPayoutAddress) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| newPayoutAddress | address | undefined |
+| newPayoutAddress | address | New payout address. |
 
 ### updateProvenanceHash
 

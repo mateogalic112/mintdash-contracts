@@ -1178,4 +1178,19 @@ describe('ERC721DropImplementation', function() {
       );
     });
   });
+
+  describe('supportsInterface', () => {
+    it('supports ERC721', async () => {
+      expect(await collection.supportsInterface('0x80ac58cd')).to.eq(true);
+    });
+    it('supports ERC165', async () => {
+      expect(await collection.supportsInterface('0x01ffc9a7')).to.eq(true);
+    });
+    it('supports ERC721Metadata', async () => {
+      expect(await collection.supportsInterface('0x5b5e139f')).to.eq(true);
+    });
+    it('supports ERC2981', async () => {
+      expect(await collection.supportsInterface('0x2a55205a')).to.eq(true);
+    });
+  });
 });

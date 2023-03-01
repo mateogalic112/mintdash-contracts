@@ -23,7 +23,7 @@ abstract contract AdministratedUpgradable is OwnableUpgradeable {
         _;
     }
 
-     modifier onlyOwnerOrAdministrator() {
+    modifier onlyOwnerOrAdministrator() {
         if (msg.sender != owner()) {
             if (msg.sender != administrator) {
                 revert OnlyOwnerOrAdministrator();
