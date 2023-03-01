@@ -8,5 +8,8 @@ interface IAirdrop {
      * @param to List of addresses to receive tokens.
      * @param quantity List of quantities to assign to each address.
      */
-    function airdrop(address[] calldata to, uint64[] calldata quantity) external;
+    function airdrop(
+        address[] calldata to,
+        uint64[] calldata quantity
+    ) external;
 }

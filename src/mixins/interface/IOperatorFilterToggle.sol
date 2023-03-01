@@ -4,7 +4,7 @@ pragma solidity 0.8.18;
 interface IOperatorFilterToggle {
     /**
      * @dev Emit an event when operator filterer is enabled or disabled.
-    */
+     */
     event OperatorFiltererEnabledUpdated(bool indexed enabled);
 
     /**

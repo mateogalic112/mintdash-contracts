@@ -6,18 +6,23 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 abstract contract AdministratedUpgradable is OwnableUpgradeable {
     address public administrator;
 
-    event AdministrationTransferred(address indexed previousAdmin, address indexed newAdmin);
+    event AdministrationTransferred(
+        address indexed previousAdmin,
+        address indexed newAdmin
+    );
 
     error OnlyOwnerOrAdministrator();
     error OnlyAdministrator();
     error InvalidAdministratorAddress();
-  
-    function __Administrated_init_unchained(address newAdmin) internal onlyInitializing {
+
+    function __Administrated_init_unchained(
+        address newAdmin
+    ) internal onlyInitializing {
         _transferAdministration(newAdmin);
     }
 
     modifier onlyAdministrator() {
-        if(administrator != _msgSender()) {
+        if (administrator != _msgSender()) {
             revert OnlyAdministrator();
         }
         _;
@@ -36,8 +41,10 @@ abstract contract AdministratedUpgradable is OwnableUpgradeable {
         _transferAdministration(address(0));
     }
 
-    function transferAdministration(address newAdmin) public onlyOwnerOrAdministrator {
-        if(newAdmin == address(0)){
+    function transferAdministration(
+        address newAdmin
+    ) public onlyOwnerOrAdministrator {
+        if (newAdmin == address(0)) {
             revert InvalidAdministratorAddress();
         }
         _transferAdministration(newAdmin);

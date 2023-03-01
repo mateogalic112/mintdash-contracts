@@ -102,23 +102,6 @@ function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) ext
 |---|---|---|
 | allowlistMintStageData | AllowlistMintStage | undefined |
 
-### updatePayer
-
-```solidity
-function updatePayer(address payer, bool isAllowed) external nonpayable
-```
-
-Updates allowed payers.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| payer | address | If payer is allowed. |
-| isAllowed | bool | undefined |
-
 ### updatePublicMintStage
 
 ```solidity
@@ -218,17 +201,6 @@ error AllowlistStageInvalidProof()
 
 
 *Revert if supplied merkle proof is not valid for allowlist mint stage.*
-
-
-### PayerNotAllowed
-
-```solidity
-error PayerNotAllowed()
-```
-
-
-
-*Revert if the payout address is zero address.*
 
 
 ### TokenGatedNftContractCannotBeZeroAddress

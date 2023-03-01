@@ -3,7 +3,7 @@ pragma solidity 0.8.18;
 
 /**
  * @notice A struct for configuration of public mint stage.
- * 
+ *
  * @param mintPrice                The mint price per token in native token (ETH, MATIC)
  * @param startTime                The start time of the stage, must not be zero.
  * @param endTIme                  The end time of the stage, must not be zero.
@@ -11,7 +11,7 @@ pragma solidity 0.8.18;
  *                                 allowed.
  */
 struct PublicMintStage {
-    uint80 mintPrice; 
+    uint80 mintPrice;
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;
@@ -19,7 +19,7 @@ struct PublicMintStage {
 
 /**
  * @notice A struct for configuration of allowlist mint stage.
- * 
+ *
  * @param mintPrice                The mint price per token in native token (ETH, MATIC)
  * @param startTime                The start time of the stage, must not be zero.
  * @param endTIme                  The end time of the stage, must not be zero.
@@ -29,7 +29,7 @@ struct PublicMintStage {
  * @param merkleRoot               Merkle root of all allowed addresses.
  */
 struct AllowlistMintStage {
-    uint80 mintPrice; 
+    uint80 mintPrice;
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;
@@ -39,7 +39,7 @@ struct AllowlistMintStage {
 
 /**
  * @notice A struct for configuration of token gated mint stage.
- * 
+ *
  * @param mintPrice                The mint price per token in native token (ETH, MATIC)
  * @param startTime                The start time of the stage, must not be zero.
  * @param endTIme                  The end time of the stage, must not be zero.
@@ -48,7 +48,7 @@ struct AllowlistMintStage {
  * @param maxSupplyForStage        Maximum allowed supply to be minted in this stage.
  */
 struct TokenGatedMintStage {
-    uint80 mintPrice; 
+    uint80 mintPrice;
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;
