@@ -8,7 +8,7 @@ async function main() {
     );
 
     const ERC721Proxy = await ethers.getContractFactory("ERC721Proxy");
-    const proxy = await ERC721Proxy.deploy("Funky Cats", "CATS");
+    const proxy = await ERC721Proxy.deploy("Blank Demo", "DEMO");
     await proxy.deployed();
 
     console.log("🚀 ERC721Proxy deployed to: ", proxy.address);
