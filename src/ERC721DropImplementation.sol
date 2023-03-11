@@ -43,14 +43,12 @@ contract ERC721DropImplementation is
 
     function initialize(
         string memory _name,
-        string memory _symbol,
-        address administrator
+        string memory _symbol
     ) external initializerERC721A initializer {
         __ERC721A_init(_name, _symbol);
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();
-        __Administrated_init_unchained(administrator);
     }
 
     function mintPublic(address recipient, uint256 quantity) external payable {

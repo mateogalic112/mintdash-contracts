@@ -248,7 +248,7 @@ Returns if token is redeemed for NFT contract.
 ### initialize
 
 ```solidity
-function initialize(string _name, string _symbol, address administrator) external nonpayable
+function initialize(string _name, string _symbol) external nonpayable
 ```
 
 
@@ -261,7 +261,6 @@ function initialize(string _name, string _symbol, address administrator) externa
 |---|---|---|
 | _name | string | undefined |
 | _symbol | string | undefined |
-| administrator | address | undefined |
 
 ### isApprovedForAll
 

@@ -15,12 +15,6 @@ abstract contract AdministratedUpgradable is OwnableUpgradeable {
     error OnlyAdministrator();
     error InvalidAdministratorAddress();
 
-    function __Administrated_init_unchained(
-        address newAdmin
-    ) internal onlyInitializing {
-        _transferAdministration(newAdmin);
-    }
-
     modifier onlyAdministrator() {
         if (administrator != _msgSender()) {
             revert OnlyAdministrator();
@@ -43,7 +37,7 @@ abstract contract AdministratedUpgradable is OwnableUpgradeable {
 
     function transferAdministration(
         address newAdmin
-    ) public onlyOwnerOrAdministrator {
+    ) public onlyOwner {
         if (newAdmin == address(0)) {
             revert InvalidAdministratorAddress();
         }
@@ -53,6 +47,6 @@ abstract contract AdministratedUpgradable is OwnableUpgradeable {
     function _transferAdministration(address newAdmin) internal {
         address oldAdmin = administrator;
         administrator = newAdmin;
-        emit OwnershipTransferred(oldAdmin, newAdmin);
+        emit AdministrationTransferred(oldAdmin, newAdmin);
     }
 }
