@@ -32,7 +32,7 @@ interface IERC721DropImplementation {
     /**
      * @dev Emit an event when allowlist mint stage configuration is updated.
      */
-    event AllowlistMintStageUpdated(AllowlistMintStage data);
+    event AllowlistMintStageUpdated(uint256 indexed allowlistStageId, AllowlistMintStage data);
 
     /**
      * @dev Emit an event when token gated mint stage configuration is updated for NFT contract.
@@ -53,11 +53,13 @@ interface IERC721DropImplementation {
     /**
      * @notice Mint an allowlist stage.
      *
+     * @param allowlistStageId ID of the allowlist stage.
      * @param recipient Recipient of tokens.
      * @param quantity Number of tokens to mint.
      * @param merkleProof Valid Merkle proof.
      */
     function mintAllowlist(
+        uint256 allowlistStageId,
         address recipient,
         uint256 quantity,
         bytes32[] calldata merkleProof
@@ -99,9 +101,11 @@ interface IERC721DropImplementation {
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
+     * @param allowlistStageId ID of the allowlist mint stage to set
      * @param allowlistMintStageData The new allowlist mint stage data to set.
      */
     function updateAllowlistMintStage(
+        uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external;
 

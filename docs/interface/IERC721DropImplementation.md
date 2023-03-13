@@ -36,7 +36,7 @@ Returns if token is redeemed for NFT contract.
 ### mintAllowlist
 
 ```solidity
-function mintAllowlist(address recipient, uint256 quantity, bytes32[] merkleProof) external payable
+function mintAllowlist(uint256 allowlistStageId, address recipient, uint256 quantity, bytes32[] merkleProof) external payable
 ```
 
 Mint an allowlist stage.
@@ -47,6 +47,7 @@ Mint an allowlist stage.
 
 | Name | Type | Description |
 |---|---|---|
+| allowlistStageId | uint256 | ID of the allowlist stage. |
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 | merkleProof | bytes32[] | Valid Merkle proof. |
@@ -89,7 +90,7 @@ Mint an token gated stage.
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage allowlistMintStageData) external nonpayable
 ```
 
 
@@ -100,6 +101,7 @@ function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) ext
 
 | Name | Type | Description |
 |---|---|---|
+| allowlistStageId | uint256 | undefined |
 | allowlistMintStageData | AllowlistMintStage | undefined |
 
 ### updatePublicMintStage
@@ -142,7 +144,7 @@ function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage toke
 ### AllowlistMintStageUpdated
 
 ```solidity
-event AllowlistMintStageUpdated(AllowlistMintStage data)
+event AllowlistMintStageUpdated(uint256 indexed allowlistStageId, AllowlistMintStage data)
 ```
 
 
@@ -153,6 +155,7 @@ event AllowlistMintStageUpdated(AllowlistMintStage data)
 
 | Name | Type | Description |
 |---|---|---|
+| allowlistStageId `indexed` | uint256 | undefined |
 | data  | AllowlistMintStage | undefined |
 
 ### PublicMintStageUpdated

@@ -25,7 +25,7 @@ contract ERC721DropImplementation is
     IERC721DropImplementation
 {
     PublicMintStage public publicMintStage;
-    AllowlistMintStage public allowlistMintStage;
+    mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage) public allowlistMintStages;
     mapping(address nftContract => TokenGatedMintStage mintStage)
         public tokenGatedMintStages;
     mapping(address nftContract => mapping(uint256 tokenId => bool redeemed))
@@ -79,6 +79,7 @@ contract ERC721DropImplementation is
     }
 
     function mintAllowlist(
+        uint256 allowlistStageId,
         address recipient,
         uint256 quantity,
         bytes32[] calldata merkleProof
@@ -88,6 +89,8 @@ contract ERC721DropImplementation is
 
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
+
+        AllowlistMintStage storage allowlistMintStage = allowlistMintStages[allowlistStageId];
 
         // Ensure that allowlist mint stage is active
         _checkStageActive(
@@ -199,11 +202,12 @@ contract ERC721DropImplementation is
     }
 
     function updateAllowlistMintStage(
+        uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external onlyOwnerOrAdministrator {
-        allowlistMintStage = allowlistMintStageData;
+        allowlistMintStages[allowlistStageId] = allowlistMintStageData;
 
-        emit AllowlistMintStageUpdated(allowlistMintStageData);
+        emit AllowlistMintStageUpdated(allowlistStageId, allowlistMintStageData);
     }
 
     function updateTokenGatedMintStage(

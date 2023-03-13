@@ -214,11 +214,12 @@ describe("ERC721DropImplementation", function () {
     });
 
     describe("mintAllowlist", () => {
+        const PREPARED_MINT_STAGE_ID = 1;
         beforeEach(async () => {
             const currentTimestamp = await time.latest();
 
             // Configure allowlist stage
-            await collection.updateAllowlistMintStage({
+            await collection.updateAllowlistMintStage(PREPARED_MINT_STAGE_ID, {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
                 startTime: currentTimestamp, // start right away
                 endTime: currentTimestamp + 86400, // last 24 hours
@@ -236,6 +237,7 @@ describe("ERC721DropImplementation", function () {
             await collection
                 .connect(allowlistUser)
                 .mintAllowlist(
+                    PREPARED_MINT_STAGE_ID,
                     allowlistUser.address,
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
@@ -256,6 +258,7 @@ describe("ERC721DropImplementation", function () {
             await collection
                 .connect(randomUser)
                 .mintAllowlist(
+                    PREPARED_MINT_STAGE_ID,
                     allowlistUser.address,
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
@@ -274,6 +277,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         2,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -291,6 +295,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(randomUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         2,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -306,6 +311,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         2,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -322,6 +328,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         3,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -338,6 +345,7 @@ describe("ERC721DropImplementation", function () {
             await collection
                 .connect(allowlistUser)
                 .mintAllowlist(
+                    PREPARED_MINT_STAGE_ID,
                     allowlistUser.address,
                     1,
                     getMerkleProof(allowlist, allowlistUser.address),
@@ -350,6 +358,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         2,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -367,7 +376,7 @@ describe("ERC721DropImplementation", function () {
             const currentTimestamp = await time.latest();
 
             // Configure allowlist stage
-            await collection.updateAllowlistMintStage({
+            await collection.updateAllowlistMintStage(PREPARED_MINT_STAGE_ID, {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
                 startTime: currentTimestamp, // start right away
                 endTime: currentTimestamp + 86400, // last 24 hours
@@ -383,6 +392,7 @@ describe("ERC721DropImplementation", function () {
             await collection
                 .connect(allowlistUser)
                 .mintAllowlist(
+                    PREPARED_MINT_STAGE_ID,
                     allowlistUser.address,
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
@@ -395,6 +405,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser2)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser2.address,
                         2,
                         getMerkleProof(allowlist, allowlistUser2.address),
@@ -415,6 +426,7 @@ describe("ERC721DropImplementation", function () {
             await collection
                 .connect(allowlistUser)
                 .mintAllowlist(
+                    PREPARED_MINT_STAGE_ID,
                     allowlistUser.address,
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
@@ -427,6 +439,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser2)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser2.address,
                         2,
                         getMerkleProof(allowlist, allowlistUser2.address),
@@ -448,6 +461,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         1,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -462,7 +476,7 @@ describe("ERC721DropImplementation", function () {
             const currentTimestamp = await time.latest();
 
             // Configure allowlist stage
-            await collection.updateAllowlistMintStage({
+            await collection.updateAllowlistMintStage(PREPARED_MINT_STAGE_ID, {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
                 startTime: currentTimestamp + 86400, // start in 24 hours
                 endTime: currentTimestamp + 186400,
@@ -475,6 +489,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         1,
                         getMerkleProof(allowlist, allowlistUser.address),
@@ -488,6 +503,7 @@ describe("ERC721DropImplementation", function () {
         it("reverts if not on allowlist", async () => {
             await expect(
                 collection.mintAllowlist(
+                    PREPARED_MINT_STAGE_ID,
                     owner.address,
                     1,
                     getMerkleProof(allowlist, userWithoutAllowlist.address),
@@ -506,6 +522,7 @@ describe("ERC721DropImplementation", function () {
                 collection
                     .connect(allowlistUser)
                     .mintAllowlist(
+                        PREPARED_MINT_STAGE_ID,
                         allowlistUser.address,
                         1,
                         getMerkleProof(allowlist, allowlistUser2.address),
@@ -517,6 +534,20 @@ describe("ERC721DropImplementation", function () {
                 collection,
                 "AllowlistStageInvalidProof",
             );
+        });
+
+        it("revents if invalid stage ID", async () => {
+            await expect(
+                collection.mintAllowlist(
+                    100, // ID doesn't exist
+                    owner.address,
+                    1,
+                    getMerkleProof(allowlist, userWithoutAllowlist.address),
+                    {
+                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                    },
+                ),
+            ).to.revertedWithCustomError(collection, "StageNotActive");
         });
     });
 
@@ -835,7 +866,8 @@ describe("ERC721DropImplementation", function () {
     describe("updateAllowlistMintStage", () => {
         it("updates", async () => {
             // Check current config
-            const currentConfig = await collection.allowlistMintStage();
+            const stageId = 1;
+            const currentConfig = await collection.allowlistMintStages(stageId);
             expect(currentConfig.mintPrice).to.equal(0);
             expect(currentConfig.startTime).to.equal(0);
             expect(currentConfig.endTime).to.equal(0);
@@ -851,10 +883,10 @@ describe("ERC721DropImplementation", function () {
                 maxSupplyForStage: 4000,
                 merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
             };
-            await collection.updateAllowlistMintStage(newConfigData);
+            await collection.updateAllowlistMintStage(stageId, newConfigData);
 
             // Check updated config
-            const updatedConfig = await collection.allowlistMintStage();
+            const updatedConfig = await collection.allowlistMintStages(stageId);
             expect(updatedConfig.mintPrice).to.equal(newConfigData.mintPrice);
             expect(updatedConfig.startTime).to.equal(newConfigData.startTime);
             expect(updatedConfig.endTime).to.equal(newConfigData.endTime);
@@ -866,7 +898,7 @@ describe("ERC721DropImplementation", function () {
 
         it("reverts if caller is not contract owner or administrator", async () => {
             await expect(
-                collection.connect(randomUser).updateAllowlistMintStage({
+                collection.connect(randomUser).updateAllowlistMintStage(1, {
                     mintPrice: "100000000000000000", // 0.1 ETH
                     startTime: 1676043287, // 0.1 ETH
                     endTime: 1686043287, // 0.1 ETH
@@ -892,7 +924,7 @@ describe("ERC721DropImplementation", function () {
             };
 
             await expect(
-                collection.updateAllowlistMintStage(newConfigData),
+                collection.updateAllowlistMintStage(1, newConfigData),
             ).to.emit(collection, "AllowlistMintStageUpdated");
         });
     });

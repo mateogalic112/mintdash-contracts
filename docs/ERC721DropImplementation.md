@@ -66,16 +66,21 @@ function allowedPayers(address payer) external view returns (bool allowed)
 |---|---|---|
 | allowed | bool | undefined |
 
-### allowlistMintStage
+### allowlistMintStages
 
 ```solidity
-function allowlistMintStage() external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
+function allowlistMintStages(uint256 allowlistStageId) external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
 ```
 
 
 
 
 
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| allowlistStageId | uint256 | undefined |
 
 #### Returns
 
@@ -305,7 +310,7 @@ function maxSupply() external view returns (uint256)
 ### mintAllowlist
 
 ```solidity
-function mintAllowlist(address recipient, uint256 quantity, bytes32[] merkleProof) external payable
+function mintAllowlist(uint256 allowlistStageId, address recipient, uint256 quantity, bytes32[] merkleProof) external payable
 ```
 
 Mint an allowlist stage.
@@ -316,6 +321,7 @@ Mint an allowlist stage.
 
 | Name | Type | Description |
 |---|---|---|
+| allowlistStageId | uint256 | ID of the allowlist stage. |
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 | merkleProof | bytes32[] | Valid Merkle proof. |
@@ -739,7 +745,7 @@ function transferOwnership(address newOwner) external nonpayable
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage allowlistMintStageData) external nonpayable
 ```
 
 
@@ -750,6 +756,7 @@ function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) ext
 
 | Name | Type | Description |
 |---|---|---|
+| allowlistStageId | uint256 | undefined |
 | allowlistMintStageData | AllowlistMintStage | undefined |
 
 ### updateBaseURI
@@ -934,7 +941,7 @@ event AdministrationTransferred(address indexed previousAdmin, address indexed n
 ### AllowlistMintStageUpdated
 
 ```solidity
-event AllowlistMintStageUpdated(AllowlistMintStage data)
+event AllowlistMintStageUpdated(uint256 indexed allowlistStageId, AllowlistMintStage data)
 ```
 
 
@@ -945,6 +952,7 @@ event AllowlistMintStageUpdated(AllowlistMintStage data)
 
 | Name | Type | Description |
 |---|---|---|
+| allowlistStageId `indexed` | uint256 | undefined |
 | data  | AllowlistMintStage | undefined |
 
 ### Approval
