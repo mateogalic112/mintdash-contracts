@@ -1,28 +1,24 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.18;
 
-import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/ERC721DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradable} from "./mixins/AdministratedUpgradable.sol";
 import {ERC1155ContractMetadata} from "./mixins/ERC1155ContractMetadata.sol";
-import {Airdrop} from "./mixins/Airdrop.sol";
 import {PrimarySale} from "./mixins/PrimarySale.sol";
 import {OperatorFilterToggle} from "./mixins/OperatorFilterToggle.sol";
 
-import {IERC721DropImplementation} from "./interface/IERC721DropImplementation.sol";
+import {IERC1155DropImplementation} from "./interface/IERC1155DropImplementation.sol";
 
 contract ERC1155DropImplementation is
     AdministratedUpgradable,
     ERC1155ContractMetadata,
-    Airdrop,
     PrimarySale,
     OperatorFilterToggle,
-    IERC721DropImplementation
+    IERC1155DropImplementation
 {
     PublicMintStage public publicMintStage;
     mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage) public allowlistMintStages;
@@ -41,17 +37,22 @@ contract ERC1155DropImplementation is
     uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE =
         type(uint256).max;
 
-    function initialize(
-        string memory _name,
-        string memory _symbol
-    ) external initializerERC721A initializer {
-        __ERC721A_init(_name, _symbol);
+    function initialize(string memory _name, string memory _symbol) external initializer {
+        __ERC1155_init("");
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();
+
+        name = _name;
+        symbol = _symbol;
     }
 
-    function mintPublic(address recipient, uint256 quantity) external payable {
+    function mintPublic(
+        address recipient, 
+        uint256 tokenId, 
+        uint256 quantity, 
+        bytes memory data
+    ) external payable {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
@@ -67,6 +68,7 @@ contract ERC1155DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            tokenId,
             quantity,
             publicMintStage.mintLimitPerWallet,
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
@@ -75,14 +77,16 @@ contract ERC1155DropImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
 
-        _mintBase(minter, quantity, PUBLIC_STAGE_INDEX);
+        _mintBase(minter,tokenId, quantity, data, PUBLIC_STAGE_INDEX);
     }
 
     function mintAllowlist(
         uint256 allowlistStageId,
+        uint256 tokenId,
         address recipient,
         uint256 quantity,
-        bytes32[] calldata merkleProof
+        bytes32[] calldata merkleProof, 
+        bytes memory data
     ) external payable {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
@@ -100,6 +104,7 @@ contract ERC1155DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            tokenId,
             quantity,
             allowlistMintStage.mintLimitPerWallet,
             allowlistMintStage.maxSupplyForStage
@@ -118,13 +123,15 @@ contract ERC1155DropImplementation is
             revert AllowlistStageInvalidProof();
         }
 
-        _mintBase(minter, quantity, ALLOWLIST_STAGE_INDEX);
+        _mintBase(minter, tokenId, quantity, data, ALLOWLIST_STAGE_INDEX);
     }
 
     function mintTokenGated(
         address recipient,
+        uint256 tokenId,
         address nftContract,
-        uint256[] calldata tokenIds
+        uint256[] calldata tokenIds,
+        bytes memory data
     ) external payable {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
@@ -148,6 +155,7 @@ contract ERC1155DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            tokenId,
             quantity,
             tokenGatedMintStage.mintLimitPerWallet,
             tokenGatedMintStage.maxSupplyForStage
@@ -159,10 +167,10 @@ contract ERC1155DropImplementation is
         // Iterate through each tokenIds to make sure it's not already claimed
         for (uint256 i = 0; i < quantity; ) {
             // For easier and cheaper access.
-            uint256 tokenId = tokenIds[i];
+            uint256 gatedTokenId = tokenIds[i];
 
             // Check that the minter is the owner of the tokenId.
-            if (IERC721(nftContract).ownerOf(tokenId) != minter) {
+            if (IERC1155(nftContract).balanceOf(minter, gatedTokenId) == 0) {
                 revert TokenGatedNotTokenOwner();
             }
 
@@ -171,19 +179,19 @@ contract ERC1155DropImplementation is
                 storage redeemedTokenIds = _tokenGatedTokenRedeems[nftContract];
 
             // Check that the token id has not already been redeemed.
-            if (redeemedTokenIds[tokenId]) {
+            if (redeemedTokenIds[gatedTokenId]) {
                 revert TokenGatedTokenAlreadyRedeemed();
             }
 
             // Mark the token id as redeemed.
-            redeemedTokenIds[tokenId] = true;
+            redeemedTokenIds[gatedTokenId] = true;
 
             unchecked {
                 ++i;
             }
         }
 
-        _mintBase(minter, quantity, TOKEN_GATED_STAGE_INDEX);
+        _mintBase(minter, tokenId, quantity, data, TOKEN_GATED_STAGE_INDEX);
     }
 
     function getTokenGatedIsRedeemed(
@@ -228,16 +236,6 @@ contract ERC1155DropImplementation is
         bool approved
     ) public override {
         super.setApprovalForAll(operator, approved);
-    }
-
-    function approve(
-        address operator,
-        uint256 tokenId
-    ) public override {
-        if (operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.approve(operator, tokenId);
     }
 
     function safeTransferFrom(

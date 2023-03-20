@@ -33,7 +33,7 @@ function administrator() external view returns (address)
 function airdrop(address[] to, uint64[] quantity) external nonpayable
 ```
 
-Mints tokens to addresses.
+
 
 
 
@@ -41,8 +41,8 @@ Mints tokens to addresses.
 
 | Name | Type | Description |
 |---|---|---|
-| to | address[] | List of addresses to receive tokens. |
-| quantity | uint64[] | List of quantities to assign to each address. |
+| to | address[] | undefined |
+| quantity | uint64[] | undefined |
 
 ### allowedPayers
 

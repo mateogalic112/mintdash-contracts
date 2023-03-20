@@ -14,8 +14,7 @@ describe("ERC721DropImplementation", function () {
         allowlistUser: SignerWithAddress,
         allowlistUser2: SignerWithAddress,
         userWithoutAllowlist: SignerWithAddress,
-        randomUser: SignerWithAddress,
-        admin: SignerWithAddress;
+        randomUser: SignerWithAddress;
 
     let allowlist: string[];
 
@@ -51,7 +50,6 @@ describe("ERC721DropImplementation", function () {
             allowlistUser2,
             userWithoutAllowlist,
             randomUser,
-            admin,
         ] = await ethers.getSigners();
 
         allowlist = [allowlistUser.address, allowlistUser2.address];

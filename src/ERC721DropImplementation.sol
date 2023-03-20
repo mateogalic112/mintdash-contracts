@@ -6,11 +6,10 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/ERC721DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradable} from "./mixins/AdministratedUpgradable.sol";
 import {ERC721ContractMetadata} from "./mixins/ERC721ContractMetadata.sol";
-import {Airdrop} from "./mixins/Airdrop.sol";
 import {PrimarySale} from "./mixins/PrimarySale.sol";
 import {OperatorFilterToggle} from "./mixins/OperatorFilterToggle.sol";
 
@@ -19,7 +18,6 @@ import {IERC721DropImplementation} from "./interface/IERC721DropImplementation.s
 contract ERC721DropImplementation is
     AdministratedUpgradable,
     ERC721ContractMetadata,
-    Airdrop,
     PrimarySale,
     OperatorFilterToggle,
     IERC721DropImplementation

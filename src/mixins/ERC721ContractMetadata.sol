@@ -30,6 +30,25 @@ abstract contract ERC721ContractMetadata is
         _burn(tokenId, true);
     }
 
+    function airdrop(
+        address[] calldata to,
+        uint64[] calldata quantity
+    ) external onlyOwnerOrAdministrator {
+        address[] memory recipients = to;
+
+        for (uint64 i = 0; i < recipients.length; ) {
+            _mint(recipients[i], quantity[i]);
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        if (_totalMinted() > maxSupply) {
+            revert MintQuantityExceedsMaxSupply();
+        }
+    }
+
     function updateMaxSupply(
         uint256 newMaxSupply
     ) external onlyOwnerOrAdministrator {

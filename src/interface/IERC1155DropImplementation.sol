@@ -47,35 +47,45 @@ interface IERC1155DropImplementation {
      *
      * @param recipient Recipient of tokens.
      * @param quantity Number of tokens to mint.
+     * @param tokenId ID of token to mint.
+     * @param data Mint data.
      */
-    function mintPublic(address recipient, uint256 quantity) external payable;
+    function mintPublic(address recipient, uint256 tokenId, uint256 quantity, bytes memory data) external payable;
 
     /**
      * @notice Mint an allowlist stage.
      *
      * @param allowlistStageId ID of the allowlist stage.
+     * @param tokenId ID of the token to mint.
      * @param recipient Recipient of tokens.
      * @param quantity Number of tokens to mint.
      * @param merkleProof Valid Merkle proof.
+     * @param data Mint data.
      */
     function mintAllowlist(
         uint256 allowlistStageId,
+        uint256 tokenId,
         address recipient,
         uint256 quantity,
-        bytes32[] calldata merkleProof
+        bytes32[] calldata merkleProof,
+        bytes memory data
     ) external payable;
 
     /**
      * @notice Mint an token gated stage.
      *
      * @param recipient Recipient of tokens.
+     * @param tokenId Id of the token to mint.
      * @param nftContract NFT collection to redeem for.
      * @param tokenIds Token Ids to redeem.
+     * @param data Mint data.
      */
     function mintTokenGated(
         address recipient,
+        uint256 tokenId,
         address nftContract,
-        uint256[] calldata tokenIds
+        uint256[] calldata tokenIds,
+        bytes calldata data
     ) external payable;
 
     /**
