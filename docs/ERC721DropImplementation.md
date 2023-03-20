@@ -33,7 +33,7 @@ function administrator() external view returns (address)
 function airdrop(address[] to, uint64[] quantity) external nonpayable
 ```
 
-
+Mints tokens to addresses.
 
 
 
@@ -41,8 +41,8 @@ function airdrop(address[] to, uint64[] quantity) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| to | address[] | undefined |
-| quantity | uint64[] | undefined |
+| to | address[] | List of addresses to receive tokens. |
+| quantity | uint64[] | List of quantities to assign to each address. |
 
 ### allowedPayers
 
@@ -775,6 +775,22 @@ Updates base URI of the collection.
 |---|---|---|
 | newUri | string | The new base URI to set. |
 
+### updateConfiguration
+
+```solidity
+function updateConfiguration(MultiStageConfig config) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| config | MultiStageConfig | undefined |
+
 ### updateMaxSupply
 
 ```solidity
@@ -1214,6 +1230,17 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 ## Errors
 
+### AllowlistPhaseConfigMismatch
+
+```solidity
+error AllowlistPhaseConfigMismatch()
+```
+
+
+
+*Revert if allowlist multi config part is not valid.*
+
+
 ### AllowlistStageInvalidProof
 
 ```solidity
@@ -1510,6 +1537,17 @@ error TokenGatedNotTokenOwner()
 
 
 *Revert if minter is not token owner for token gated mint stage.*
+
+
+### TokenGatedPhaseConfigMismatch
+
+```solidity
+error TokenGatedPhaseConfigMismatch()
+```
+
+
+
+*Revert if token gated multi config part is not valid.*
 
 
 ### TokenGatedTokenAlreadyRedeemed

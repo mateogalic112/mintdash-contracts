@@ -104,6 +104,22 @@ function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage a
 | allowlistStageId | uint256 | undefined |
 | allowlistMintStageData | AllowlistMintStage | undefined |
 
+### updateConfiguration
+
+```solidity
+function updateConfiguration(MultiStageConfig config) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| config | MultiStageConfig | undefined |
+
 ### updatePublicMintStage
 
 ```solidity
@@ -195,6 +211,17 @@ event TokenGatedMintStageUpdated(address indexed nftContract, TokenGatedMintStag
 
 ## Errors
 
+### AllowlistPhaseConfigMismatch
+
+```solidity
+error AllowlistPhaseConfigMismatch()
+```
+
+
+
+*Revert if allowlist multi config part is not valid.*
+
+
 ### AllowlistStageInvalidProof
 
 ```solidity
@@ -226,6 +253,17 @@ error TokenGatedNotTokenOwner()
 
 
 *Revert if minter is not token owner for token gated mint stage.*
+
+
+### TokenGatedPhaseConfigMismatch
+
+```solidity
+error TokenGatedPhaseConfigMismatch()
+```
+
+
+
+*Revert if token gated multi config part is not valid.*
 
 
 ### TokenGatedTokenAlreadyRedeemed

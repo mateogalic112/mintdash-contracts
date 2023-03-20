@@ -104,6 +104,17 @@ interface IERC721ContractMetadata {
     function getAmountMinted(address user) external view returns (uint64);
 
     /**
+     * @notice Mints tokens to addresses.
+     *
+     * @param to List of addresses to receive tokens.
+     * @param quantity List of quantities to assign to each address.
+     */
+    function airdrop(
+        address[] calldata to,
+        uint64[] calldata quantity
+    ) external;
+
+    /**
      * @notice Burns a token.
      *
      * @param tokenId Id of the token to burn.

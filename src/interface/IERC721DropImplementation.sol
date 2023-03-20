@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, MultiStageConfig} from "../lib/DropStructs.sol";
 
 interface IERC721DropImplementation {
     /**
@@ -23,6 +23,16 @@ interface IERC721DropImplementation {
      * @dev Revert if NFT contract is zero address when updating token gated mint stage.
      */
     error TokenGatedNftContractCannotBeZeroAddress();
+
+    /**
+     * @dev Revert if allowlist multi config part is not valid.
+    */
+    error AllowlistPhaseConfigMismatch();
+
+    /**
+     * @dev Revert if token gated multi config part is not valid.
+    */
+    error TokenGatedPhaseConfigMismatch();
 
     /**
      * @dev Emit an event when public mint stage configuration is updated.
@@ -88,6 +98,17 @@ interface IERC721DropImplementation {
         address nftContract,
         uint256 tokenId
     ) external view returns (bool);
+
+
+    /**
+     * @notice Updates configation for all phases.
+     * @dev This should be user for initial contract configuration.
+     *
+     * @param config The new configuration for contract
+     */
+    function updateConfiguration(
+        MultiStageConfig calldata config
+    ) external;
 
     /**
      * @notice Updates configuration for public mint stage.
