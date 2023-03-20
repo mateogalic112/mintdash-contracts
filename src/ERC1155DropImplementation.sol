@@ -3,7 +3,7 @@ pragma solidity 0.8.18;
 
 import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
@@ -182,7 +182,7 @@ contract ERC1155DropImplementation is
             uint256 gatedTokenId = tokenIds[i];
 
             // Check that the minter is the owner of the tokenId.
-            if (IERC1155(nftContract).balanceOf(minter, gatedTokenId) == 0) {
+             if (IERC721(nftContract).ownerOf(tokenId) != minter) {
                 revert TokenGatedNotTokenOwner();
             }
 

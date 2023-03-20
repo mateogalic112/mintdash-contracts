@@ -37,7 +37,7 @@ const config = {
     gasReporter: {
         enabled: true,
         currency: "USD",
-        gasPrice: 25,
+        gasPrice: 100,
         coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     },
     dodoc: {
