@@ -20,15 +20,20 @@ contract ERC1155DropImplementation is
     OperatorFilterToggle,
     IERC1155DropImplementation
 {
-    PublicMintStage public publicMintStage;
-    mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage) public allowlistMintStages;
-    mapping(address nftContract => TokenGatedMintStage mintStage)
-        public tokenGatedMintStages;
-    mapping(address nftContract => mapping(uint256 tokenId => bool redeemed))
-        private _tokenGatedTokenRedeems;
+    mapping(uint256 tokenId => 
+        PublicMintStage publicMintStage) public publicMintStage;
 
-    mapping(address minter => mapping(address nftContract => mapping(uint256 tokenId => bool redeemed)))
-        private _tokenHolderRedeemed;
+    mapping(uint256 tokenId => 
+        mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage)) public allowlistMintStages;
+
+    mapping(uint256 tokenId => 
+        mapping(address nftContract => TokenGatedMintStage mintStage)) public tokenGatedMintStages;
+
+    mapping(uint256 tokenId => 
+        mapping(address nftContract => mapping(uint256 nftContractTokenId => bool redeemed))) private _tokenGatedTokenRedeems;
+
+    mapping(uint256 tokenId => 
+        mapping(address minter => mapping(address nftContract => mapping(uint256 nftContractTokenId => bool redeemed)))) private _tokenHolderRedeemed;
 
     uint256 internal constant PUBLIC_STAGE_INDEX = 0;
     uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
@@ -63,19 +68,22 @@ contract ERC1155DropImplementation is
             revert PayerNotAllowed();
         }
 
+        // Load public mint stage to memory
+        PublicMintStage memory mintStage = publicMintStage[tokenId];
+
         // Ensure that public mint stage is active
-        _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
+        _checkStageActive(mintStage.startTime, mintStage.endTime);
 
         // Ensure correct mint quantity
         _checkMintQuantity(
             tokenId,
             quantity,
-            publicMintStage.mintLimitPerWallet,
+            mintStage.mintLimitPerWallet,
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
         );
 
         // Ensure enough ETH is provided
-        _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
+        _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
         _mintBase(minter,tokenId, quantity, data, PUBLIC_STAGE_INDEX);
     }
@@ -94,29 +102,30 @@ contract ERC1155DropImplementation is
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
-        AllowlistMintStage storage allowlistMintStage = allowlistMintStages[allowlistStageId];
+        // Load allowlist mint stage to memory
+        AllowlistMintStage memory mintStage = allowlistMintStages[tokenId][allowlistStageId];
 
         // Ensure that allowlist mint stage is active
         _checkStageActive(
-            allowlistMintStage.startTime,
-            allowlistMintStage.endTime
+            mintStage.startTime,
+            mintStage.endTime
         );
 
         // Ensure correct mint quantity
         _checkMintQuantity(
             tokenId,
             quantity,
-            allowlistMintStage.mintLimitPerWallet,
-            allowlistMintStage.maxSupplyForStage
+            mintStage.mintLimitPerWallet,
+            mintStage.maxSupplyForStage
         );
 
         // Ensure enough ETH is provided
-        _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
+        _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
         if (
             !MerkleProof.verifyCalldata(
                 merkleProof,
-                allowlistMintStage.merkleRoot,
+                mintStage.merkleRoot,
                 keccak256(abi.encodePacked(minter))
             )
         ) {
@@ -139,8 +148,8 @@ contract ERC1155DropImplementation is
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
-        // Get token gated mint stage for NFT contract
-        TokenGatedMintStage memory tokenGatedMintStage = tokenGatedMintStages[
+        // Load token gated mint stage to memory
+        TokenGatedMintStage memory mintStage = tokenGatedMintStages[tokenId][
             nftContract
         ];
 
@@ -149,20 +158,20 @@ contract ERC1155DropImplementation is
 
         // Ensure that token holder mint stage is active
         _checkStageActive(
-            tokenGatedMintStage.startTime,
-            tokenGatedMintStage.endTime
+            mintStage.startTime,
+            mintStage.endTime
         );
 
         // Ensure correct mint quantity
         _checkMintQuantity(
             tokenId,
             quantity,
-            tokenGatedMintStage.mintLimitPerWallet,
-            tokenGatedMintStage.maxSupplyForStage
+            mintStage.mintLimitPerWallet,
+            mintStage.maxSupplyForStage
         );
 
         // Ensure enough ETH is provided
-        _checkFunds(msg.value, quantity, tokenGatedMintStage.mintPrice);
+        _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
         // Iterate through each tokenIds to make sure it's not already claimed
         for (uint256 i = 0; i < quantity; ) {
@@ -176,7 +185,7 @@ contract ERC1155DropImplementation is
 
             // For easier and cheaper access.
             mapping(uint256 => bool)
-                storage redeemedTokenIds = _tokenGatedTokenRedeems[nftContract];
+                storage redeemedTokenIds = _tokenGatedTokenRedeems[tokenId][nftContract];
 
             // Check that the token id has not already been redeemed.
             if (redeemedTokenIds[gatedTokenId]) {
@@ -195,30 +204,34 @@ contract ERC1155DropImplementation is
     }
 
     function getTokenGatedIsRedeemed(
+        uint256 tokenId,
         address nftContract,
-        uint256 tokenId
+        uint256 nftContractTokenId
     ) external view returns (bool) {
-        return _tokenGatedTokenRedeems[nftContract][tokenId];
+        return _tokenGatedTokenRedeems[tokenId][nftContract][nftContractTokenId];
     }
 
     function updatePublicMintStage(
+        uint256 tokenId,
         PublicMintStage calldata publicMintStageData
     ) external onlyOwnerOrAdministrator {
-        publicMintStage = publicMintStageData;
+        publicMintStage[tokenId] = publicMintStageData;
 
-        emit PublicMintStageUpdated(publicMintStageData);
+        emit PublicMintStageUpdated(tokenId, publicMintStageData);
     }
 
     function updateAllowlistMintStage(
+        uint256 tokenId,
         uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external onlyOwnerOrAdministrator {
-        allowlistMintStages[allowlistStageId] = allowlistMintStageData;
+        allowlistMintStages[tokenId][allowlistStageId] = allowlistMintStageData;
 
-        emit AllowlistMintStageUpdated(allowlistStageId, allowlistMintStageData);
+        emit AllowlistMintStageUpdated(tokenId, allowlistStageId, allowlistMintStageData);
     }
 
     function updateTokenGatedMintStage(
+        uint256 tokenId,
         address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external onlyOwnerOrAdministrator {
@@ -226,9 +239,9 @@ contract ERC1155DropImplementation is
             revert TokenGatedNftContractCannotBeZeroAddress();
         }
 
-        tokenGatedMintStages[nftContract] = tokenGatedMintStageData;
+        tokenGatedMintStages[tokenId][nftContract] = tokenGatedMintStageData;
 
-        emit TokenGatedMintStageUpdated(nftContract, tokenGatedMintStageData);
+        emit TokenGatedMintStageUpdated(tokenId, nftContract, tokenGatedMintStageData);
     }
 
     function setApprovalForAll(

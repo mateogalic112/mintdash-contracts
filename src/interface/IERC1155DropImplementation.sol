@@ -27,17 +27,22 @@ interface IERC1155DropImplementation {
     /**
      * @dev Emit an event when public mint stage configuration is updated.
      */
-    event PublicMintStageUpdated(PublicMintStage data);
+    event PublicMintStageUpdated(uint256 indexed tokenId, PublicMintStage data);
 
     /**
      * @dev Emit an event when allowlist mint stage configuration is updated.
      */
-    event AllowlistMintStageUpdated(uint256 indexed allowlistStageId, AllowlistMintStage data);
+    event AllowlistMintStageUpdated(
+        uint256 indexed tokenId, 
+        uint256 indexed allowlistStageId, 
+        AllowlistMintStage data
+    );
 
     /**
      * @dev Emit an event when token gated mint stage configuration is updated for NFT contract.
      */
     event TokenGatedMintStageUpdated(
+        uint256 indexed tokenId,
         address indexed nftContract,
         TokenGatedMintStage data
     );
@@ -91,30 +96,36 @@ interface IERC1155DropImplementation {
     /**
      * @notice Returns if token is redeemed for NFT contract.
      *
+     * @param tokenId ID of the token.
      * @param nftContract The token gated nft contract.
-     * @param tokenId The token gated token ID to check.
+     * @param nftContractTokenId The token gated token ID to check.
      */
     function getTokenGatedIsRedeemed(
+        uint256 tokenId,
         address nftContract,
-        uint256 tokenId
+        uint256 nftContractTokenId
     ) external view returns (bool);
 
     /**
      * @notice Updates configuration for public mint stage.
      *
+     * @param tokenId ID of the token.
      * @param publicMintStageData The new public mint stage data to set.
      */
     function updatePublicMintStage(
+        uint256 tokenId,
         PublicMintStage calldata publicMintStageData
     ) external;
 
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
+     * @param tokenId ID of the token.
      * @param allowlistStageId ID of the allowlist mint stage to set
      * @param allowlistMintStageData The new allowlist mint stage data to set.
      */
     function updateAllowlistMintStage(
+        uint256 tokenId,
         uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external;
@@ -122,10 +133,12 @@ interface IERC1155DropImplementation {
     /**
      * @notice Updates configuration for token gated mint stage.
      *
+     * @param tokenId ID of the token.
      * @param nftContract Gated NFT contract address to be updated.
      * @param tokenGatedMintStageData The new token gated mint stage data to set.
      */
     function updateTokenGatedMintStage(
+        uint256 tokenId,
         address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external;
