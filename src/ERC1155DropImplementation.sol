@@ -1,22 +1,25 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.18;
 
+import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
-import {AdministratedUpgradable} from "./mixins/AdministratedUpgradable.sol";
-import {ERC1155ContractMetadata} from "./mixins/ERC1155ContractMetadata.sol";
-import {PrimarySale} from "./mixins/PrimarySale.sol";
-import {OperatorFilterToggle} from "./mixins/OperatorFilterToggle.sol";
+import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
+import {ERC1155ContractMetadata} from "./core/ERC1155ContractMetadata.sol";
+import {ERC2981Upgradeable} from "./core/ERC2981Upgradeable.sol";
+import {Payout} from "./core/Payout.sol";
+import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 
 import {IERC1155DropImplementation} from "./interface/IERC1155DropImplementation.sol";
 
 contract ERC1155DropImplementation is
     AdministratedUpgradable,
     ERC1155ContractMetadata,
-    PrimarySale,
+    Payout,
     OperatorFilterToggle,
     IERC1155DropImplementation
 {
@@ -249,6 +252,19 @@ contract ERC1155DropImplementation is
         bool approved
     ) public override {
         super.setApprovalForAll(operator, approved);
+    }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    )
+        public
+        view
+        override(ERC1155Upgradeable, ERC2981Upgradeable)
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC2981Upgradeable).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     function safeTransferFrom(

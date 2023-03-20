@@ -55,15 +55,3 @@ struct TokenGatedMintStage {
     uint40 maxSupplyForStage;
 }
 
-struct MultiStageConfig {
-    // Public stage
-    PublicMintStage publicMintStage;
-
-    // Allowlist stages
-    uint256[] allowlistMintStageIds;
-    AllowlistMintStage[] allowlistMintStages;
-
-    // Token gated stages
-    address[] nftContracts;
-    TokenGatedMintStage[] tokenGatedMintStages;
-}

@@ -1041,6 +1041,164 @@ describe("ERC721DropImplementation", function () {
         });
     });
 
+    describe("updateConfiguration", () => {
+        it("updates", async () => {
+            const newConfig = {
+                maxSupply: 1000,
+                baseURI: "ipfs://hash/",
+                royaltiesReceiver: randomUser.address,
+                royaltiesFeeNumerator: 1500,
+                payoutAddress: owner.address,
+                publicMintStage: {
+                    mintPrice: "100000000000000000",
+                    startTime: 1676043287,
+                    endTime: 1686043287,
+                    mintLimitPerWallet: 5,
+                },
+                allowlistMintStageIds: [1, 2],
+                allowlistMintStages: [
+                    {
+                        mintPrice: "100000000000000000",
+                        startTime: 1676043287,
+                        endTime: 1686043287,
+                        mintLimitPerWallet: 5,
+                        maxSupplyForStage: 400,
+                        merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+                    },
+                    {
+                        mintPrice: "200000000000000000",
+                        startTime: 1676043286,
+                        endTime: 1686043286,
+                        mintLimitPerWallet: 2,
+                        maxSupplyForStage: 100,
+                        merkleRoot: `0x${getMerkleTreeRoot([
+                            randomUser.address,
+                        ])}`,
+                    },
+                ],
+                nftContracts: [randomUser.address, owner.address],
+                tokenGatedMintStages: [
+                    {
+                        mintPrice: "100000000000000000",
+                        startTime: 1676043287,
+                        endTime: 1686043287,
+                        mintLimitPerWallet: 5,
+                        maxSupplyForStage: 4000,
+                    },
+                    {
+                        mintPrice: "200000000000000000",
+                        startTime: 1676043286,
+                        endTime: 1686043286,
+                        mintLimitPerWallet: 2,
+                        maxSupplyForStage: 1000,
+                    },
+                ],
+            };
+
+            // Update
+            await collection.updateConfiguration(newConfig);
+
+            // Check new state
+            expect(await collection.maxSupply()).to.eq(newConfig.maxSupply);
+            expect(await collection.baseURI()).to.eq(newConfig.baseURI);
+            expect(await collection.payoutAddress()).to.eq(
+                newConfig.payoutAddress,
+            );
+
+            const defaultRoyalties = await collection.defaultRoyaltyInfo();
+            expect(defaultRoyalties.receiver).to.eq(
+                newConfig.royaltiesReceiver,
+            );
+            expect(defaultRoyalties.royaltyFraction).to.eq(
+                newConfig.royaltiesFeeNumerator,
+            );
+
+            const publicMintStage = await collection.publicMintStage();
+            expect(publicMintStage.mintPrice).to.equal(
+                newConfig.publicMintStage.mintPrice,
+            );
+            expect(publicMintStage.startTime).to.equal(
+                newConfig.publicMintStage.startTime,
+            );
+            expect(publicMintStage.endTime).to.equal(
+                newConfig.publicMintStage.endTime,
+            );
+            expect(publicMintStage.mintLimitPerWallet).to.equal(
+                newConfig.publicMintStage.mintLimitPerWallet,
+            );
+
+            const allowlistStageConfig1 = await collection.allowlistMintStages(
+                1,
+            );
+            expect(allowlistStageConfig1.mintPrice).to.equal(
+                newConfig.allowlistMintStages[0].mintPrice,
+            );
+            expect(allowlistStageConfig1.startTime).to.equal(
+                newConfig.allowlistMintStages[0].startTime,
+            );
+            expect(allowlistStageConfig1.endTime).to.equal(
+                newConfig.allowlistMintStages[0].endTime,
+            );
+            expect(allowlistStageConfig1.mintLimitPerWallet).to.equal(
+                newConfig.allowlistMintStages[0].mintLimitPerWallet,
+            );
+            expect(allowlistStageConfig1.merkleRoot).to.equal(
+                newConfig.allowlistMintStages[0].merkleRoot,
+            );
+
+            const allowlistStageConfig2 = await collection.allowlistMintStages(
+                2,
+            );
+            expect(allowlistStageConfig2.mintPrice).to.equal(
+                newConfig.allowlistMintStages[1].mintPrice,
+            );
+            expect(allowlistStageConfig2.startTime).to.equal(
+                newConfig.allowlistMintStages[1].startTime,
+            );
+            expect(allowlistStageConfig2.endTime).to.equal(
+                newConfig.allowlistMintStages[1].endTime,
+            );
+            expect(allowlistStageConfig2.mintLimitPerWallet).to.equal(
+                newConfig.allowlistMintStages[1].mintLimitPerWallet,
+            );
+            expect(allowlistStageConfig2.merkleRoot).to.equal(
+                newConfig.allowlistMintStages[1].merkleRoot,
+            );
+
+            const tokenGatedStage1 = await collection.tokenGatedMintStages(
+                randomUser.address,
+            );
+            expect(tokenGatedStage1.mintPrice).to.equal(
+                newConfig.tokenGatedMintStages[0].mintPrice,
+            );
+            expect(tokenGatedStage1.startTime).to.equal(
+                newConfig.tokenGatedMintStages[0].startTime,
+            );
+            expect(tokenGatedStage1.endTime).to.equal(
+                newConfig.tokenGatedMintStages[0].endTime,
+            );
+            expect(tokenGatedStage1.mintLimitPerWallet).to.equal(
+                newConfig.tokenGatedMintStages[0].mintLimitPerWallet,
+            );
+
+            const tokenGatedStage2 = await collection.tokenGatedMintStages(
+                owner.address,
+            );
+            expect(tokenGatedStage2.mintPrice).to.equal(
+                newConfig.tokenGatedMintStages[1].mintPrice,
+            );
+            expect(tokenGatedStage2.startTime).to.equal(
+                newConfig.tokenGatedMintStages[1].startTime,
+            );
+            expect(tokenGatedStage2.endTime).to.equal(
+                newConfig.tokenGatedMintStages[1].endTime,
+            );
+            expect(tokenGatedStage2.mintLimitPerWallet).to.equal(
+                newConfig.tokenGatedMintStages[1].mintLimitPerWallet,
+            );
+        });
+    });
+
     describe("updateOperatorFilterer", () => {
         it("updates", async () => {
             // Check current state

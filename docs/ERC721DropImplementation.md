@@ -778,7 +778,7 @@ Updates base URI of the collection.
 ### updateConfiguration
 
 ```solidity
-function updateConfiguration(MultiStageConfig config) external nonpayable
+function updateConfiguration(IERC721DropImplementation.MultiStageConfig config) external nonpayable
 ```
 
 
@@ -789,7 +789,7 @@ function updateConfiguration(MultiStageConfig config) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| config | MultiStageConfig | undefined |
+| config | IERC721DropImplementation.MultiStageConfig | undefined |
 
 ### updateMaxSupply
 
@@ -1141,6 +1141,22 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 |---|---|---|
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
+
+### PayoutAddressUpdated
+
+```solidity
+event PayoutAddressUpdated(address indexed payoutAddress)
+```
+
+
+
+*Emit an event when payout address is updated*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payoutAddress `indexed` | address | undefined |
 
 ### ProvenanceHashUpdated
 

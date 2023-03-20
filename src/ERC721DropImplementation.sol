@@ -3,22 +3,23 @@ pragma solidity 0.8.18;
 
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, MultiStageConfig} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
-import {AdministratedUpgradable} from "./mixins/AdministratedUpgradable.sol";
-import {ERC721ContractMetadata} from "./mixins/ERC721ContractMetadata.sol";
-import {PrimarySale} from "./mixins/PrimarySale.sol";
-import {OperatorFilterToggle} from "./mixins/OperatorFilterToggle.sol";
+import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
+import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
+import {ERC2981Upgradeable} from "./core/ERC2981Upgradeable.sol";
+import {Payout} from "./core/Payout.sol";
+import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 
 import {IERC721DropImplementation} from "./interface/IERC721DropImplementation.sol";
 
 contract ERC721DropImplementation is
     AdministratedUpgradable,
     ERC721ContractMetadata,
-    PrimarySale,
+    Payout,
     OperatorFilterToggle,
     IERC721DropImplementation
 {
@@ -190,10 +191,50 @@ contract ERC721DropImplementation is
     ) external view returns (bool) {
         return _tokenGatedTokenRedeems[nftContract][tokenId];
     }
+    
+    function updatePublicMintStage(
+        PublicMintStage calldata publicMintStageData
+    ) external onlyOwnerOrAdministrator {
+        _updatePublicMintStage(publicMintStageData);
+    }
+
+    function updateAllowlistMintStage(
+        uint256 allowlistStageId,
+        AllowlistMintStage calldata allowlistMintStageData
+    ) external onlyOwnerOrAdministrator {
+        _updateAllowlistMintStage(allowlistStageId, allowlistMintStageData);
+    }
+
+    function updateTokenGatedMintStage(
+        address nftContract,
+        TokenGatedMintStage calldata tokenGatedMintStageData
+    ) external onlyOwnerOrAdministrator {
+        _updateTokenGatedMintStage(nftContract, tokenGatedMintStageData);
+    }
 
     function updateConfiguration(
         MultiStageConfig calldata config
     ) external onlyOwnerOrAdministrator {
+
+        // Update max supply
+        if(config.maxSupply > 0) {
+            _updateMaxSupply(config.maxSupply);
+        }
+
+        // Update base URI
+        if(bytes(config.baseURI).length > 0){
+            _updateBaseURI(config.baseURI);
+        }
+
+        // Update royalties
+        if(config.royaltiesReceiver != address(0)){
+            _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
+        }
+
+        // Update payout
+        if(config.payoutAddress != address(0)){
+            _updatePayoutAddress(config.payoutAddress);
+        }
 
         // Update public phase
         if(_toUint256(config.publicMintStage.startTime != 0) |
@@ -234,24 +275,18 @@ contract ERC721DropImplementation is
         }
     }
     
-    function updatePublicMintStage(
-        PublicMintStage calldata publicMintStageData
-    ) external onlyOwnerOrAdministrator {
-        _updatePublicMintStage(publicMintStageData);
-    }
-
-    function updateAllowlistMintStage(
-        uint256 allowlistStageId,
-        AllowlistMintStage calldata allowlistMintStageData
-    ) external onlyOwnerOrAdministrator {
-        _updateAllowlistMintStage(allowlistStageId, allowlistMintStageData);
-    }
-
-    function updateTokenGatedMintStage(
-        address nftContract,
-        TokenGatedMintStage calldata tokenGatedMintStageData
-    ) external onlyOwnerOrAdministrator {
-        _updateTokenGatedMintStage(nftContract, tokenGatedMintStageData);
+    function supportsInterface(
+        bytes4 interfaceId
+    )
+        public
+        view
+        override(ERC2981Upgradeable, ERC721AUpgradeable)
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC2981Upgradeable).interfaceId ||
+            ERC721AUpgradeable.supportsInterface(interfaceId)||
+            super.supportsInterface(interfaceId);
     }
 
     function setApprovalForAll(

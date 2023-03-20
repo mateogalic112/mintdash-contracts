@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-interface IERC1155ContractMetadata {
+interface IERC721ContractMetadata {
     /**
      * @dev Revert if called mint stage is not currently yet.
      */
@@ -52,56 +52,65 @@ interface IERC1155ContractMetadata {
     event ProvenanceHashUpdated(bytes32 indexed provenanceHash);
 
     /**
+     * @dev Emit an event for token metadata reveals/updates,
+     *      according to EIP-4906.
+     *
+     * @param _fromTokenId The start token id.
+     * @param _toTokenId   The end token id.
+     */
+    event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
+
+    /**
      * @dev Emit an event when base URI of the collection is updated.
      */
 
     event BaseURIUpdated(string indexed baseURI);
     /**
-     * @dev Emit an event when max supply of the token is updated.
+     * @dev Emit an event when max supply of the collection is updated.
      */
 
-    event MaxSupplyUpdated(uint256 indexed tokenId, uint256 indexed maxSupply);
+    event MaxSupplyUpdated(uint256 indexed maxSupply);
 
     /**
      * @dev Emit an event when token is minted.
      */
     event Minted(
         address indexed recipient,
-        uint256 indexed tokenId,
         uint256 indexed quantity,
-        uint256 stageIndex
+        uint256 indexed stageIndex
     );
-
-    /**
-     * @dev Emit an event when royalties are updated.
-     */
-    event RoyaltiesUpdated(
-        address indexed receiver,
-        uint96 indexed feeNumerator
-    );
-
-    /**
-     * @notice Updates royalties for the collection.
-     *
-     * @param receiver New address of the royalties receiver.
-     * @param feeNumerator Royalties amount %.
-     */
-    function updateRoyalties(address receiver, uint96 feeNumerator) external;
 
     /**
      * @notice Returns number of tokens minted for address.
      *
      * @param user The address of user to check minted amount for.
-     * @param tokenId The token ID to check minted amount for.
      */
-    function getAmountMinted(address user, uint256 tokenId) external view returns (uint64);
+    function getAmountMinted(address user) external view returns (uint64);
+
+    /**
+     * @notice Mints tokens to addresses.
+     *
+     * @param to List of addresses to receive tokens.
+     * @param quantity List of quantities to assign to each address.
+     */
+    function airdrop(
+        address[] calldata to,
+        uint64[] calldata quantity
+    ) external;
+
+    /**
+     * @notice Burns a token.
+     *
+     * @param tokenId Id of the token to burn.
+     */
+    function burn(uint256 tokenId) external;
 
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
      * @param newMaxSupply The new max supply to set.
      */
-    function updateMaxSupply(uint256 tokenId, uint256 newMaxSupply) external;
+    function updateMaxSupply(uint256 newMaxSupply) external;
 
     /**
      * @notice Updates provenance hash.
