@@ -3,7 +3,7 @@ pragma solidity 0.8.18;
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
 
-interface IERC721DropImplementation {
+interface IERC1155DropImplementation {
     /**
      * @dev Revert if supplied merkle proof is not valid for allowlist mint stage.
      */
