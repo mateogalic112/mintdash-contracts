@@ -4,14 +4,11 @@ pragma solidity 0.8.18;
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
-import {ERC2981Upgradeable} from "../eip/ERC2981Upgradeable.sol";
-
 import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
 
 import {IERC721ContractMetadata} from "./interface/IERC721ContractMetadata.sol";
 
 abstract contract ERC721ContractMetadata is
-    ERC2981Upgradeable,
     AdministratedUpgradable,
     ERC721AUpgradeable,
     IERC721ContractMetadata
@@ -30,51 +27,41 @@ abstract contract ERC721ContractMetadata is
         _burn(tokenId, true);
     }
 
+    function airdrop(
+        address[] calldata to,
+        uint64[] calldata quantity
+    ) external onlyOwnerOrAdministrator {
+        address[] memory recipients = to;
+
+        for (uint64 i = 0; i < recipients.length; ) {
+            _mint(recipients[i], quantity[i]);
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        if (_totalMinted() > maxSupply) {
+            revert MintQuantityExceedsMaxSupply();
+        }
+    }
+
     function updateMaxSupply(
         uint256 newMaxSupply
     ) external onlyOwnerOrAdministrator {
-        // Ensure the max supply does not exceed the maximum value of uint64.
-        if (newMaxSupply > 2 ** 64 - 1) {
-            revert CannotExceedMaxSupplyOfUint64();
-        }
-
-        maxSupply = newMaxSupply;
-
-        emit MaxSupplyUpdated(newMaxSupply);
+        _updateMaxSupply(newMaxSupply);
     }
 
     function updateBaseURI(
         string calldata newUri
     ) external onlyOwnerOrAdministrator {
-        baseURI = newUri;
-
-        if (totalSupply() != 0) {
-            emit BatchMetadataUpdate(1, _nextTokenId() - 1);
-        }
-
-        emit BaseURIUpdated(newUri);
+        _updateBaseURI(newUri);
     }
 
     function updateProvenanceHash(
         bytes32 newProvenanceHash
     ) external onlyOwnerOrAdministrator {
-        // Ensure mint did not start
-        if (_totalMinted() > 0) {
-            revert ProvenanceHashCannotBeUpdatedAfterMintStarted();
-        }
-
-        provenanceHash = newProvenanceHash;
-
-        emit ProvenanceHashUpdated(newProvenanceHash);
-    }
-
-    function updateRoyalties(
-        address receiver,
-        uint96 feeNumerator
-    ) external onlyOwnerOrAdministrator {
-        _setDefaultRoyalty(receiver, feeNumerator);
-
-        emit RoyaltiesUpdated(receiver, feeNumerator);
+        _updateProvenanceHash(newProvenanceHash);
     }
 
     function updatePayer(
@@ -84,17 +71,43 @@ abstract contract ERC721ContractMetadata is
         allowedPayers[payer] = isAllowed;
     }
 
-    function supportsInterface(
-        bytes4 interfaceId
-    )
-        public
-        view
-        override(ERC721AUpgradeable, ERC2981Upgradeable)
-        returns (bool)
-    {
-        return
-            interfaceId == type(IERC2981Upgradeable).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function _updateMaxSupply(
+        uint256 newMaxSupply
+    ) internal {
+        // Ensure the max supply does not exceed the maximum value of uint64.
+        if (newMaxSupply > 2 ** 64 - 1) {
+            revert CannotExceedMaxSupplyOfUint64();
+        }
+
+        maxSupply = newMaxSupply;
+
+        emit MaxSupplyUpdated(newMaxSupply);
+    }
+    
+
+    function _updateBaseURI(
+        string calldata newUri
+    ) internal {
+        baseURI = newUri;
+
+        if (totalSupply() != 0) {
+            emit BatchMetadataUpdate(1, _nextTokenId() - 1);
+        }
+
+        emit BaseURIUpdated(newUri);
+    }
+
+    function _updateProvenanceHash(
+        bytes32 newProvenanceHash
+    ) internal {
+        // Ensure mint did not start
+        if (_totalMinted() > 0) {
+            revert ProvenanceHashCannotBeUpdatedAfterMintStarted();
+        }
+
+        provenanceHash = newProvenanceHash;
+
+        emit ProvenanceHashUpdated(newProvenanceHash);
     }
 
     function _checkPayer(address minter) internal view {

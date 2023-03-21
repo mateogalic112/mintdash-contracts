@@ -775,6 +775,22 @@ Updates base URI of the collection.
 |---|---|---|
 | newUri | string | The new base URI to set. |
 
+### updateConfiguration
+
+```solidity
+function updateConfiguration(MultiStageConfig config) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| config | MultiStageConfig | undefined |
+
 ### updateMaxSupply
 
 ```solidity
@@ -1126,6 +1142,22 @@ event OwnershipTransferred(address indexed previousOwner, address indexed newOwn
 | previousOwner `indexed` | address | undefined |
 | newOwner `indexed` | address | undefined |
 
+### PayoutAddressUpdated
+
+```solidity
+event PayoutAddressUpdated(address indexed payoutAddress)
+```
+
+
+
+*Emit an event when payout address is updated*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payoutAddress `indexed` | address | undefined |
+
 ### ProvenanceHashUpdated
 
 ```solidity
@@ -1213,6 +1245,17 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 
 ## Errors
+
+### AllowlistPhaseConfigMismatch
+
+```solidity
+error AllowlistPhaseConfigMismatch()
+```
+
+
+
+*Revert if allowlist multi config part is not valid.*
+
 
 ### AllowlistStageInvalidProof
 
@@ -1510,6 +1553,17 @@ error TokenGatedNotTokenOwner()
 
 
 *Revert if minter is not token owner for token gated mint stage.*
+
+
+### TokenGatedPhaseConfigMismatch
+
+```solidity
+error TokenGatedPhaseConfigMismatch()
+```
+
+
+
+*Revert if token gated multi config part is not valid.*
 
 
 ### TokenGatedTokenAlreadyRedeemed
