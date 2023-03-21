@@ -107,7 +107,7 @@ function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage a
 ### updateConfiguration
 
 ```solidity
-function updateConfiguration(IERC721DropImplementation.MultiStageConfig config) external nonpayable
+function updateConfiguration(MultiStageConfig config) external nonpayable
 ```
 
 
@@ -118,7 +118,7 @@ function updateConfiguration(IERC721DropImplementation.MultiStageConfig config) 
 
 | Name | Type | Description |
 |---|---|---|
-| config | IERC721DropImplementation.MultiStageConfig | undefined |
+| config | MultiStageConfig | undefined |
 
 ### updatePublicMintStage
 

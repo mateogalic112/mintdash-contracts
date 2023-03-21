@@ -6,7 +6,7 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, MultiStageConfig} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
 import {ERC1155ContractMetadata} from "./core/ERC1155ContractMetadata.sol";
@@ -206,6 +206,20 @@ contract ERC1155DropImplementation is
         _mintBase(minter, tokenId, quantity, data, TOKEN_GATED_STAGE_INDEX);
     }
 
+    function getAllowlistMintStage(
+        uint256 tokenId, 
+        uint256 allowlistStageId
+    ) external view returns (AllowlistMintStage memory) {
+        return allowlistMintStages[tokenId][allowlistStageId];
+    }
+
+    function getTokenGatedMintStage(
+        uint256 tokenId,
+        address nftContract
+    ) external view returns (TokenGatedMintStage memory) {
+        return tokenGatedMintStages[tokenId][nftContract];
+    }
+    
     function getTokenGatedIsRedeemed(
         uint256 tokenId,
         address nftContract,
@@ -214,13 +228,75 @@ contract ERC1155DropImplementation is
         return _tokenGatedTokenRedeems[tokenId][nftContract][nftContractTokenId];
     }
 
+    function updateConfiguration(
+        uint256 tokenId,
+        MultiStageConfig calldata config
+    ) external onlyOwnerOrAdministrator {
+
+        // Update max supply
+        if(config.maxSupply > 0) {
+            _updateMaxSupply(tokenId, config.maxSupply);
+        }
+
+        // Update base URI
+        if(bytes(config.baseURI).length > 0){
+            _updateTokenURI(tokenId, config.baseURI);
+        }
+
+        // Update royalties
+        if(config.royaltiesReceiver != address(0)){
+            _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
+        }
+
+        // Update payout
+        if(config.payoutAddress != address(0)){
+            _updatePayoutAddress(config.payoutAddress);
+        }
+
+        // Update public phase
+        if(_toUint256(config.publicMintStage.startTime != 0) |
+                _toUint256(config.publicMintStage.endTime != 0) ==
+            1
+        ){
+            _updatePublicMintStage(tokenId, config.publicMintStage);
+        }
+
+        // Update allowlist phases
+        if(config.allowlistMintStages.length > 0){
+             if(config.allowlistMintStageIds.length != config.allowlistMintStages.length){
+                revert AllowlistPhaseConfigMismatch();
+            }
+
+            for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
+                _updateAllowlistMintStage(tokenId, config.allowlistMintStageIds[i], config.allowlistMintStages[i]);
+
+                unchecked {
+                    ++i;
+                }
+            }
+        }
+
+         // Update token gated phases
+        if(config.tokenGatedMintStages.length > 0){
+             if(config.nftContracts.length != config.tokenGatedMintStages.length){
+                revert TokenGatedPhaseConfigMismatch();
+            }
+
+            for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
+                _updateTokenGatedMintStage(tokenId, config.nftContracts[i], config.tokenGatedMintStages[i]);
+
+                unchecked {
+                    ++i;
+                }
+            }
+        }
+    }
+
     function updatePublicMintStage(
         uint256 tokenId,
         PublicMintStage calldata publicMintStageData
     ) external onlyOwnerOrAdministrator {
-        publicMintStage[tokenId] = publicMintStageData;
-
-        emit PublicMintStageUpdated(tokenId, publicMintStageData);
+        _updatePublicMintStage(tokenId, publicMintStageData);
     }
 
     function updateAllowlistMintStage(
@@ -228,9 +304,7 @@ contract ERC1155DropImplementation is
         uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external onlyOwnerOrAdministrator {
-        allowlistMintStages[tokenId][allowlistStageId] = allowlistMintStageData;
-
-        emit AllowlistMintStageUpdated(tokenId, allowlistStageId, allowlistMintStageData);
+        _updateAllowlistMintStage(tokenId, allowlistStageId, allowlistMintStageData);
     }
 
     function updateTokenGatedMintStage(
@@ -238,13 +312,7 @@ contract ERC1155DropImplementation is
         address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external onlyOwnerOrAdministrator {
-        if (nftContract == address(0)) {
-            revert TokenGatedNftContractCannotBeZeroAddress();
-        }
-
-        tokenGatedMintStages[tokenId][nftContract] = tokenGatedMintStageData;
-
-        emit TokenGatedMintStageUpdated(tokenId, nftContract, tokenGatedMintStageData);
+        _updateTokenGatedMintStage(tokenId, nftContract, tokenGatedMintStageData);
     }
 
     function setApprovalForAll(
@@ -291,5 +359,38 @@ contract ERC1155DropImplementation is
             _checkFilterOperator(msg.sender);
         }
         super.safeBatchTransferFrom(from, to, ids, amounts, data);
+    }
+
+    function _updatePublicMintStage(
+        uint256 tokenId,
+        PublicMintStage calldata publicMintStageData
+    ) internal {
+        publicMintStage[tokenId] = publicMintStageData;
+
+        emit PublicMintStageUpdated(tokenId, publicMintStageData);
+    }
+
+    function _updateAllowlistMintStage(
+        uint256 tokenId,
+        uint256 allowlistStageId,
+        AllowlistMintStage calldata allowlistMintStageData
+    ) internal {
+        allowlistMintStages[tokenId][allowlistStageId] = allowlistMintStageData;
+
+        emit AllowlistMintStageUpdated(tokenId, allowlistStageId, allowlistMintStageData);
+    }
+
+    function _updateTokenGatedMintStage(
+        uint256 tokenId,
+        address nftContract,
+        TokenGatedMintStage calldata tokenGatedMintStageData
+    ) internal {
+        if (nftContract == address(0)) {
+            revert TokenGatedNftContractCannotBeZeroAddress();
+        }
+
+        tokenGatedMintStages[tokenId][nftContract] = tokenGatedMintStageData;
+
+        emit TokenGatedMintStageUpdated(tokenId, nftContract, tokenGatedMintStageData);
     }
 }

@@ -20,9 +20,15 @@ abstract contract ERC1155ContractMetadata is
 
     mapping(uint256 tokenId=> uint256 maxSupply) public maxSupply;
     mapping(uint256 tokenId => uint256 totalSupply) public totalSupply;
+    mapping(uint256 tokenid => string tokenURI) public tokenURIs;
+
     mapping(address user => mapping(uint256 tokenId => uint64 amount)) public minted;
 
     mapping(address payer => bool allowed) public allowedPayers;
+
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        return tokenURIs[tokenId];
+    }
 
     function getAmountMinted(address user, uint256 tokenId) external view returns (uint64) {
         return minted[user][tokenId];
@@ -61,10 +67,11 @@ abstract contract ERC1155ContractMetadata is
         _updateMaxSupply(tokenId, newMaxSupply);
     }
 
-    function updateBaseURI(
+    function updateTokenURI(
+        uint256 tokenId,
         string calldata newUri
     ) external onlyOwnerOrAdministrator {
-        _updateBaseURI(newUri);
+        _updateTokenURI(tokenId, newUri);
     }
 
     function updateProvenanceHash(
@@ -94,12 +101,13 @@ abstract contract ERC1155ContractMetadata is
         emit MaxSupplyUpdated(tokenId, newMaxSupply);
     }
 
-    function _updateBaseURI(
+    function _updateTokenURI(
+        uint256 tokenId,
         string calldata newUri
     ) internal {
-        _setURI(newUri);
+        tokenURIs[tokenId] = newUri;
 
-        emit BaseURIUpdated(newUri);
+        emit TokenURIUpdated(tokenId, newUri);
     }
 
     function _updateProvenanceHash(
@@ -172,7 +180,8 @@ abstract contract ERC1155ContractMetadata is
         uint256 mintStageIndex
     ) internal {
         minted[recipient][tokenId] += uint64(quantity);
-
+        totalSupply[tokenId] += quantity;
+        
         _mint(recipient, tokenId, quantity, data);
 
         emit Minted(recipient, tokenId, quantity, mintStageIndex);

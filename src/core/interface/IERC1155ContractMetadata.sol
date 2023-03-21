@@ -55,7 +55,7 @@ interface IERC1155ContractMetadata {
      * @dev Emit an event when base URI of the collection is updated.
      */
 
-    event BaseURIUpdated(string indexed baseURI);
+    event TokenURIUpdated(uint256 indexed tokenId, string indexed tokenURI);
     /**
      * @dev Emit an event when max supply of the token is updated.
      */
@@ -83,6 +83,7 @@ interface IERC1155ContractMetadata {
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
+     * @param tokenId The token ID to update max supply for.
      * @param newMaxSupply The new max supply to set.
      */
     function updateMaxSupply(uint256 tokenId, uint256 newMaxSupply) external;
@@ -96,11 +97,12 @@ interface IERC1155ContractMetadata {
     function updateProvenanceHash(bytes32 newProvenanceHash) external;
 
     /**
-     * @notice Updates base URI of the collection.
+     * @notice Updates token URI for the token.
      *
-     * @param newUri The new base URI to set.
+     * @param tokenId The token ID to update max supply for.
+     * @param newUri The URI to set for the token ID.
      */
-    function updateBaseURI(string calldata newUri) external;
+    function updateTokenURI(uint256 tokenId, string calldata newUri) external;
 
     /**
      * @notice Updates allowed payers.

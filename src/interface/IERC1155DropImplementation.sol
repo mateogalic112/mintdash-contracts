@@ -25,6 +25,16 @@ interface IERC1155DropImplementation {
     error TokenGatedNftContractCannotBeZeroAddress();
 
     /**
+     * @dev Revert if token gated multi config part is not valid.
+    */
+    error TokenGatedPhaseConfigMismatch();
+
+    /**
+     * @dev Revert if allowlist multi config part is not valid.
+    */
+    error AllowlistPhaseConfigMismatch();
+    
+    /**
      * @dev Emit an event when public mint stage configuration is updated.
      */
     event PublicMintStageUpdated(uint256 indexed tokenId, PublicMintStage data);
@@ -92,6 +102,22 @@ interface IERC1155DropImplementation {
         uint256[] calldata tokenIds,
         bytes calldata data
     ) external payable;
+
+    /**
+     * @notice Returns allowlist mint stage for token and ID.
+     *
+     * @param tokenId The token ID to check allowlist stage for.
+     * @param tokenId The ID of allowlist stage.
+     */
+    function getAllowlistMintStage(uint256 tokenId, uint256 allowlistStageId) external returns(AllowlistMintStage memory);
+
+    /**
+     * @notice Returns token gated mint stage for token and NFT contract address.
+     *
+     * @param tokenId The token ID to check allowlist stage for.
+     * @param nftContract The token gated nft contract.
+     */
+    function getTokenGatedMintStage(uint256 tokenId, address nftContract) external returns (TokenGatedMintStage memory);
 
     /**
      * @notice Returns if token is redeemed for NFT contract.
