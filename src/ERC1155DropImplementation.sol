@@ -6,7 +6,7 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, MultiStageConfig} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
 import {ERC1155ContractMetadata} from "./core/ERC1155ContractMetadata.sol";
@@ -24,7 +24,7 @@ contract ERC1155DropImplementation is
     IERC1155DropImplementation
 {
     mapping(uint256 tokenId => 
-        PublicMintStage publicMintStage) public publicMintStage;
+        PublicMintStage publicMintStage) public publicMintStages;
 
     mapping(uint256 tokenId => 
         mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage)) public allowlistMintStages;
@@ -72,7 +72,7 @@ contract ERC1155DropImplementation is
         }
 
         // Load public mint stage to memory
-        PublicMintStage memory mintStage = publicMintStage[tokenId];
+        PublicMintStage memory mintStage = publicMintStages[tokenId];
 
         // Ensure that public mint stage is active
         _checkStageActive(mintStage.startTime, mintStage.endTime);
@@ -206,6 +206,11 @@ contract ERC1155DropImplementation is
         _mintBase(minter, tokenId, quantity, data, TOKEN_GATED_STAGE_INDEX);
     }
 
+    function getPublicMintStage(
+        uint256 tokenId
+    ) external view returns (PublicMintStage memory) {
+        return publicMintStages[tokenId];
+    }
     function getAllowlistMintStage(
         uint256 tokenId, 
         uint256 allowlistStageId
@@ -230,7 +235,7 @@ contract ERC1155DropImplementation is
 
     function updateConfiguration(
         uint256 tokenId,
-        MultiStageConfig calldata config
+        MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
 
         // Update max supply
@@ -241,16 +246,6 @@ contract ERC1155DropImplementation is
         // Update base URI
         if(bytes(config.baseURI).length > 0){
             _updateTokenURI(tokenId, config.baseURI);
-        }
-
-        // Update royalties
-        if(config.royaltiesReceiver != address(0)){
-            _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
-        }
-
-        // Update payout
-        if(config.payoutAddress != address(0)){
-            _updatePayoutAddress(config.payoutAddress);
         }
 
         // Update public phase
@@ -365,7 +360,7 @@ contract ERC1155DropImplementation is
         uint256 tokenId,
         PublicMintStage calldata publicMintStageData
     ) internal {
-        publicMintStage[tokenId] = publicMintStageData;
+        publicMintStages[tokenId] = publicMintStageData;
 
         emit PublicMintStageUpdated(tokenId, publicMintStageData);
     }
