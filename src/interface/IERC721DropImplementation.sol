@@ -1,9 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, MultiStageConfig} from "../lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
 
 interface IERC721DropImplementation {
+    struct MultiConfig {
+        // Max supply
+        uint256 maxSupply;
+
+        // Collection base URI
+        string baseURI;
+
+        // Royalties
+        address royaltiesReceiver;
+        uint96 royaltiesFeeNumerator;
+
+        // Payout
+        address payoutAddress;
+
+        // Public stage
+        PublicMintStage publicMintStage;
+
+        // Allowlist stages
+        uint256[] allowlistMintStageIds;
+        AllowlistMintStage[] allowlistMintStages;
+
+        // Token gated stages
+        address[] nftContracts;
+        TokenGatedMintStage[] tokenGatedMintStages;
+    }
+
     /**
      * @dev Revert if supplied merkle proof is not valid for allowlist mint stage.
      */
@@ -107,7 +133,7 @@ interface IERC721DropImplementation {
      * @param config The new configuration for contract
      */
     function updateConfiguration(
-        MultiStageConfig calldata config
+        MultiConfig calldata config
     ) external;
 
     /**

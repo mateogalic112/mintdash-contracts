@@ -4,6 +4,24 @@ pragma solidity 0.8.18;
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
 
 interface IERC1155DropImplementation {
+    struct MultiConfig {
+        // Max supply
+        uint256 maxSupply;
+
+        // Collection base URI
+        string baseURI;
+
+        // Public stage
+        PublicMintStage publicMintStage;
+
+        // Allowlist stages
+        uint256[] allowlistMintStageIds;
+        AllowlistMintStage[] allowlistMintStages;
+
+        // Token gated stages
+        address[] nftContracts;
+        TokenGatedMintStage[] tokenGatedMintStages;
+    }
     /**
      * @dev Revert if supplied merkle proof is not valid for allowlist mint stage.
      */
@@ -33,7 +51,7 @@ interface IERC1155DropImplementation {
      * @dev Revert if allowlist multi config part is not valid.
     */
     error AllowlistPhaseConfigMismatch();
-    
+
     /**
      * @dev Emit an event when public mint stage configuration is updated.
      */
@@ -131,6 +149,18 @@ interface IERC1155DropImplementation {
         address nftContract,
         uint256 nftContractTokenId
     ) external view returns (bool);
+
+    /**
+     * @notice Updates configation for all phases.
+     * @dev This should be user for initial contract configuration.
+     *
+     * @param tokenId The token ID to update configuration for.
+     * @param config The new configuration for contract.
+     */
+    function updateConfiguration(
+        uint256 tokenId,
+        MultiConfig calldata config
+    ) external;
 
     /**
      * @notice Updates configuration for public mint stage.

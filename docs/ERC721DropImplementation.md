@@ -778,7 +778,7 @@ Updates base URI of the collection.
 ### updateConfiguration
 
 ```solidity
-function updateConfiguration(MultiStageConfig config) external nonpayable
+function updateConfiguration(IERC721DropImplementation.MultiConfig config) external nonpayable
 ```
 
 
@@ -789,7 +789,7 @@ function updateConfiguration(MultiStageConfig config) external nonpayable
 
 | Name | Type | Description |
 |---|---|---|
-| config | MultiStageConfig | undefined |
+| config | IERC721DropImplementation.MultiConfig | undefined |
 
 ### updateMaxSupply
 
