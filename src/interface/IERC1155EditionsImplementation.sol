@@ -3,7 +3,7 @@ pragma solidity 0.8.18;
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
 
-interface IERC1155DropImplementation {
+interface IERC1155EditionsImplementation {
     struct MultiConfig {
         // Max supply
         uint256 maxSupply;

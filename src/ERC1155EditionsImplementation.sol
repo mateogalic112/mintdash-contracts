@@ -14,14 +14,14 @@ import {ERC2981Upgradeable} from "./core/ERC2981Upgradeable.sol";
 import {Payout} from "./core/Payout.sol";
 import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 
-import {IERC1155DropImplementation} from "./interface/IERC1155DropImplementation.sol";
+import {IERC1155EditionsImplementation} from "./interface/IERC1155EditionsImplementation.sol";
 
-contract ERC1155DropImplementation is
+contract ERC1155EditionsImplementation is
     AdministratedUpgradable,
     ERC1155ContractMetadata,
     Payout,
     OperatorFilterToggle,
-    IERC1155DropImplementation
+    IERC1155EditionsImplementation
 {
     mapping(uint256 tokenId => 
         PublicMintStage publicMintStage) public publicMintStages;

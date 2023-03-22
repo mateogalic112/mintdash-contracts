@@ -7,7 +7,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { getMerkleProof, getMerkleTreeRoot } from "./helpers/merkleTree";
 import { ZERO_ADDRESS, ZERO_BYTES32 } from "./helpers/consts";
 
-describe("ERC1155DropImplementation", function () {
+describe("ERC1155EditionsImplementation", function () {
     let collection: Contract;
 
     let owner: SignerWithAddress,
@@ -55,10 +55,10 @@ describe("ERC1155DropImplementation", function () {
 
         allowlist = [allowlistUser.address, allowlistUser2.address];
 
-        const ERC1155DropImplementation = await ethers.getContractFactory(
-            "ERC1155DropImplementation",
+        const ERC1155EditionsImplementation = await ethers.getContractFactory(
+            "ERC1155EditionsImplementation",
         );
-        collection = await ERC1155DropImplementation.deploy();
+        collection = await ERC1155EditionsImplementation.deploy();
         await collection.deployed();
 
         // Initialize
