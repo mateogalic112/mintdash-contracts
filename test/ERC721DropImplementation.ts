@@ -893,6 +893,151 @@ describe("ERC721DropImplementation", function () {
             // Check account token balance
             expect(await collection.balanceOf(owner.address)).to.eq(3);
         });
+
+        it("mints with allowed payer", async () => {
+            // Setup payer
+            await collection.updatePayer(randomUser.address, true);
+
+            // Mint 3 tokens to owner address with payer
+            const signature = await signMint(
+                owner,
+                mintParams,
+                salt,
+                allowedSigner,
+            );
+
+            await collection
+                .connect(randomUser)
+                .mintSigned(owner.address, 3, mintParams, salt, signature, {
+                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                });
+
+            // Check account token balance
+            expect(await collection.balanceOf(owner.address)).to.eq(3);
+            expect(await collection.balanceOf(randomUser.address)).to.eq(0);
+        });
+
+        it("emits Minted event", async () => {
+            const signature = await signMint(
+                owner,
+                mintParams,
+                salt,
+                allowedSigner,
+            );
+            await expect(
+                collection.mintSigned(
+                    owner.address,
+                    3,
+                    mintParams,
+                    salt,
+                    signature,
+                    {
+                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    },
+                ),
+            )
+                .to.emit(collection, "Minted")
+                .withArgs(owner.address, 3, 1);
+        });
+
+        it("reverts with unallowed payer", async () => {
+            const signature = await signMint(
+                owner,
+                mintParams,
+                salt,
+                allowedSigner,
+            );
+
+            await expect(
+                collection
+                    .connect(randomUser)
+                    .mintSigned(owner.address, 3, mintParams, salt, signature, {
+                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    }),
+            ).to.revertedWithCustomError(collection, "PayerNotAllowed");
+        });
+
+        it("reverts if not enough ETH is provided", async () => {
+            const signature = await signMint(
+                owner,
+                mintParams,
+                salt,
+                allowedSigner,
+            );
+            await expect(
+                collection.mintSigned(
+                    owner.address,
+                    3,
+                    mintParams,
+                    salt,
+                    signature,
+                    {
+                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    },
+                ),
+            ).to.revertedWithCustomError(collection, "IncorrectFundsProvided");
+        });
+
+        it("reverts if over mint limit per wallet", async () => {
+            // Revert if over limit in single transaction
+            let signature = await signMint(
+                owner,
+                mintParams,
+                salt,
+                allowedSigner,
+            );
+
+            await expect(
+                collection.mintSigned(
+                    owner.address,
+                    5,
+                    mintParams,
+                    salt,
+                    signature,
+                    {
+                        value: ethers.utils.parseUnits("0.5", "ether"), // 3 * 0.1 ETH
+                    },
+                ),
+            ).to.revertedWithCustomError(
+                collection,
+                "MintQuantityExceedsWalletLimit",
+            );
+
+            // Revert if over limit in multiple transactons
+
+            salt = salt.add(1);
+            signature = await signMint(owner, mintParams, salt, allowedSigner);
+
+            await collection.mintSigned(
+                owner.address,
+                3,
+                mintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                },
+            );
+
+            salt = salt.add(1);
+            signature = await signMint(owner, mintParams, salt, allowedSigner);
+
+            await expect(
+                collection.mintSigned(
+                    owner.address,
+                    2,
+                    mintParams,
+                    salt,
+                    signature,
+                    {
+                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    },
+                ),
+            ).to.revertedWithCustomError(
+                collection,
+                "MintQuantityExceedsWalletLimit",
+            );
+        });
     });
 
     describe("getAmountMinted", () => {
