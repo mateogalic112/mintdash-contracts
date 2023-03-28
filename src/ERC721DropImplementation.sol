@@ -71,7 +71,6 @@ contract ERC721DropImplementation is
         _NAME_HASH = keccak256("ERC721Drop");
         _VERSION_HASH = keccak256("1.0");
         _CHAIN_ID = block.chainid;
-        _DOMAIN_SEPARATOR = _deriveDomainSeparator();
         _EIP_712_DOMAIN_TYPEHASH = keccak256(
             "EIP712Domain("
                 "string name,"
@@ -105,6 +104,7 @@ contract ERC721DropImplementation is
                 "uint256 stageIndex"
             ")"
         );
+        _DOMAIN_SEPARATOR = _deriveDomainSeparator();
     }
 
     function mintPublic(address recipient, uint256 quantity) external payable {
