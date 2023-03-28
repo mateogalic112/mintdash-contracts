@@ -3,4 +3,3 @@
 
 yarn lint:sol
 yarn lint:ts
-yarn test
