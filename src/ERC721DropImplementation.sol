@@ -253,7 +253,7 @@ contract ERC721DropImplementation is
         SignedMintParams calldata mintParams,
         uint256 salt,
         bytes calldata signature
-    ) external payable override {
+    ) external payable {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
@@ -267,6 +267,9 @@ contract ERC721DropImplementation is
             mintParams.mintLimitPerWallet,
             mintParams.maxSupplyForStage
         );
+
+        // Ensure that signed mint stage is active
+        _checkStageActive(mintParams.startTime, mintParams.endTime);
 
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, mintParams.mintPrice);

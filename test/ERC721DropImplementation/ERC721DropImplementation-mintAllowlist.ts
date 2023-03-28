@@ -90,7 +90,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 2,
                 getMerkleProof(allowlist, allowlistUser.address),
                 {
-                    value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.2", "ether"),
                 },
             );
 
@@ -111,7 +111,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 2,
                 getMerkleProof(allowlist, allowlistUser.address),
                 {
-                    value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.2", "ether"),
                 },
             );
 
@@ -130,7 +130,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 ),
         )
@@ -148,7 +148,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(collection, "PayerNotAllowed");
@@ -164,7 +164,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(collection, "IncorrectFundsProvided");
@@ -181,7 +181,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     3,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.3", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(
@@ -198,7 +198,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 1,
                 getMerkleProof(allowlist, allowlistUser.address),
                 {
-                    value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.1", "ether"),
                 },
             );
 
@@ -211,7 +211,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     2,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(
@@ -245,7 +245,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 2,
                 getMerkleProof(allowlist, allowlistUser.address),
                 {
-                    value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.2", "ether"),
                 },
             );
 
@@ -258,7 +258,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     2,
                     getMerkleProof(allowlist, allowlistUser2.address),
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(
@@ -314,7 +314,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     1,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(collection, "StageNotActive");
@@ -342,7 +342,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     1,
                     getMerkleProof(allowlist, allowlistUser.address),
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(collection, "StageNotActive");
@@ -356,7 +356,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 1,
                 getMerkleProof(allowlist, userWithoutAllowlist.address),
                 {
-                    value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.1", "ether"),
                 },
             ),
         ).to.revertedWithCustomError(collection, "AllowlistStageInvalidProof");
@@ -372,7 +372,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                     1,
                     getMerkleProof(allowlist, allowlistUser2.address),
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 ),
         ).to.revertedWithCustomError(collection, "AllowlistStageInvalidProof");
@@ -386,7 +386,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 1,
                 getMerkleProof(allowlist, userWithoutAllowlist.address),
                 {
-                    value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.1", "ether"),
                 },
             ),
         ).to.revertedWithCustomError(collection, "StageNotActive");

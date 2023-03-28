@@ -62,7 +62,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
     it("mints", async () => {
         // Mint 3 tokens
         await collection.mintPublic(owner.address, 3, {
-            value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+            value: ethers.utils.parseUnits("0.3", "ether"),
         });
 
         // Check account token balance
@@ -75,7 +75,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
 
         // Mint 3 tokens to owner address with payer
         await collection.connect(randomUser).mintPublic(owner.address, 3, {
-            value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+            value: ethers.utils.parseUnits("0.3", "ether"),
         });
 
         // Check account token balance
@@ -86,7 +86,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
     it("emits Minted event", async () => {
         await expect(
             collection.mintPublic(owner.address, 3, {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             }),
         )
             .to.emit(collection, "Minted")
@@ -96,7 +96,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
     it("reverts with unallowed payer", async () => {
         await expect(
             collection.connect(randomUser).mintPublic(owner.address, 3, {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             }),
         ).to.revertedWithCustomError(collection, "PayerNotAllowed");
     });

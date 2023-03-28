@@ -76,7 +76,7 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
             testERC721.address,
             [1, 2, 3],
             {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             },
         );
 
@@ -92,7 +92,7 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
         await collection
             .connect(randomUser)
             .mintTokenGated(owner.address, testERC721.address, [1, 2, 3], {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             });
 
         // Check account token balance
@@ -107,7 +107,7 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
                 testERC721.address,
                 [1, 2, 3],
                 {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 },
             ),
         )
@@ -156,7 +156,7 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
             collection
                 .connect(randomUser)
                 .mintTokenGated(owner.address, testERC721.address, [1, 2, 3], {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 }),
         ).to.revertedWithCustomError(collection, "PayerNotAllowed");
     });

@@ -2,6 +2,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { BigNumber, Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 import type { SignedMintParamsStruct } from "../../typechain-types/src/ERC721DropImplementation";
 
@@ -133,7 +134,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
             salt,
             signature,
             {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             },
         );
 
@@ -156,7 +157,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
         await collection
             .connect(randomUser)
             .mintSigned(owner.address, 3, mintParams, salt, signature, {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             });
 
         // Check account token balance
@@ -179,7 +180,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
                 salt,
                 signature,
                 {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 },
             ),
         )
@@ -199,7 +200,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
             collection
                 .connect(randomUser)
                 .mintSigned(owner.address, 3, mintParams, salt, signature, {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 }),
         ).to.revertedWithCustomError(collection, "PayerNotAllowed");
     });
@@ -219,7 +220,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
                 salt,
                 signature,
                 {
-                    value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.2", "ether"),
                 },
             ),
         ).to.revertedWithCustomError(collection, "IncorrectFundsProvided");
@@ -237,7 +238,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
                 salt,
                 signature,
                 {
-                    value: ethers.utils.parseUnits("0.5", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.5", "ether"),
                 },
             ),
         ).to.revertedWithCustomError(
@@ -246,7 +247,6 @@ describe("ERC721DropImplementation - mintSigned", function () {
         );
 
         // Revert if over limit in multiple transactons
-
         salt = salt.add(1);
         signature = await signMint(owner, mintParams, salt, allowedSigner);
 
@@ -257,7 +257,7 @@ describe("ERC721DropImplementation - mintSigned", function () {
             salt,
             signature,
             {
-                value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                value: ethers.utils.parseUnits("0.3", "ether"),
             },
         );
 
@@ -272,12 +272,146 @@ describe("ERC721DropImplementation - mintSigned", function () {
                 salt,
                 signature,
                 {
-                    value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.2", "ether"),
                 },
             ),
         ).to.revertedWithCustomError(
             collection,
             "MintQuantityExceedsWalletLimit",
         );
+    });
+
+    it("reverts if over max supply", async () => {
+        // Update max supply
+        await collection.updateMaxSupply(2);
+
+        const signature = await signMint(
+            owner,
+            mintParams,
+            salt,
+            allowedSigner,
+        );
+
+        await expect(
+            collection.mintSigned(
+                owner.address,
+                3,
+                mintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"),
+                },
+            ),
+        ).to.revertedWithCustomError(
+            collection,
+            "MintQuantityExceedsMaxSupply",
+        );
+    });
+
+    it("reverts if digest was already used", async () => {
+        const signature = await signMint(
+            owner,
+            mintParams,
+            salt,
+            allowedSigner,
+        );
+
+        // Mint 1 token
+        await collection.mintSigned(
+            owner.address,
+            1,
+            mintParams,
+            salt,
+            signature,
+            {
+                value: ethers.utils.parseUnits("0.1", "ether"),
+            },
+        );
+
+        // Mint again with same signature
+        await expect(
+            collection.mintSigned(
+                owner.address,
+                1,
+                mintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.1", "ether"),
+                },
+            ),
+        ).to.revertedWithCustomError(collection, "SignatureAlreadyUsed");
+    });
+
+    it("reverts is signer is not allowed", async () => {
+        const signature = await signMint(owner, mintParams, salt, randomUser);
+
+        await expect(
+            collection.mintSigned(
+                owner.address,
+                3,
+                mintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"),
+                },
+            ),
+        ).to.revertedWithCustomError(collection, "InvalidSignature");
+    });
+
+    it("reverts if stage didn't start", async () => {
+        const currentTimestamp = await time.latest();
+        const inactiveStageMintParams = {
+            ...mintParams,
+            startTime: currentTimestamp + 86400, // start in 24 hours
+            endTime: currentTimestamp + 186400,
+        };
+
+        const signature = await signMint(
+            owner,
+            inactiveStageMintParams,
+            salt,
+            allowedSigner,
+        );
+
+        await expect(
+            collection.mintSigned(
+                owner.address,
+                3,
+                inactiveStageMintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"),
+                },
+            ),
+        ).to.revertedWithCustomError(collection, "StageNotActive");
+    });
+
+    it("reverts if stage ended", async () => {
+        const signature = await signMint(
+            owner,
+            mintParams,
+            salt,
+            allowedSigner,
+        );
+
+        // Travel 30 hours in the future
+        await time.increase(30 * 3600);
+
+        await expect(
+            collection.mintSigned(
+                owner.address,
+                3,
+                mintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"),
+                },
+            ),
+        ).to.revertedWithCustomError(collection, "StageNotActive");
     });
 });
