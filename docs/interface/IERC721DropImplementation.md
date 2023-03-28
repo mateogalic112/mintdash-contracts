@@ -177,6 +177,23 @@ function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage toke
 
 ## Events
 
+### AllowedSignerUpdated
+
+```solidity
+event AllowedSignerUpdated(address indexed signer, bool indexed allowed)
+```
+
+
+
+*Emit an event when allowed signer is updated.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer `indexed` | address | undefined |
+| allowed `indexed` | bool | undefined |
+
 ### AllowlistMintStageUpdated
 
 ```solidity
@@ -256,13 +273,18 @@ error AllowlistStageInvalidProof()
 ### InvalidSignature
 
 ```solidity
-error InvalidSignature()
+error InvalidSignature(address recoveredAddress)
 ```
 
 
 
 *Revert if signature is not valid.*
 
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recoveredAddress | address | undefined |
 
 ### TokenGatedNftContractCannotBeZeroAddress
 

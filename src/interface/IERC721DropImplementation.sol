@@ -63,7 +63,7 @@ interface IERC721DropImplementation {
     /**
      * @dev Revert if signature is not valid.
     */
-    error InvalidSignature();
+    error InvalidSignature(address recoveredAddress);
 
     /**
      * @dev Emit an event when public mint stage configuration is updated.
@@ -82,6 +82,11 @@ interface IERC721DropImplementation {
         address indexed nftContract,
         TokenGatedMintStage data
     );
+
+     /**
+     * @dev Emit an event when allowed signer is updated.
+    */
+    event AllowedSignerUpdated(address indexed signer, bool indexed allowed);
 
     /**
      * @notice Mint a public stage.

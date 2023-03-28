@@ -1,11 +1,12 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 import { getMerkleProof, getMerkleTreeRoot } from "./helpers/merkleTree";
 import { ZERO_ADDRESS, ZERO_BYTES32 } from "./helpers/consts";
+import type { SignedMintParamsStruct } from "../typechain-types/src/ERC721DropImplementation";
 
 describe("ERC721DropImplementation", function () {
     let collection: Contract;
@@ -14,7 +15,8 @@ describe("ERC721DropImplementation", function () {
         allowlistUser: SignerWithAddress,
         allowlistUser2: SignerWithAddress,
         userWithoutAllowlist: SignerWithAddress,
-        randomUser: SignerWithAddress;
+        randomUser: SignerWithAddress,
+        allowedSigner: SignerWithAddress;
 
     let allowlist: string[];
 
@@ -50,6 +52,7 @@ describe("ERC721DropImplementation", function () {
             allowlistUser2,
             userWithoutAllowlist,
             randomUser,
+            allowedSigner,
         ] = await ethers.getSigners();
 
         allowlist = [allowlistUser.address, allowlistUser2.address];
@@ -74,6 +77,9 @@ describe("ERC721DropImplementation", function () {
 
         // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
+
+        // Configure allowed signer
+        await collection.updateAllowedSigner(allowedSigner.address, true);
     });
 
     describe("mintPublic", () => {
@@ -788,6 +794,104 @@ describe("ERC721DropImplementation", function () {
                     },
                 ),
             ).to.revertedWithCustomError(collection, "StageNotActive");
+        });
+    });
+
+    describe("mintSigned", () => {
+        let eip712Domain: { [key: string]: string | number };
+        let eip712Types: Record<string, Array<{ name: string; type: string }>>;
+
+        let mintParams: SignedMintParamsStruct;
+        let salt: BigNumber;
+
+        const signMint = async (
+            minter: SignerWithAddress,
+            mintParams: SignedMintParamsStruct,
+            salt: BigNumber,
+            signer: SignerWithAddress,
+        ) => {
+            const signedMint = {
+                minter: minter.address,
+                mintParams,
+                salt,
+            };
+
+            const signature = await signer._signTypedData(
+                eip712Domain,
+                eip712Types,
+                signedMint,
+            );
+
+            // Make sure signature is ok.
+            const verifiedAddress = ethers.utils.verifyTypedData(
+                eip712Domain,
+                eip712Types,
+                signedMint,
+                signature,
+            );
+            expect(verifiedAddress).to.eq(signer.address);
+
+            return signature;
+        };
+
+        beforeEach(async () => {
+            eip712Domain = {
+                name: "ERC721Drop",
+                version: "1.0",
+                chainId: (await ethers.provider.getNetwork()).chainId,
+                verifyingContract: collection.address,
+            };
+
+            eip712Types = {
+                SignedMint: [
+                    { name: "minter", type: "address" },
+                    { name: "mintParams", type: "SignedMintParams" },
+                    { name: "salt", type: "uint256" },
+                ],
+                SignedMintParams: [
+                    { name: "mintPrice", type: "uint80" },
+                    { name: "startTime", type: "uint48" },
+                    { name: "endTime", type: "uint48" },
+                    { name: "mintLimitPerWallet", type: "uint16" },
+                    { name: "maxSupplyForStage", type: "uint40" },
+                    { name: "stageIndex", type: "uint256" },
+                ],
+            };
+
+            mintParams = {
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: Math.round(Date.now() / 1000) - 1000,
+                endTime: Math.round(Date.now() / 1000) + 1000,
+                mintLimitPerWallet: 3,
+                maxSupplyForStage: 100,
+                stageIndex: 1,
+            };
+
+            salt = BigNumber.from("1");
+        });
+
+        it("mints", async () => {
+            const signature = await signMint(
+                owner,
+                mintParams,
+                salt,
+                allowedSigner,
+            );
+
+            // Mint 3 tokens
+            await collection.mintSigned(
+                owner.address,
+                3,
+                mintParams,
+                salt,
+                signature,
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                },
+            );
+
+            // Check account token balance
+            expect(await collection.balanceOf(owner.address)).to.eq(3);
         });
     });
 

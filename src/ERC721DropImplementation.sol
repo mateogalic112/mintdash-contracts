@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: Unlicense
-
-
 pragma solidity 0.8.18;
 
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
@@ -47,12 +45,12 @@ contract ERC721DropImplementation is
 
     uint256 internal UNLIMITED_MAX_SUPPLY_FOR_STAGE;
 
+    uint256 internal _CHAIN_ID;
     bytes32 internal _SIGNED_MINT_TYPEHASH;
     bytes32 internal _MINT_PARAMS_TYPEHASH;
     bytes32 internal _EIP_712_DOMAIN_TYPEHASH;
     bytes32 internal _NAME_HASH;
     bytes32 internal _VERSION_HASH;
-    uint256 internal _CHAIN_ID;
     bytes32 internal _DOMAIN_SEPARATOR;
 
     function initialize(
@@ -88,13 +86,12 @@ contract ERC721DropImplementation is
                 "uint48 startTime,"
                 "uint48 endTime,"
                 "uint16 mintLimitPerWallet,"
-                "uint256 stageIndex,"
-                "uint40 maxTokenSupplyForStage,"
+                "uint40 maxSupplyForStage,"
+                "uint256 stageIndex"
             ")"
         );
         _SIGNED_MINT_TYPEHASH = keccak256(
              "SignedMint("
-                "address nftContract,"
                 "address minter,"
                 "SignedMintParams mintParams,"
                 "uint256 salt"
@@ -104,8 +101,8 @@ contract ERC721DropImplementation is
                 "uint48 startTime,"
                 "uint48 endTime,"
                 "uint16 mintLimitPerWallet,"
-                "uint256 stageIndex,"
-                "uint40 maxTokenSupplyForStage,"
+                "uint40 maxSupplyForStage,"
+                "uint256 stageIndex"
             ")"
         );
     }
@@ -126,6 +123,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             publicMintStage.mintLimitPerWallet,
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
@@ -160,6 +158,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             allowlistMintStage.mintLimitPerWallet,
             allowlistMintStage.maxSupplyForStage
@@ -208,6 +207,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             tokenGatedMintStage.mintLimitPerWallet,
             tokenGatedMintStage.maxSupplyForStage
@@ -262,6 +262,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             mintParams.mintLimitPerWallet,
             mintParams.maxSupplyForStage
@@ -317,6 +318,16 @@ contract ERC721DropImplementation is
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external onlyOwnerOrAdministrator {
         _updateTokenGatedMintStage(nftContract, tokenGatedMintStageData);
+    }
+
+    function updateAllowedSigner(
+        address signer, 
+        bool isAllowed
+    ) external onlyOwnerOrAdministrator
+    {
+        allowedSigners[signer] = isAllowed;
+
+        emit AllowedSignerUpdated(signer, isAllowed);
     }
 
     function updateConfiguration(
@@ -453,7 +464,7 @@ contract ERC721DropImplementation is
     ) internal view {
         address recoveredAddress = digest.recover(signature);
         if(!allowedSigners[recoveredAddress]){
-            revert InvalidSignature();
+            revert InvalidSignature(recoveredAddress);
         }
     }
 
@@ -469,19 +480,18 @@ contract ERC721DropImplementation is
                 mintParams.startTime,
                 mintParams.endTime,
                 mintParams.mintLimitPerWallet,
-                mintParams.stageIndex,
-                mintParams.maxSupplyForStage
+                mintParams.maxSupplyForStage,
+                mintParams.stageIndex
             )
         );
 
-        bytes32 digest = keccak256(
+        return keccak256(
             bytes.concat(
                 bytes2(0x1901),
                 _domainSeparator(),
                 keccak256(
                     abi.encode(
                         _SIGNED_MINT_TYPEHASH,
-                        address(this),
                         minter,
                         mintParamsHashStruct,
                         salt
@@ -489,19 +499,15 @@ contract ERC721DropImplementation is
                 )
             )
         );
-
-        return digest;
     }
 
     function _domainSeparator() internal view returns (bytes32) {
-        // prettier-ignore
         return block.chainid == _CHAIN_ID
             ? _DOMAIN_SEPARATOR
             : _deriveDomainSeparator();
     }
 
     function _deriveDomainSeparator() internal view returns (bytes32) {
-        // prettier-ignore
         return keccak256(
             abi.encode(
                 _EIP_712_DOMAIN_TYPEHASH,

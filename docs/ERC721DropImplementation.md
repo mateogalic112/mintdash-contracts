@@ -784,6 +784,23 @@ function transferOwnership(address newOwner) external nonpayable
 |---|---|---|
 | newOwner | address | undefined |
 
+### updateAllowedSigner
+
+```solidity
+function updateAllowedSigner(address signer, bool isAllowed) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer | address | undefined |
+| isAllowed | bool | undefined |
+
 ### updateAllowlistMintStage
 
 ```solidity
@@ -995,6 +1012,40 @@ event AdministrationTransferred(address indexed previousAdmin, address indexed n
 |---|---|---|
 | previousAdmin `indexed` | address | undefined |
 | newAdmin `indexed` | address | undefined |
+
+### AllowedPayerUpdated
+
+```solidity
+event AllowedPayerUpdated(address indexed payer, bool indexed allowed)
+```
+
+
+
+*Emit an event when allowed payer is updated.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payer `indexed` | address | undefined |
+| allowed `indexed` | bool | undefined |
+
+### AllowedSignerUpdated
+
+```solidity
+event AllowedSignerUpdated(address indexed signer, bool indexed allowed)
+```
+
+
+
+*Emit an event when allowed signer is updated.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer `indexed` | address | undefined |
+| allowed `indexed` | bool | undefined |
 
 ### AllowlistMintStageUpdated
 
@@ -1390,13 +1441,18 @@ error InvalidPayoutAddress()
 ### InvalidSignature
 
 ```solidity
-error InvalidSignature()
+error InvalidSignature(address recoveredAddress)
 ```
 
 
 
 *Revert if signature is not valid.*
 
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recoveredAddress | address | undefined |
 
 ### MintERC2309QuantityExceedsLimit
 

@@ -71,6 +71,6 @@ struct SignedMintParams {
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;
-    uint256 stageIndex;
     uint40 maxSupplyForStage;
+    uint256 stageIndex;
 }
