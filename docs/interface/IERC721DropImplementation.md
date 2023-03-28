@@ -69,13 +69,33 @@ Mint a public stage.
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
+### mintSigned
+
+```solidity
+function mintSigned(address recipient, uint256 quantity, SignedMintParams mintParams, uint256 salt, bytes signature) external payable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recipient | address | undefined |
+| quantity | uint256 | undefined |
+| mintParams | SignedMintParams | undefined |
+| salt | uint256 | undefined |
+| signature | bytes | undefined |
+
 ### mintTokenGated
 
 ```solidity
 function mintTokenGated(address recipient, address nftContract, uint256[] tokenIds) external payable
 ```
 
-Mint an token gated stage.
+Mint a token gated stage.
 
 
 
@@ -231,6 +251,17 @@ error AllowlistStageInvalidProof()
 
 
 *Revert if supplied merkle proof is not valid for allowlist mint stage.*
+
+
+### InvalidSignature
+
+```solidity
+error InvalidSignature()
+```
+
+
+
+*Revert if signature is not valid.*
 
 
 ### TokenGatedNftContractCannotBeZeroAddress

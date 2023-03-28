@@ -66,6 +66,28 @@ function allowedPayers(address payer) external view returns (bool allowed)
 |---|---|---|
 | allowed | bool | undefined |
 
+### allowedSigners
+
+```solidity
+function allowedSigners(address signer) external view returns (bool allowed)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| allowed | bool | undefined |
+
 ### allowlistMintStages
 
 ```solidity
@@ -343,13 +365,33 @@ Mint a public stage.
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
+### mintSigned
+
+```solidity
+function mintSigned(address recipient, uint256 quantity, SignedMintParams mintParams, uint256 salt, bytes signature) external payable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recipient | address | undefined |
+| quantity | uint256 | undefined |
+| mintParams | SignedMintParams | undefined |
+| salt | uint256 | undefined |
+| signature | bytes | undefined |
+
 ### mintTokenGated
 
 ```solidity
 function mintTokenGated(address recipient, address nftContract, uint256[] tokenIds) external payable
 ```
 
-Mint an token gated stage.
+Mint a token gated stage.
 
 
 
@@ -1345,6 +1387,17 @@ error InvalidPayoutAddress()
 *Revert if the payout address is zero address.*
 
 
+### InvalidSignature
+
+```solidity
+error InvalidSignature()
+```
+
+
+
+*Revert if signature is not valid.*
+
+
 ### MintERC2309QuantityExceedsLimit
 
 ```solidity
@@ -1513,6 +1566,17 @@ error ProvenanceHashCannotBeUpdatedAfterMintStarted()
 
 
 *Revert if provenance hash is being updated after tokens have been minted.*
+
+
+### SignatureAlreadyUsed
+
+```solidity
+error SignatureAlreadyUsed()
+```
+
+
+
+*Revert if signature was already used for signed mint.*
 
 
 ### StageNotActive

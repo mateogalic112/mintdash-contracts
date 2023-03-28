@@ -54,3 +54,23 @@ struct TokenGatedMintStage {
     uint16 mintLimitPerWallet;
     uint40 maxSupplyForStage;
 }
+
+/**
+ * @notice A struct for signed mint params
+ *
+ * @param mintPrice                The mint price per token in native token (ETH, MATIC)
+ * @param startTime                The start time of the stage, must not be zero.
+ * @param endTIme                  The end time of the stage, must not be zero.
+ * @param mintLimitPerWallet       Maximum total number of mints a user is
+ *                                 allowed.
+ * @param stageIndex               The index of the mint stage.
+ * @param maxSupplyForStage        Maximum allowed supply to be minted in this stage.
+ */
+struct SignedMintParams {
+    uint80 mintPrice;
+    uint48 startTime;
+    uint48 endTime;
+    uint16 mintLimitPerWallet;
+    uint256 stageIndex;
+    uint40 maxSupplyForStage;
+}

@@ -47,6 +47,11 @@ interface IERC721ContractMetadata {
     error PayerNotAllowed();
 
     /**
+     * @dev Revert if signature was already used for signed mint.
+     */
+    error SignatureAlreadyUsed();
+
+    /**
      * @dev Emit an event when provenance hash is updated.
      */
     event ProvenanceHashUpdated(bytes32 indexed provenanceHash);
