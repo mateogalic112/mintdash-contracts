@@ -32,7 +32,7 @@
     "dotenv": "^16.0.3",
     "eslint": "^8.34.0",
     "ethers": "5.7.2",
-    "hardhat": "^2.12.7",
+    "hardhat": "^2.13.0",
     "hardhat-contract-sizer": "^2.7.0",
     "hardhat-gas-reporter": "^1.0.9",
     "husky": "^8.0.3",
