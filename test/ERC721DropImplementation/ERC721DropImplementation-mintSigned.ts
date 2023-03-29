@@ -107,10 +107,12 @@ describe("ERC721DropImplementation - mintSigned", function () {
             ],
         };
 
+        const currentTimestamp = await time.latest();
+
         mintParams = {
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: Math.round(Date.now() / 1000) - 1000,
-            endTime: Math.round(Date.now() / 1000) + 1000,
+            startTime: currentTimestamp - 1000,
+            endTime: currentTimestamp + 1000,
             mintLimitPerWallet: 3,
             maxSupplyForStage: 100,
             stageIndex: 1,
