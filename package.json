@@ -6,7 +6,7 @@
     "compile": "yarn hardhat compile",
     "test": "yarn hardhat test --typecheck",
     "size": "yarn hardhat size-contracts",
-    "lint:sol": "yarn solhint ‘contracts/**/*.sol’",
+    "lint:sol": "yarn solhint src/**/*.sol’",
     "lint:ts": "yarn eslint .",
     "coverage": "yarn hardhat coverage --network hardhat",
     "prepare": "husky install"
