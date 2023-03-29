@@ -5,8 +5,8 @@ import "hardhat-gas-reporter";
 import "hardhat-contract-sizer";
 import "solidity-coverage";
 import "@typechain/hardhat";
-import dotenv from "dotenv";
 
+import dotenv from "dotenv";
 dotenv.config();
 
 const config = {

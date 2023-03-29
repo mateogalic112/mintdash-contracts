@@ -12,28 +12,28 @@ concurrency:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - name: "Check out the repo"
-        uses: "actions/checkout@v3"
+      uses: "actions/checkout@v3"
     - name: "Install Node.js"
-        uses: "actions/setup-node@v3"
-        with:
-          cache: "yarn"
-          node-version: "lts/*"
+      uses: "actions/setup-node@v3"
+      with:
+        cache: "yarn"
     - name: Install dependencies
-      run: |
+      run:
         yarn install
-    - name: Lint
-      run: |
-        yarn lint
+    - name: Lint Solidity
+      run:
+        yarn lint:sol
+    - name: Lint Typescript
+      run:
+        yarn lint:ts
     - name: Test
-      run: |
+      run:
         yarn test
       env:
-        ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+        TESTNET_PRIVATE_KEY: ${{ secrets.TESTNET_PRIVATE_KEY }}
         MAINNET_PRIVATE_KEY: ${{ secrets.MAINNET_PRIVATE_KEY }}
         ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
