@@ -23,6 +23,9 @@ jobs:
     - name: Install dependencies
       run:
         yarn install
+    - name: Compile
+      run:
+        yarn compile
     - name: Lint Solidity
       run:
         yarn lint:sol
