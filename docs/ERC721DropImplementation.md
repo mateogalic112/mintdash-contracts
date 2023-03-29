@@ -66,6 +66,28 @@ function allowedPayers(address payer) external view returns (bool allowed)
 |---|---|---|
 | allowed | bool | undefined |
 
+### allowedSigners
+
+```solidity
+function allowedSigners(address signer) external view returns (bool allowed)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer | address | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| allowed | bool | undefined |
+
 ### allowlistMintStages
 
 ```solidity
@@ -343,13 +365,33 @@ Mint a public stage.
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
+### mintSigned
+
+```solidity
+function mintSigned(address recipient, uint256 quantity, SignedMintParams mintParams, uint256 salt, bytes signature) external payable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recipient | address | undefined |
+| quantity | uint256 | undefined |
+| mintParams | SignedMintParams | undefined |
+| salt | uint256 | undefined |
+| signature | bytes | undefined |
+
 ### mintTokenGated
 
 ```solidity
 function mintTokenGated(address recipient, address nftContract, uint256[] tokenIds) external payable
 ```
 
-Mint an token gated stage.
+Mint a token gated stage.
 
 
 
@@ -742,6 +784,23 @@ function transferOwnership(address newOwner) external nonpayable
 |---|---|---|
 | newOwner | address | undefined |
 
+### updateAllowedSigner
+
+```solidity
+function updateAllowedSigner(address signer, bool isAllowed) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer | address | undefined |
+| isAllowed | bool | undefined |
+
 ### updateAllowlistMintStage
 
 ```solidity
@@ -953,6 +1012,40 @@ event AdministrationTransferred(address indexed previousAdmin, address indexed n
 |---|---|---|
 | previousAdmin `indexed` | address | undefined |
 | newAdmin `indexed` | address | undefined |
+
+### AllowedPayerUpdated
+
+```solidity
+event AllowedPayerUpdated(address indexed payer, bool indexed allowed)
+```
+
+
+
+*Emit an event when allowed payer is updated.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| payer `indexed` | address | undefined |
+| allowed `indexed` | bool | undefined |
+
+### AllowedSignerUpdated
+
+```solidity
+event AllowedSignerUpdated(address indexed signer, bool indexed allowed)
+```
+
+
+
+*Emit an event when allowed signer is updated.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| signer `indexed` | address | undefined |
+| allowed `indexed` | bool | undefined |
 
 ### AllowlistMintStageUpdated
 
@@ -1345,6 +1438,22 @@ error InvalidPayoutAddress()
 *Revert if the payout address is zero address.*
 
 
+### InvalidSignature
+
+```solidity
+error InvalidSignature(address recoveredAddress)
+```
+
+
+
+*Revert if signature is not valid.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| recoveredAddress | address | undefined |
+
 ### MintERC2309QuantityExceedsLimit
 
 ```solidity
@@ -1513,6 +1622,17 @@ error ProvenanceHashCannotBeUpdatedAfterMintStarted()
 
 
 *Revert if provenance hash is being updated after tokens have been minted.*
+
+
+### SignatureAlreadyUsed
+
+```solidity
+error SignatureAlreadyUsed()
+```
+
+
+
+*Revert if signature was already used for signed mint.*
 
 
 ### StageNotActive

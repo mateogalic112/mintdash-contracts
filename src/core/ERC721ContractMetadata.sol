@@ -69,6 +69,8 @@ abstract contract ERC721ContractMetadata is
         bool isAllowed
     ) external onlyOwnerOrAdministrator {
         allowedPayers[payer] = isAllowed;
+
+        emit AllowedPayerUpdated(payer, isAllowed);
     }
 
     function _updateMaxSupply(
@@ -130,6 +132,7 @@ abstract contract ERC721ContractMetadata is
     }
 
     function _checkMintQuantity(
+        address minter,
         uint256 quantity,
         uint256 walletLimit,
         uint256 maxSupplyForStage
@@ -140,7 +143,7 @@ abstract contract ERC721ContractMetadata is
         }
 
         // Ensure wallet limit is not exceeded
-        uint256 balanceAfterMint = _getAux(msg.sender) + quantity;
+        uint256 balanceAfterMint = _getAux(minter) + quantity;
         if (balanceAfterMint > walletLimit) {
             revert MintQuantityExceedsWalletLimit();
         }

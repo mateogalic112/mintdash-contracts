@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: Unlicense
-
-
 pragma solidity 0.8.18;
 
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, SignedMintParams} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
@@ -25,6 +24,8 @@ contract ERC721DropImplementation is
     OperatorFilterToggle,
     IERC721DropImplementation
 {
+    using ECDSA for bytes32;
+
     PublicMintStage public publicMintStage;
     mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage) public allowlistMintStages;
     mapping(address nftContract => TokenGatedMintStage mintStage)
@@ -35,12 +36,22 @@ contract ERC721DropImplementation is
     mapping(address minter => mapping(address nftContract => mapping(uint256 tokenId => bool redeemed)))
         private _tokenHolderRedeemed;
 
-    uint256 internal constant PUBLIC_STAGE_INDEX = 0;
-    uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
-    uint256 internal constant TOKEN_GATED_STAGE_INDEX = 2;
+    mapping(bytes32 digest => bool used) private _usedDigests;
+    mapping(address signer => bool allowed) public allowedSigners;
 
-    uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE =
-        type(uint256).max;
+    uint256 internal PUBLIC_STAGE_INDEX;
+    uint256 internal ALLOWLIST_STAGE_INDEX;
+    uint256 internal TOKEN_GATED_STAGE_INDEX;
+
+    uint256 internal UNLIMITED_MAX_SUPPLY_FOR_STAGE;
+
+    uint256 internal _CHAIN_ID;
+    bytes32 internal _SIGNED_MINT_TYPEHASH;
+    bytes32 internal _MINT_PARAMS_TYPEHASH;
+    bytes32 internal _EIP_712_DOMAIN_TYPEHASH;
+    bytes32 internal _NAME_HASH;
+    bytes32 internal _VERSION_HASH;
+    bytes32 internal _DOMAIN_SEPARATOR;
 
     function initialize(
         string memory _name,
@@ -50,6 +61,50 @@ contract ERC721DropImplementation is
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();
+
+        PUBLIC_STAGE_INDEX = 0;
+        ALLOWLIST_STAGE_INDEX = 1;
+        TOKEN_GATED_STAGE_INDEX = 2;
+
+        UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
+
+        _NAME_HASH = keccak256("ERC721Drop");
+        _VERSION_HASH = keccak256("1.0");
+        _CHAIN_ID = block.chainid;
+        _EIP_712_DOMAIN_TYPEHASH = keccak256(
+            "EIP712Domain("
+                "string name,"
+                "string version,"
+                "uint256 chainId,"
+                "address verifyingContract"
+            ")"
+        );
+        _MINT_PARAMS_TYPEHASH = keccak256(
+           "SignedMintParams("
+                "uint80 mintPrice,"
+                "uint48 startTime,"
+                "uint48 endTime,"
+                "uint16 mintLimitPerWallet,"
+                "uint40 maxSupplyForStage,"
+                "uint256 stageIndex"
+            ")"
+        );
+        _SIGNED_MINT_TYPEHASH = keccak256(
+             "SignedMint("
+                "address minter,"
+                "SignedMintParams mintParams,"
+                "uint256 salt"
+            ")"
+            "SignedMintParams("
+                "uint80 mintPrice,"
+                "uint48 startTime,"
+                "uint48 endTime,"
+                "uint16 mintLimitPerWallet,"
+                "uint40 maxSupplyForStage,"
+                "uint256 stageIndex"
+            ")"
+        );
+        _DOMAIN_SEPARATOR = _deriveDomainSeparator();
     }
 
     function mintPublic(address recipient, uint256 quantity) external payable {
@@ -68,6 +123,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             publicMintStage.mintLimitPerWallet,
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
@@ -76,6 +132,7 @@ contract ERC721DropImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
 
+        // Mint tokens
         _mintBase(minter, quantity, PUBLIC_STAGE_INDEX);
     }
 
@@ -101,6 +158,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             allowlistMintStage.mintLimitPerWallet,
             allowlistMintStage.maxSupplyForStage
@@ -149,6 +207,7 @@ contract ERC721DropImplementation is
 
         // Ensure correct mint quantity
         _checkMintQuantity(
+            minter,
             quantity,
             tokenGatedMintStage.mintLimitPerWallet,
             tokenGatedMintStage.maxSupplyForStage
@@ -184,7 +243,57 @@ contract ERC721DropImplementation is
             }
         }
 
+        // Mint tokens
         _mintBase(minter, quantity, TOKEN_GATED_STAGE_INDEX);
+    }
+
+    function mintSigned(
+        address recipient,
+        uint256 quantity,
+        SignedMintParams calldata mintParams,
+        uint256 salt,
+        bytes calldata signature
+    ) external payable {
+        // Get the minter address. Default to msg.sender.
+        address minter = recipient != address(0) ? recipient : msg.sender;
+
+        // Ensure the payer is allowed if not caller
+        _checkPayer(minter);
+
+        // Ensure correct mint quantity
+        _checkMintQuantity(
+            minter,
+            quantity,
+            mintParams.mintLimitPerWallet,
+            mintParams.maxSupplyForStage
+        );
+
+        // Ensure that signed mint stage is active
+        _checkStageActive(mintParams.startTime, mintParams.endTime);
+
+        // Ensure enough ETH is provided
+        _checkFunds(msg.value, quantity, mintParams.mintPrice);
+
+        // Get the digest to verify the EIP-712 signature.
+        bytes32 digest = _getDigest(
+            minter,
+            mintParams,
+            salt
+        );
+
+        // Ensure the digest has not already been used.
+        if (_usedDigests[digest]) {
+            revert SignatureAlreadyUsed();
+        }
+
+        // Mark the digest as used.
+        _usedDigests[digest] = true;
+
+        // Ensure correct signer signed this message.
+        _checkSigner(digest, signature);
+
+        // Mint tokens
+        _mintBase(minter, quantity, mintParams.stageIndex);
     }
 
     function getTokenGatedIsRedeemed(
@@ -212,6 +321,16 @@ contract ERC721DropImplementation is
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external onlyOwnerOrAdministrator {
         _updateTokenGatedMintStage(nftContract, tokenGatedMintStageData);
+    }
+
+    function updateAllowedSigner(
+        address signer, 
+        bool isAllowed
+    ) external onlyOwnerOrAdministrator
+    {
+        allowedSigners[signer] = isAllowed;
+
+        emit AllowedSignerUpdated(signer, isAllowed);
     }
 
     function updateConfiguration(
@@ -340,6 +459,67 @@ contract ERC721DropImplementation is
             _checkFilterOperator(msg.sender);
         }
         super.safeTransferFrom(from, to, tokenId, data);
+    }
+
+    function _checkSigner(
+        bytes32 digest, 
+        bytes calldata signature
+    ) internal view {
+        address recoveredAddress = digest.recover(signature);
+        if(!allowedSigners[recoveredAddress]){
+            revert InvalidSignature(recoveredAddress);
+        }
+    }
+
+    function _getDigest(
+        address minter,
+        SignedMintParams memory mintParams,
+        uint256 salt
+    ) internal view returns (bytes32) {
+        bytes32 mintParamsHashStruct = keccak256(
+            abi.encode(
+                _MINT_PARAMS_TYPEHASH,
+                mintParams.mintPrice,
+                mintParams.startTime,
+                mintParams.endTime,
+                mintParams.mintLimitPerWallet,
+                mintParams.maxSupplyForStage,
+                mintParams.stageIndex
+            )
+        );
+
+        return keccak256(
+            bytes.concat(
+                bytes2(0x1901),
+                _domainSeparator(),
+                keccak256(
+                    abi.encode(
+                        _SIGNED_MINT_TYPEHASH,
+                        minter,
+                        mintParamsHashStruct,
+                        salt
+                    )
+                )
+            )
+        );
+    }
+
+    function _domainSeparator() internal view returns (bytes32) {
+        return block.chainid == _CHAIN_ID
+            ? _DOMAIN_SEPARATOR
+            : _deriveDomainSeparator();
+    }
+
+    function _deriveDomainSeparator() internal view returns (bytes32) {
+        return keccak256(
+            abi.encode(
+                _EIP_712_DOMAIN_TYPEHASH,
+                _NAME_HASH,
+                _VERSION_HASH,
+                block.chainid,
+                address(this)
+            )
+        );
     }
 
     function _updatePublicMintStage(

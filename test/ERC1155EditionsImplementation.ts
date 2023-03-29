@@ -109,7 +109,7 @@ describe("ERC1155EditionsImplementation", function () {
                 3,
                 "0x",
                 {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 },
             );
 
@@ -127,7 +127,7 @@ describe("ERC1155EditionsImplementation", function () {
             await collection
                 .connect(randomUser)
                 .mintPublic(owner.address, DEFAULT_TOKEN_ID, 3, "0x", {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 });
 
             // Check account token balance
@@ -150,7 +150,7 @@ describe("ERC1155EditionsImplementation", function () {
                     3,
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.3", "ether"),
                     },
                 ),
             )
@@ -163,7 +163,7 @@ describe("ERC1155EditionsImplementation", function () {
                 collection
                     .connect(randomUser)
                     .mintPublic(owner.address, DEFAULT_TOKEN_ID, 3, "0x", {
-                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.3", "ether"),
                     }),
             ).to.revertedWithCustomError(collection, "PayerNotAllowed");
         });
@@ -323,7 +323,7 @@ describe("ERC1155EditionsImplementation", function () {
                     getMerkleProof(allowlist, allowlistUser.address),
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 );
 
@@ -351,7 +351,7 @@ describe("ERC1155EditionsImplementation", function () {
                     getMerkleProof(allowlist, allowlistUser.address),
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 );
 
@@ -382,7 +382,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.2", "ether"),
                         },
                     ),
             )
@@ -402,7 +402,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.2", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(collection, "PayerNotAllowed");
@@ -420,7 +420,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.1", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(collection, "IncorrectFundsProvided");
@@ -439,7 +439,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.3", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(
@@ -458,7 +458,7 @@ describe("ERC1155EditionsImplementation", function () {
                     getMerkleProof(allowlist, allowlistUser.address),
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 );
 
@@ -473,7 +473,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.2", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(
@@ -513,7 +513,7 @@ describe("ERC1155EditionsImplementation", function () {
                     getMerkleProof(allowlist, allowlistUser.address),
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.2", "ether"),
                     },
                 );
 
@@ -528,7 +528,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser2.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.2", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.2", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(
@@ -590,7 +590,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.1", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(collection, "StageNotActive");
@@ -624,7 +624,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.1", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(collection, "StageNotActive");
@@ -640,7 +640,7 @@ describe("ERC1155EditionsImplementation", function () {
                     getMerkleProof(allowlist, userWithoutAllowlist.address),
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 ),
             ).to.revertedWithCustomError(
@@ -661,7 +661,7 @@ describe("ERC1155EditionsImplementation", function () {
                         getMerkleProof(allowlist, allowlistUser2.address),
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.1", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(
@@ -680,7 +680,7 @@ describe("ERC1155EditionsImplementation", function () {
                     getMerkleProof(allowlist, userWithoutAllowlist.address),
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.1", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.1", "ether"),
                     },
                 ),
             ).to.revertedWithCustomError(collection, "StageNotActive");
@@ -726,7 +726,7 @@ describe("ERC1155EditionsImplementation", function () {
                 [1, 2, 3],
                 "0x",
                 {
-                    value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                    value: ethers.utils.parseUnits("0.3", "ether"),
                 },
             );
 
@@ -750,7 +750,7 @@ describe("ERC1155EditionsImplementation", function () {
                     [1, 2, 3],
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.3", "ether"),
                     },
                 );
 
@@ -775,7 +775,7 @@ describe("ERC1155EditionsImplementation", function () {
                     [1, 2, 3],
                     "0x",
                     {
-                        value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                        value: ethers.utils.parseUnits("0.3", "ether"),
                     },
                 ),
             )
@@ -841,7 +841,7 @@ describe("ERC1155EditionsImplementation", function () {
                         [1, 2, 3],
                         "0x",
                         {
-                            value: ethers.utils.parseUnits("0.3", "ether"), // 3 * 0.1 ETH
+                            value: ethers.utils.parseUnits("0.3", "ether"),
                         },
                     ),
             ).to.revertedWithCustomError(collection, "PayerNotAllowed");
