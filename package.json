@@ -12,7 +12,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.8.1",
+    "@openzeppelin/contracts": "^4.8.2",
     "@primitivefi/hardhat-dodoc": "^0.2.3",
     "erc721a": "^4.2.3",
     "erc721a-upgradeable": "^4.2.3",
