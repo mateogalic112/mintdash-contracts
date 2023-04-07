@@ -31,7 +31,8 @@ abstract contract Payout is AdministratedUpgradable, ERC2981Upgradeable, IPayout
             revert InvalidPayoutAddress();
         }
 
-        payable(payoutAddress).transfer(address(this).balance);
+        (bool success, ) = payoutAddress.call{value: address(this).balance}("");
+        require(success, "Transfer failed.");
     }
 
     function _updatePayoutAddress(
