@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.18;
 
+import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
-import {ERC2981Upgradeable} from "./ERC2981Upgradeable.sol";
 
 import {IPayout} from "./interface/IPayout.sol";
 

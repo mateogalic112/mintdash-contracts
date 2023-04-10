@@ -383,14 +383,6 @@ describe("ERC721DropImplementation", function () {
                 newConfig.payoutAddress,
             );
 
-            const defaultRoyalties = await collection.defaultRoyaltyInfo();
-            expect(defaultRoyalties.receiver).to.eq(
-                newConfig.royaltiesReceiver,
-            );
-            expect(defaultRoyalties.royaltyFraction).to.eq(
-                newConfig.royaltiesFeeNumerator,
-            );
-
             const publicMintStage = await collection.publicMintStage();
             expect(publicMintStage.mintPrice).to.equal(
                 newConfig.publicMintStage.mintPrice,
@@ -583,12 +575,6 @@ describe("ERC721DropImplementation", function () {
             expect(updatedAmount).to.eq(
                 ethers.utils.parseUnits("0.5", "ether"),
             );
-
-            // Check new default royalties
-            const defaultRoyalties = await collection.defaultRoyaltyInfo();
-
-            expect(defaultRoyalties.receiver).to.eq(newReceiver);
-            expect(defaultRoyalties.royaltyFraction).to.eq(newFeeNumerator);
         });
 
         it("reverts if caller is not contract owner or administrator", async () => {

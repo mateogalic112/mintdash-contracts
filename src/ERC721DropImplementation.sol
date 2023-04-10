@@ -6,12 +6,12 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
+import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, SignedMintParams} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
-import {ERC2981Upgradeable} from "./core/ERC2981Upgradeable.sol";
 import {Payout} from "./core/Payout.sol";
 import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 
