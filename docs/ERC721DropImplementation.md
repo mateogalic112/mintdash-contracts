@@ -385,6 +385,28 @@ Mint a token gated stage.
 | nftContract | address | NFT collection to redeem for. |
 | tokenIds | uint256[] | Token Ids to redeem. |
 
+### multicall
+
+```solidity
+function multicall(bytes[] data) external nonpayable returns (bytes[] results)
+```
+
+
+
+*Receives and executes a batch of function calls on this contract.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| data | bytes[] | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| results | bytes[] | undefined |
+
 ### name
 
 ```solidity
