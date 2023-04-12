@@ -16,9 +16,9 @@ contract ERC721Proxy is Proxy {
         );
         StorageSlot
             .getAddressSlot(_IMPLEMENTATION_SLOT)
-            .value = 0xB043e6518E8064C6CF920aF739B2BC042F9661Ab;
+            .value = 0x3B4D6D7399B458FA8DCb36DE5e0a41430e6C45DC;
         Address.functionDelegateCall(
-            0xB043e6518E8064C6CF920aF739B2BC042F9661Ab,
+            0x3B4D6D7399B458FA8DCb36DE5e0a41430e6C45DC,
             abi.encodeWithSignature(
                 "initialize(string,string)",
                 name,

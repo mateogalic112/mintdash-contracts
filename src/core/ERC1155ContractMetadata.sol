@@ -3,6 +3,7 @@ pragma solidity 0.8.18;
 
 import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
 import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
 import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
 
@@ -11,6 +12,7 @@ import {IERC1155ContractMetadata} from "./interface/IERC1155ContractMetadata.sol
 abstract contract ERC1155ContractMetadata is
     AdministratedUpgradable,
     ERC1155BurnableUpgradeable,
+    MulticallUpgradeable,
     IERC1155ContractMetadata
 {
     string public name;

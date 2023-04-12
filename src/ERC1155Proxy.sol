@@ -16,9 +16,9 @@ contract ERC1155Proxy is Proxy {
         );
         StorageSlot
             .getAddressSlot(_IMPLEMENTATION_SLOT)
-            .value = 0xcAfDB0E39edCe1b9c336EcFd27f6636c890fA295;
+            .value = 0x5b69115cA107222B6F988215dEAdaBE6229c9bbc;
         Address.functionDelegateCall(
-            0xcAfDB0E39edCe1b9c336EcFd27f6636c890fA295,
+            0x5b69115cA107222B6F988215dEAdaBE6229c9bbc,
             abi.encodeWithSignature(
                 "initialize(string,string)",
                 name,
