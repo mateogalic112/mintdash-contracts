@@ -6,7 +6,6 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
-import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
@@ -22,7 +21,6 @@ contract ERC1155EditionsImplementation is
     ERC1155ContractMetadata,
     Payout,
     OperatorFilterToggle,
-    MulticallUpgradeable,
     IERC1155EditionsImplementation
 {
     mapping(uint256 tokenId => 
