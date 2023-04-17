@@ -5,12 +5,12 @@ import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/to
 import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
-import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
+import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
 
 import {IERC1155ContractMetadata} from "./interface/IERC1155ContractMetadata.sol";
 
 abstract contract ERC1155ContractMetadata is
-    AdministratedUpgradable,
+    AdministratedUpgradeable,
     ERC1155BurnableUpgradeable,
     MulticallUpgradeable,
     IERC1155ContractMetadata

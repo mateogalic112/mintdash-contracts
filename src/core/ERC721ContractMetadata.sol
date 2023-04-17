@@ -5,12 +5,12 @@ import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeab
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
-import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
+import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
 
 import {IERC721ContractMetadata} from "./interface/IERC721ContractMetadata.sol";
 
 abstract contract ERC721ContractMetadata is
-    AdministratedUpgradable,
+    AdministratedUpgradeable,
     ERC721AUpgradeable,
     MulticallUpgradeable,
     IERC721ContractMetadata

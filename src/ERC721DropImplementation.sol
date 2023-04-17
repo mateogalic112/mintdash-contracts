@@ -10,7 +10,7 @@ import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/comm
 
 import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, SignedMintParams} from "./lib/DropStructs.sol";
 
-import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
+import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
 import {Payout} from "./core/Payout.sol";
 import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
@@ -18,7 +18,7 @@ import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 import {IERC721DropImplementation} from "./interface/IERC721DropImplementation.sol";
 
 contract ERC721DropImplementation is
-    AdministratedUpgradable,
+    AdministratedUpgradeable,
     ERC721ContractMetadata,
     Payout,
     OperatorFilterToggle,

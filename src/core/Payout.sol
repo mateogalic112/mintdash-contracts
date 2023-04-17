@@ -2,11 +2,11 @@
 pragma solidity 0.8.18;
 
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
-import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
+import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
 
 import {IPayout} from "./interface/IPayout.sol";
 
-abstract contract Payout is AdministratedUpgradable, ERC2981Upgradeable, IPayout {
+abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayout {
     address public payoutAddress;
 
     function updatePayoutAddress(

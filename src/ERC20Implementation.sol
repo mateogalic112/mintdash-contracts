@@ -4,11 +4,11 @@ pragma solidity 0.8.18;
 import {ERC20BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
-import {AdministratedUpgradable} from "./core/AdministratedUpgradable.sol";
+import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 
 contract ERC20Implementation is
     ERC20BurnableUpgradeable,
-    AdministratedUpgradable,
+    AdministratedUpgradeable,
     MulticallUpgradeable
 {
     function initialize(

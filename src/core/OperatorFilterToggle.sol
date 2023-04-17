@@ -3,12 +3,12 @@ pragma solidity 0.8.18;
 
 import {DefaultOperatorFiltererUpgradeable} from "operator-filter-registry/src/upgradeable/DefaultOperatorFiltererUpgradeable.sol";
 
-import {AdministratedUpgradable} from "./AdministratedUpgradable.sol";
+import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
 
 import {IOperatorFilterToggle} from "./interface/IOperatorFilterToggle.sol";
 
 abstract contract OperatorFilterToggle is
-    AdministratedUpgradable,
+    AdministratedUpgradeable,
     DefaultOperatorFiltererUpgradeable,
     IOperatorFilterToggle
 {
