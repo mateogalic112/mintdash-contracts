@@ -3,7 +3,7 @@ pragma solidity 0.8.18;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-abstract contract AdministratedUpgradable is OwnableUpgradeable {
+abstract contract AdministratedUpgradeable is OwnableUpgradeable {
     address public administrator;
 
     event AdministrationTransferred(
