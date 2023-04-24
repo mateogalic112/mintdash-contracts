@@ -64,12 +64,13 @@ contract ERC721StakingImplementation is
     }
 
     function claimRewards() external {
-        uint256 rewards =
-            _calculateRewardsSinceLastUpdate(msg.sender) + stakersInfo[msg.sender].unclaimedRewards;
+        StakerInfo storage stakerInfo = stakersInfo[msg.sender];
+
+        uint256 rewards = _calculateRewardsSinceLastUpdate(msg.sender) + stakerInfo.unclaimedRewards;
 
         if (rewards == 0) revert NoRewardsToClaim();
 
-        stakersInfo[msg.sender].unclaimedRewards = 0;
+        stakerInfo.unclaimedRewards = 0;
         _updateStakerTimestamps();
 
         IERC20(rewardToken).transfer(msg.sender, rewards);
@@ -78,11 +79,13 @@ contract ERC721StakingImplementation is
     }
 
     function updateRewardRate(uint256 rewardsPerSecond) external onlyOwnerOrAdministrator {
-        if (rewardPhases[nextRewardPhaseId - 1].rewardsPerSecond == rewardsPerSecond) {
+        RewardPhase storage currentRewardPhase = rewardPhases[nextRewardPhaseId - 1];
+
+        if (currentRewardPhase.rewardsPerSecond == rewardsPerSecond) {
             revert SameRewardRate();
         }
 
-        rewardPhases[nextRewardPhaseId - 1].endTimestamp = uint128(block.timestamp);
+        currentRewardPhase.endTimestamp = uint128(block.timestamp);
 
         _createNewRewardPhase(rewardsPerSecond);
 
