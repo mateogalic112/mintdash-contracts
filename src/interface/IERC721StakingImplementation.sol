@@ -3,16 +3,16 @@ pragma solidity 0.8.18;
 
 interface IERC721StakingImplementation {
     struct StakerInfo {
-        uint256 amountStaked;
-        uint256 lastUpdateTimestamp;
+        uint104 amountStaked;
+        uint48 lastUpdateTimestamp;
+        uint104 lastUpdatePhaseId;
         uint256 unclaimedRewards;
-        uint256 lastUpdatePhaseId;
     }
 
     struct RewardPhase {
         uint256 rewardsPerSecond;
-        uint256 startTimestamp;
-        uint256 endTimestamp;
+        uint128 startTimestamp;
+        uint128 endTimestamp;
     }
 
     error StakingPaused();

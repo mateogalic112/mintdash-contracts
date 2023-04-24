@@ -3,8 +3,7 @@ pragma solidity 0.8.18;
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {MulticallUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
+import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
@@ -18,10 +17,10 @@ contract ERC721StakingImplementation is
 {
     using SafeERC20 for IERC20;
 
-    bool public isStakingEnabled;
-    address public nftToken;
     address public rewardToken;
-    uint256 public nextRewardPhaseId;
+    address public nftToken;
+    bool public isStakingEnabled;
+    uint88 public nextRewardPhaseId;
 
     mapping(address staker => StakerInfo stakerInfo) public stakersInfo;
     mapping(uint256 tokenId => address staker) public stakedNftOwners;
@@ -83,7 +82,7 @@ contract ERC721StakingImplementation is
             revert SameRewardRate();
         }
 
-        rewardPhases[nextRewardPhaseId - 1].endTimestamp = block.timestamp;
+        rewardPhases[nextRewardPhaseId - 1].endTimestamp = uint128(block.timestamp);
 
         _createNewRewardPhase(rewardsPerSecond);
 
@@ -127,12 +126,12 @@ contract ERC721StakingImplementation is
     }
 
     function _updateStakerTimestamps() internal {
-        stakersInfo[msg.sender].lastUpdateTimestamp = block.timestamp;
+        stakersInfo[msg.sender].lastUpdateTimestamp = uint48(block.timestamp);
         stakersInfo[msg.sender].lastUpdatePhaseId = nextRewardPhaseId - 1;
     }
 
     function _createNewRewardPhase(uint256 rewardsPerSecond) internal {
-        rewardPhases[nextRewardPhaseId] = RewardPhase(rewardsPerSecond, block.timestamp, 0);
+        rewardPhases[nextRewardPhaseId] = RewardPhase(rewardsPerSecond, uint128(block.timestamp), 0);
         nextRewardPhaseId += 1;
     }
 
