@@ -51,7 +51,11 @@ const config = {
     },
     dodoc: {
         runOnCompile: true,
-        include: ["ERC721DropImplementation", "ERC20Implementation"],
+        include: [
+            "ERC721DropImplementation",
+            "ERC20Implementation",
+            "ERC721StakingImplementation",
+        ],
     },
 };
 
