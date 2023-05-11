@@ -20,10 +20,11 @@ describe("AdministratedUpgradeable", () => {
         await collection.deployed();
 
         // Initialize
-        await collection.initialize("Blank Studio Collection", "BSC");
-
-        // Setup admin
-        await collection.transferAdministration(admin.address);
+        await collection.initialize(
+            "Blank Studio Collection",
+            "BSC",
+            admin.address,
+        );
     });
 
     describe("renounceAdministration", () => {
@@ -63,7 +64,9 @@ describe("AdministratedUpgradeable", () => {
             expect(await collection.administrator()).to.equal(admin.address);
 
             // Transfer administration
-            await collection.transferAdministration(randomUser.address);
+            await collection
+                .connect(admin)
+                .transferAdministration(randomUser.address);
 
             // Check new administrator
             expect(await collection.administrator()).to.equal(
@@ -73,23 +76,29 @@ describe("AdministratedUpgradeable", () => {
 
         it("reverts if new desired administrator is zero address", async () => {
             await expect(
-                collection.transferAdministration(ethers.constants.AddressZero),
+                collection
+                    .connect(admin)
+                    .transferAdministration(ethers.constants.AddressZero),
             ).to.be.revertedWithCustomError(
                 collection,
                 "InvalidAdministratorAddress",
             );
         });
 
-        it("reverts if caller is not contract owner", async () => {
+        it("reverts if caller is not administrator", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .transferAdministration(owner.address),
-            ).to.be.revertedWith("Ownable: caller is not the owner");
+            ).to.be.revertedWithCustomError(collection, "OnlyAdministrator");
         });
 
         it("emits AdministrationTransferred event", async () => {
-            await expect(collection.transferAdministration(randomUser.address))
+            await expect(
+                collection
+                    .connect(admin)
+                    .transferAdministration(randomUser.address),
+            )
                 .to.emit(collection, "AdministrationTransferred")
                 .withArgs(admin.address, randomUser.address);
         });

@@ -45,8 +45,10 @@ contract ERC1155EditionsImplementation is
     uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE =
         type(uint256).max;
 
-    function initialize(string memory _name, string memory _symbol) external initializer {
+    function initialize(string memory _name, string memory _symbol, address _administrator) external initializer {
         __ERC1155_init("");
+        __Administrated_init(_administrator);
+        __Payout_init();
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();

@@ -9,6 +9,24 @@ import {IPayout} from "./interface/IPayout.sol";
 abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayout {
     address public payoutAddress;
 
+    address public platformFeesAddress;
+    uint256 public platformFeesNumerator;
+
+    function __Payout_init() 
+        internal 
+        onlyInitializing 
+    {
+        platformFeesAddress = 0xeA6b5147C353904D5faFA801422D268772F09512;
+        platformFeesNumerator = 500;
+    }
+
+    function updatePlatformFees(
+        address newPlatformFeesAddress,
+        uint256 newPlatformFeesNumerator
+    ) external onlyAdministrator() {
+        _updatePlatformFees(newPlatformFeesAddress, newPlatformFeesNumerator);
+    }
+
     function updatePayoutAddress(
         address newPayoutAddress
     ) external onlyOwnerOrAdministrator {
@@ -22,6 +40,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         _updateRoyalties(receiver, feeNumerator);
     }
 
+
     function withdrawAllFunds() external onlyOwnerOrAdministrator {
         if (address(this).balance == 0) {
             revert NothingToWithdraw();
@@ -31,8 +50,18 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
             revert InvalidPayoutAddress();
         }
 
-        (bool success, ) = payoutAddress.call{value: address(this).balance}("");
-        require(success, "Transfer failed.");
+        if (platformFeesAddress == address(0)) {
+            revert InvalidPlatformFeesAddress();
+        }
+
+        uint256 platformFees = (address(this).balance * platformFeesNumerator) / _feeDenominator();
+        if(platformFees > 0) {
+            (bool platformFeesSuccess, ) = platformFeesAddress.call{value: platformFees}("");
+            require(platformFeesSuccess, "Platform fees transfer failed.");
+        }
+
+        (bool payoutSuccess, ) = payoutAddress.call{value: address(this).balance}("");
+        require(payoutSuccess, "Payout failed.");
     }
 
     function _updatePayoutAddress(
@@ -54,5 +83,19 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         _setDefaultRoyalty(receiver, feeNumerator);
 
         emit RoyaltiesUpdated(receiver, feeNumerator);
+    }
+
+     function _updatePlatformFees(
+        address newPlatformFeesAddress,
+        uint256 newPlatformFeesNumerator
+    ) internal {
+        if (newPlatformFeesAddress == address(0)) {
+            revert PlatformFeesAddressCannotBeZeroAddress();
+        }
+
+        platformFeesAddress = newPlatformFeesAddress;
+        platformFeesNumerator = newPlatformFeesNumerator;
+
+        emit PlatformFeesUpdated(newPlatformFeesAddress, newPlatformFeesNumerator);
     }
 }

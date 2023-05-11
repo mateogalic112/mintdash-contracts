@@ -13,7 +13,8 @@ describe("ERC721DropImplementation", function () {
     let owner: SignerWithAddress,
         allowlistUser2: SignerWithAddress,
         randomUser: SignerWithAddress,
-        allowedSigner: SignerWithAddress;
+        allowedSigner: SignerWithAddress,
+        admin: SignerWithAddress;
 
     const initialMaxSupply = 4000;
     const initialBaseURI =
@@ -41,7 +42,7 @@ describe("ERC721DropImplementation", function () {
     };
 
     beforeEach(async function () {
-        [owner, allowlistUser2, randomUser, allowedSigner] =
+        [owner, allowlistUser2, randomUser, allowedSigner, admin] =
             await ethers.getSigners();
 
         const ERC721DropImplementation = await ethers.getContractFactory(
@@ -51,7 +52,11 @@ describe("ERC721DropImplementation", function () {
         await collection.deployed();
 
         // Initialize
-        await collection.initialize("Blank Studio Collection", "BSC");
+        await collection.initialize(
+            "Blank Studio Collection",
+            "BSC",
+            admin.address,
+        );
 
         // Configure royalties
         await collection.updateRoyalties(
@@ -647,6 +652,46 @@ describe("ERC721DropImplementation", function () {
         });
     });
 
+    describe("updatePlatformFees", () => {
+        it("updates", async () => {
+            // Check platform fees address
+            expect(await collection.platformFeesAddress()).to.eq(
+                "0xeA6b5147C353904D5faFA801422D268772F09512",
+            );
+
+            // Check platform fees
+            expect(await collection.platformFeesNumerator()).to.eq(500);
+
+            // Update payout address
+            await collection
+                .connect(admin)
+                .updatePlatformFees(owner.address, 400);
+
+            // Check updated state
+            expect(await collection.platformFeesAddress()).to.eq(owner.address);
+
+            // Check platform fees
+            expect(await collection.platformFeesNumerator()).to.eq(400);
+        });
+
+        it("reverts if caller is not contract administrator", async () => {
+            await expect(
+                collection
+                    .connect(randomUser)
+                    .updatePlatformFees(owner.address, 400),
+            ).to.be.revertedWithCustomError(collection, "OnlyAdministrator");
+        });
+
+        it("reverts if payout address is zero address", async () => {
+            await expect(
+                collection.connect(admin).updatePlatformFees(ZERO_ADDRESS, 400),
+            ).to.be.revertedWithCustomError(
+                collection,
+                "PlatformFeesAddressCannotBeZeroAddress",
+            );
+        });
+    });
+
     describe("updatePayer", () => {
         it("updates", async () => {
             // Check if payer is allowed
@@ -688,7 +733,7 @@ describe("ERC721DropImplementation", function () {
                 collection.withdrawAllFunds(),
             ).to.changeEtherBalance(
                 allowlistUser2,
-                ethers.utils.parseUnits("0.3", "ether"),
+                ethers.utils.parseUnits("0.285", "ether"),
             );
         });
 

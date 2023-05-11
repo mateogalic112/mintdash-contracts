@@ -14,7 +14,8 @@ describe("ERC1155EditionsImplementation", function () {
         allowlistUser: SignerWithAddress,
         allowlistUser2: SignerWithAddress,
         userWithoutAllowlist: SignerWithAddress,
-        randomUser: SignerWithAddress;
+        randomUser: SignerWithAddress,
+        admin: SignerWithAddress;
 
     let allowlist: string[];
 
@@ -51,6 +52,7 @@ describe("ERC1155EditionsImplementation", function () {
             allowlistUser2,
             userWithoutAllowlist,
             randomUser,
+            admin,
         ] = await ethers.getSigners();
 
         allowlist = [allowlistUser.address, allowlistUser2.address];
@@ -62,7 +64,11 @@ describe("ERC1155EditionsImplementation", function () {
         await collection.deployed();
 
         // Initialize
-        await collection.initialize("Blank Studio Collection", "BSC");
+        await collection.initialize(
+            "Blank Studio Collection",
+            "BSC",
+            admin.address,
+        );
 
         // Configure royalties
         await collection.updateRoyalties(
@@ -83,6 +89,9 @@ describe("ERC1155EditionsImplementation", function () {
         });
         it("initializes symbol", async () => {
             expect(await collection.symbol()).to.eq("BSC");
+        });
+        it("initializes admin", async () => {
+            expect(await collection.administrator()).to.eq(admin.address);
         });
     });
 
@@ -1604,6 +1613,46 @@ describe("ERC1155EditionsImplementation", function () {
         });
     });
 
+    describe("updatePlatformFees", () => {
+        it("updates", async () => {
+            // Check platform fees address
+            expect(await collection.platformFeesAddress()).to.eq(
+                "0xeA6b5147C353904D5faFA801422D268772F09512",
+            );
+
+            // Check platform fees
+            expect(await collection.platformFeesNumerator()).to.eq(500);
+
+            // Update payout address
+            await collection
+                .connect(admin)
+                .updatePlatformFees(owner.address, 400);
+
+            // Check updated state
+            expect(await collection.platformFeesAddress()).to.eq(owner.address);
+
+            // Check platform fees
+            expect(await collection.platformFeesNumerator()).to.eq(400);
+        });
+
+        it("reverts if caller is not contract administrator", async () => {
+            await expect(
+                collection
+                    .connect(randomUser)
+                    .updatePlatformFees(owner.address, 400),
+            ).to.be.revertedWithCustomError(collection, "OnlyAdministrator");
+        });
+
+        it("reverts if payout address is zero address", async () => {
+            await expect(
+                collection.connect(admin).updatePlatformFees(ZERO_ADDRESS, 400),
+            ).to.be.revertedWithCustomError(
+                collection,
+                "PlatformFeesAddressCannotBeZeroAddress",
+            );
+        });
+    });
+
     describe("updatePayer", () => {
         it("updates", async () => {
             // Check if payer is allowed
@@ -1643,7 +1692,7 @@ describe("ERC1155EditionsImplementation", function () {
                 collection.withdrawAllFunds(),
             ).to.changeEtherBalance(
                 allowlistUser2,
-                ethers.utils.parseUnits("0.3", "ether"),
+                ethers.utils.parseUnits("0.285", "ether"),
             );
         });
         it("reverts if caller is not contract owner or administrator", async () => {

@@ -12,6 +12,16 @@ interface IPayout {
      */
     error InvalidPayoutAddress();
 
+     /**
+     * @dev Revert if platform fees address is zero address when updating platform fees.
+     */
+    error PlatformFeesAddressCannotBeZeroAddress();
+
+    /**
+     * @dev Revert if the platform fees address is zero address.
+     */
+    error InvalidPlatformFeesAddress();
+
     /**
      * @dev Revert if the contract balance is zero when withdrawing funds.
      */
@@ -28,6 +38,14 @@ interface IPayout {
     event RoyaltiesUpdated(
         address indexed receiver,
         uint96 indexed feeNumerator
+    );
+
+    /**
+     * @dev Emit an event when platform fees are updated.
+     */
+    event PlatformFeesUpdated(
+        address indexed platformFeesAddress,
+        uint256 indexed platformFeesNumerator
     );
 
     /**

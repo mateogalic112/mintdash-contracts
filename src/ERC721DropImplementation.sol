@@ -55,9 +55,12 @@ contract ERC721DropImplementation is
 
     function initialize(
         string memory _name,
-        string memory _symbol
+        string memory _symbol,
+        address _administrator
     ) external initializerERC721A initializer {
         __ERC721A_init(_name, _symbol);
+        __Administrated_init(_administrator);
+        __Payout_init();
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();

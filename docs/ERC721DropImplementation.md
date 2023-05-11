@@ -257,7 +257,7 @@ Returns if token is redeemed for NFT contract.
 ### initialize
 
 ```solidity
-function initialize(string _name, string _symbol) external nonpayable
+function initialize(string _name, string _symbol, address _administrator) external nonpayable
 ```
 
 
@@ -270,6 +270,7 @@ function initialize(string _name, string _symbol) external nonpayable
 |---|---|---|
 | _name | string | undefined |
 | _symbol | string | undefined |
+| _administrator | address | undefined |
 
 ### isApprovedForAll
 
@@ -496,6 +497,40 @@ function payoutAddress() external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined |
+
+### platformFeesAddress
+
+```solidity
+function platformFeesAddress() external view returns (address)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+
+### platformFeesNumerator
+
+```solidity
+function platformFeesNumerator() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### provenanceHash
 
@@ -919,6 +954,23 @@ Updates payout address
 |---|---|---|
 | newPayoutAddress | address | New payout address. |
 
+### updatePlatformFees
+
+```solidity
+function updatePlatformFees(address newPlatformFeesAddress, uint256 newPlatformFeesNumerator) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| newPlatformFeesAddress | address | undefined |
+| newPlatformFeesNumerator | uint256 | undefined |
+
 ### updateProvenanceHash
 
 ```solidity
@@ -1255,6 +1307,23 @@ event PayoutAddressUpdated(address indexed payoutAddress)
 |---|---|---|
 | payoutAddress `indexed` | address | undefined |
 
+### PlatformFeesUpdated
+
+```solidity
+event PlatformFeesUpdated(address indexed platformFeesAddress, uint256 indexed platformFeesNumerator)
+```
+
+
+
+*Emit an event when platform fees are updated.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| platformFeesAddress `indexed` | address | undefined |
+| platformFeesNumerator `indexed` | uint256 | undefined |
+
 ### ProvenanceHashUpdated
 
 ```solidity
@@ -1442,6 +1511,17 @@ error InvalidPayoutAddress()
 *Revert if the payout address is zero address.*
 
 
+### InvalidPlatformFeesAddress
+
+```solidity
+error InvalidPlatformFeesAddress()
+```
+
+
+
+*Revert if the platform fees address is zero address.*
+
+
 ### InvalidSignature
 
 ```solidity
@@ -1615,6 +1695,17 @@ error PayoutAddressCannotBeZeroAddress()
 
 
 *Revert if payout address is zero address when updating payout address.*
+
+
+### PlatformFeesAddressCannotBeZeroAddress
+
+```solidity
+error PlatformFeesAddressCannotBeZeroAddress()
+```
+
+
+
+*Revert if platform fees address is zero address when updating platform fees.*
 
 
 ### ProvenanceHashCannotBeUpdatedAfterMintStarted

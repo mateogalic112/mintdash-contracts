@@ -20,9 +20,10 @@ contract ERC1155Proxy is Proxy {
         Address.functionDelegateCall(
             0x5b69115cA107222B6F988215dEAdaBE6229c9bbc,
             abi.encodeWithSignature(
-                "initialize(string,string)",
+                "initialize(string,string,address)",
                 name,
-                symbol
+                symbol,
+                0xeA6b5147C353904D5faFA801422D268772F09512 // default administrator
             )
         );
     }
