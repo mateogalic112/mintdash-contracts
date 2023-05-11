@@ -17,9 +17,9 @@ contract ERC721StakingProxy is Proxy {
         );
         StorageSlot
             .getAddressSlot(_IMPLEMENTATION_SLOT)
-            .value = 0x0000000000000000000000000000000000000000;
+            .value = 0xcdbA90bF5E7BCcF563A68740906c2cc348A93296;
         Address.functionDelegateCall(
-            0x0000000000000000000000000000000000000000,
+            0xcdbA90bF5E7BCcF563A68740906c2cc348A93296,
             abi.encodeWithSignature(
                 "initialize(address,address,uint256)",
                 nftContract,
