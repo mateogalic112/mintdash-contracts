@@ -49,9 +49,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
         // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
 
-        // Configure allowed signer
-        await collection.updateAllowedSigner(allowedSigner.address, true);
-
         // Deploy test NFT collection
         const TestERC721 = await ethers.getContractFactory("TestERC721");
         testERC721 = await TestERC721.deploy();

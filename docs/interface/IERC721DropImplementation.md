@@ -69,26 +69,6 @@ Mint a public stage.
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
-### mintSigned
-
-```solidity
-function mintSigned(address recipient, uint256 quantity, SignedMintParams mintParams, uint256 salt, bytes signature) external payable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| recipient | address | undefined |
-| quantity | uint256 | undefined |
-| mintParams | SignedMintParams | undefined |
-| salt | uint256 | undefined |
-| signature | bytes | undefined |
-
 ### mintTokenGated
 
 ```solidity
@@ -177,23 +157,6 @@ function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage toke
 
 ## Events
 
-### AllowedSignerUpdated
-
-```solidity
-event AllowedSignerUpdated(address indexed signer, bool indexed allowed)
-```
-
-
-
-*Emit an event when allowed signer is updated.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| signer `indexed` | address | undefined |
-| allowed `indexed` | bool | undefined |
-
 ### AllowlistMintStageUpdated
 
 ```solidity
@@ -269,22 +232,6 @@ error AllowlistStageInvalidProof()
 
 *Revert if supplied merkle proof is not valid for allowlist mint stage.*
 
-
-### InvalidSignature
-
-```solidity
-error InvalidSignature(address recoveredAddress)
-```
-
-
-
-*Revert if signature is not valid.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| recoveredAddress | address | undefined |
 
 ### TokenGatedNftContractCannotBeZeroAddress
 

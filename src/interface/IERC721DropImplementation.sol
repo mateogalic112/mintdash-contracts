@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, SignedMintParams} from "../lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
 
 interface IERC721DropImplementation {
     struct MultiConfig {
@@ -61,11 +61,6 @@ interface IERC721DropImplementation {
     error TokenGatedPhaseConfigMismatch();
 
     /**
-     * @dev Revert if signature is not valid.
-    */
-    error InvalidSignature(address recoveredAddress);
-
-    /**
      * @dev Emit an event when public mint stage configuration is updated.
      */
     event PublicMintStageUpdated(PublicMintStage data);
@@ -82,11 +77,6 @@ interface IERC721DropImplementation {
         address indexed nftContract,
         TokenGatedMintStage data
     );
-
-     /**
-     * @dev Emit an event when allowed signer is updated.
-    */
-    event AllowedSignerUpdated(address indexed signer, bool indexed allowed);
 
     /**
      * @notice Mint a public stage.
@@ -122,23 +112,6 @@ interface IERC721DropImplementation {
         address recipient,
         address nftContract,
         uint256[] calldata tokenIds
-    ) external payable;
-
-     /**
-     * @notice Mint a signed stage.
-     *
-     * @param recipient Recipient of tokens.
-     * @param quantity Number of tokens to mint.
-     * @param mintParams Mint parameters for this stage.
-     * @param salt Salt used to create a signature.
-     * @param signature Signature created by verified signers.
-     */
-    function mintSigned(
-        address recipient,
-        uint256 quantity,
-        SignedMintParams calldata mintParams,
-        uint256 salt,
-        bytes calldata signature
     ) external payable;
 
     /**

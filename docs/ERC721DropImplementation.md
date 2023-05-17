@@ -348,26 +348,6 @@ Mint a public stage.
 | recipient | address | Recipient of tokens. |
 | quantity | uint256 | Number of tokens to mint. |
 
-### mintSigned
-
-```solidity
-function mintSigned(address recipient, uint256 quantity, SignedMintParams mintParams, uint256 salt, bytes signature) external payable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| recipient | address | undefined |
-| quantity | uint256 | undefined |
-| mintParams | SignedMintParams | undefined |
-| salt | uint256 | undefined |
-| signature | bytes | undefined |
-
 ### mintTokenGated
 
 ```solidity
@@ -823,23 +803,6 @@ function transferOwnership(address newOwner) external nonpayable
 |---|---|---|
 | newOwner | address | undefined |
 
-### updateAllowedSigner
-
-```solidity
-function updateAllowedSigner(address signer, bool isAllowed) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| signer | address | undefined |
-| isAllowed | bool | undefined |
-
 ### updateAllowlistMintStage
 
 ```solidity
@@ -1084,23 +1047,6 @@ event AllowedPayerUpdated(address indexed payer, bool indexed allowed)
 | Name | Type | Description |
 |---|---|---|
 | payer `indexed` | address | undefined |
-| allowed `indexed` | bool | undefined |
-
-### AllowedSignerUpdated
-
-```solidity
-event AllowedSignerUpdated(address indexed signer, bool indexed allowed)
-```
-
-
-
-*Emit an event when allowed signer is updated.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| signer `indexed` | address | undefined |
 | allowed `indexed` | bool | undefined |
 
 ### AllowlistMintStageUpdated
@@ -1521,22 +1467,6 @@ error InvalidPlatformFeesAddress()
 
 *Revert if the platform fees address is zero address.*
 
-
-### InvalidSignature
-
-```solidity
-error InvalidSignature(address recoveredAddress)
-```
-
-
-
-*Revert if signature is not valid.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| recoveredAddress | address | undefined |
 
 ### MintERC2309QuantityExceedsLimit
 

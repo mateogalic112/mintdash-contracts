@@ -69,9 +69,6 @@ describe("ERC721DropImplementation", function () {
 
         // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
-
-        // Configure allowed signer
-        await collection.updateAllowedSigner(allowedSigner.address, true);
     });
 
     describe("getAmountMinted", () => {

@@ -67,9 +67,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
 
-        // Configure allowed signer
-        await collection.updateAllowedSigner(allowedSigner.address, true);
-
         const currentTimestamp = await time.latest();
 
         // Configure allowlist stage
