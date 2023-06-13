@@ -90,7 +90,7 @@ Mint a token gated stage.
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
 ```
 
 
@@ -101,7 +101,6 @@ function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage a
 
 | Name | Type | Description |
 |---|---|---|
-| allowlistStageId | uint256 | undefined |
 | allowlistMintStageData | AllowlistMintStage | undefined |
 
 ### updateConfiguration
@@ -139,7 +138,7 @@ function updatePublicMintStage(PublicMintStage publicMintStageData) external non
 ### updateTokenGatedMintStage
 
 ```solidity
-function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage tokenGatedMintStageData) external nonpayable
+function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) external nonpayable
 ```
 
 
@@ -150,7 +149,6 @@ function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage toke
 
 | Name | Type | Description |
 |---|---|---|
-| nftContract | address | undefined |
 | tokenGatedMintStageData | TokenGatedMintStage | undefined |
 
 
@@ -211,17 +209,6 @@ event TokenGatedMintStageUpdated(address indexed nftContract, TokenGatedMintStag
 
 ## Errors
 
-### AllowlistPhaseConfigMismatch
-
-```solidity
-error AllowlistPhaseConfigMismatch()
-```
-
-
-
-*Revert if allowlist multi config part is not valid.*
-
-
 ### AllowlistStageInvalidProof
 
 ```solidity
@@ -253,17 +240,6 @@ error TokenGatedNotTokenOwner()
 
 
 *Revert if minter is not token owner for token gated mint stage.*
-
-
-### TokenGatedPhaseConfigMismatch
-
-```solidity
-error TokenGatedPhaseConfigMismatch()
-```
-
-
-
-*Revert if token gated multi config part is not valid.*
 
 
 ### TokenGatedTokenAlreadyRedeemed

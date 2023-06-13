@@ -70,7 +70,8 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         const currentTimestamp = await time.latest();
 
         // Configure allowlist stage
-        await collection.updateAllowlistMintStage(PREPARED_MINT_STAGE_ID, {
+        await collection.updateAllowlistMintStage({
+            id: PREPARED_MINT_STAGE_ID,
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
             startTime: currentTimestamp, // start right away
             endTime: currentTimestamp + 86400, // last 24 hours
@@ -227,7 +228,8 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         const currentTimestamp = await time.latest();
 
         // Configure allowlist stage
-        await collection.updateAllowlistMintStage(PREPARED_MINT_STAGE_ID, {
+        await collection.updateAllowlistMintStage({
+            id: PREPARED_MINT_STAGE_ID,
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
             startTime: currentTimestamp, // start right away
             endTime: currentTimestamp + 86400, // last 24 hours
@@ -327,7 +329,8 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         const currentTimestamp = await time.latest();
 
         // Configure allowlist stage
-        await collection.updateAllowlistMintStage(PREPARED_MINT_STAGE_ID, {
+        await collection.updateAllowlistMintStage({
+            id: PREPARED_MINT_STAGE_ID,
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
             startTime: currentTimestamp + 86400, // start in 24 hours
             endTime: currentTimestamp + 186400,

@@ -10,7 +10,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
 
     let owner: SignerWithAddress,
         randomUser: SignerWithAddress,
-        allowedSigner: SignerWithAddress,
         admin: SignerWithAddress;
 
     const initialMaxSupply = 4000;
@@ -22,7 +21,7 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
     const initialRoyaltiesFee = 1000;
 
     beforeEach(async function () {
-        [owner, randomUser, allowedSigner, admin] = await ethers.getSigners();
+        [owner, randomUser, admin] = await ethers.getSigners();
 
         const ERC721DropImplementation = await ethers.getContractFactory(
             "ERC721DropImplementation",
@@ -59,7 +58,8 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
 
         // Configure public stage
         const currentTimestamp = await time.latest();
-        await collection.updateTokenGatedMintStage(testERC721.address, {
+        await collection.updateTokenGatedMintStage({
+            nftContract: testERC721.address,
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
             startTime: currentTimestamp, // start right away
             endTime: currentTimestamp + 86400, // last 24 hours
@@ -256,7 +256,8 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
         const currentTimestamp = await time.latest();
 
         // Configure public stage
-        await collection.updateTokenGatedMintStage(testERC721.address, {
+        await collection.updateTokenGatedMintStage({
+            nftContract: testERC721.address,
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
             startTime: currentTimestamp + 86400, // start in 24 hours
             endTime: currentTimestamp + 186400,

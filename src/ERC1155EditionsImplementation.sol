@@ -260,12 +260,8 @@ contract ERC1155EditionsImplementation is
 
         // Update allowlist phases
         if(config.allowlistMintStages.length > 0){
-             if(config.allowlistMintStageIds.length != config.allowlistMintStages.length){
-                revert AllowlistPhaseConfigMismatch();
-            }
-
             for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
-                _updateAllowlistMintStage(tokenId, config.allowlistMintStageIds[i], config.allowlistMintStages[i]);
+                _updateAllowlistMintStage(tokenId, config.allowlistMintStages[i]);
 
                 unchecked {
                     ++i;
@@ -275,12 +271,8 @@ contract ERC1155EditionsImplementation is
 
          // Update token gated phases
         if(config.tokenGatedMintStages.length > 0){
-             if(config.nftContracts.length != config.tokenGatedMintStages.length){
-                revert TokenGatedPhaseConfigMismatch();
-            }
-
             for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
-                _updateTokenGatedMintStage(tokenId, config.nftContracts[i], config.tokenGatedMintStages[i]);
+                _updateTokenGatedMintStage(tokenId, config.tokenGatedMintStages[i]);
 
                 unchecked {
                     ++i;
@@ -298,18 +290,16 @@ contract ERC1155EditionsImplementation is
 
     function updateAllowlistMintStage(
         uint256 tokenId,
-        uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external onlyOwnerOrAdministrator {
-        _updateAllowlistMintStage(tokenId, allowlistStageId, allowlistMintStageData);
+        _updateAllowlistMintStage(tokenId, allowlistMintStageData);
     }
 
     function updateTokenGatedMintStage(
         uint256 tokenId,
-        address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external onlyOwnerOrAdministrator {
-        _updateTokenGatedMintStage(tokenId, nftContract, tokenGatedMintStageData);
+        _updateTokenGatedMintStage(tokenId, tokenGatedMintStageData);
     }
 
     function setApprovalForAll(
@@ -369,25 +359,23 @@ contract ERC1155EditionsImplementation is
 
     function _updateAllowlistMintStage(
         uint256 tokenId,
-        uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) internal {
-        allowlistMintStages[tokenId][allowlistStageId] = allowlistMintStageData;
+        allowlistMintStages[tokenId][allowlistMintStageData.id] = allowlistMintStageData;
 
-        emit AllowlistMintStageUpdated(tokenId, allowlistStageId, allowlistMintStageData);
+        emit AllowlistMintStageUpdated(tokenId, allowlistMintStageData.id, allowlistMintStageData);
     }
 
     function _updateTokenGatedMintStage(
         uint256 tokenId,
-        address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) internal {
-        if (nftContract == address(0)) {
+        if (tokenGatedMintStageData.nftContract == address(0)) {
             revert TokenGatedNftContractCannotBeZeroAddress();
         }
 
-        tokenGatedMintStages[tokenId][nftContract] = tokenGatedMintStageData;
+        tokenGatedMintStages[tokenId][tokenGatedMintStageData.nftContract] = tokenGatedMintStageData;
 
-        emit TokenGatedMintStageUpdated(tokenId, nftContract, tokenGatedMintStageData);
+        emit TokenGatedMintStageUpdated(tokenId, tokenGatedMintStageData.nftContract, tokenGatedMintStageData);
     }
 }

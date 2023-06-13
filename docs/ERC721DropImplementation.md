@@ -91,7 +91,7 @@ function allowedSigners(address signer) external view returns (bool allowed)
 ### allowlistMintStages
 
 ```solidity
-function allowlistMintStages(uint256 allowlistStageId) external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
+function allowlistMintStages(uint256 allowlistStageId) external view returns (uint256 id, uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
 ```
 
 
@@ -108,6 +108,7 @@ function allowlistMintStages(uint256 allowlistStageId) external view returns (ui
 
 | Name | Type | Description |
 |---|---|---|
+| id | uint256 | undefined |
 | mintPrice | uint80 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
@@ -691,7 +692,7 @@ function symbol() external view returns (string)
 ### tokenGatedMintStages
 
 ```solidity
-function tokenGatedMintStages(address nftContract) external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
+function tokenGatedMintStages(address nftContract) external view returns (address nftContract, uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
 ```
 
 
@@ -708,6 +709,7 @@ function tokenGatedMintStages(address nftContract) external view returns (uint80
 
 | Name | Type | Description |
 |---|---|---|
+| nftContract | address | undefined |
 | mintPrice | uint80 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
@@ -806,7 +808,7 @@ function transferOwnership(address newOwner) external nonpayable
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
 ```
 
 
@@ -817,7 +819,6 @@ function updateAllowlistMintStage(uint256 allowlistStageId, AllowlistMintStage a
 
 | Name | Type | Description |
 |---|---|---|
-| allowlistStageId | uint256 | undefined |
 | allowlistMintStageData | AllowlistMintStage | undefined |
 
 ### updateBaseURI
@@ -986,7 +987,7 @@ Updates royalties for the collection.
 ### updateTokenGatedMintStage
 
 ```solidity
-function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage tokenGatedMintStageData) external nonpayable
+function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) external nonpayable
 ```
 
 
@@ -997,7 +998,6 @@ function updateTokenGatedMintStage(address nftContract, TokenGatedMintStage toke
 
 | Name | Type | Description |
 |---|---|---|
-| nftContract | address | undefined |
 | tokenGatedMintStageData | TokenGatedMintStage | undefined |
 
 ### withdrawAllFunds
@@ -1358,17 +1358,6 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 ## Errors
 
-### AllowlistPhaseConfigMismatch
-
-```solidity
-error AllowlistPhaseConfigMismatch()
-```
-
-
-
-*Revert if allowlist multi config part is not valid.*
-
-
 ### AllowlistStageInvalidProof
 
 ```solidity
@@ -1698,17 +1687,6 @@ error TokenGatedNotTokenOwner()
 
 
 *Revert if minter is not token owner for token gated mint stage.*
-
-
-### TokenGatedPhaseConfigMismatch
-
-```solidity
-error TokenGatedPhaseConfigMismatch()
-```
-
-
-
-*Revert if token gated multi config part is not valid.*
 
 
 ### TokenGatedTokenAlreadyRedeemed

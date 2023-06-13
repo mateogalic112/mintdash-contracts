@@ -22,11 +22,9 @@ interface IERC721DropImplementation {
         PublicMintStage publicMintStage;
 
         // Allowlist stages
-        uint256[] allowlistMintStageIds;
         AllowlistMintStage[] allowlistMintStages;
 
         // Token gated stages
-        address[] nftContracts;
         TokenGatedMintStage[] tokenGatedMintStages;
     }
 
@@ -49,16 +47,6 @@ interface IERC721DropImplementation {
      * @dev Revert if NFT contract is zero address when updating token gated mint stage.
      */
     error TokenGatedNftContractCannotBeZeroAddress();
-
-    /**
-     * @dev Revert if allowlist multi config part is not valid.
-    */
-    error AllowlistPhaseConfigMismatch();
-
-    /**
-     * @dev Revert if token gated multi config part is not valid.
-    */
-    error TokenGatedPhaseConfigMismatch();
 
     /**
      * @dev Emit an event when public mint stage configuration is updated.
@@ -147,22 +135,18 @@ interface IERC721DropImplementation {
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
-     * @param allowlistStageId ID of the allowlist mint stage to set
      * @param allowlistMintStageData The new allowlist mint stage data to set.
      */
     function updateAllowlistMintStage(
-        uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external;
 
     /**
      * @notice Updates configuration for token gated mint stage.
      *
-     * @param nftContract Gated NFT contract address to be updated.
      * @param tokenGatedMintStageData The new token gated mint stage data to set.
      */
     function updateTokenGatedMintStage(
-        address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external;
 }

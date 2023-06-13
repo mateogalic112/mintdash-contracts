@@ -154,6 +154,7 @@ describe("ERC721DropImplementation", function () {
 
             // Update config
             const newConfigData = {
+                id: stageId,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -161,7 +162,7 @@ describe("ERC721DropImplementation", function () {
                 maxSupplyForStage: 4000,
                 merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
             };
-            await collection.updateAllowlistMintStage(stageId, newConfigData);
+            await collection.updateAllowlistMintStage(newConfigData);
 
             // Check updated config
             const updatedConfig = await collection.allowlistMintStages(stageId);
@@ -176,7 +177,8 @@ describe("ERC721DropImplementation", function () {
 
         it("reverts if caller is not contract owner or administrator", async () => {
             await expect(
-                collection.connect(randomUser).updateAllowlistMintStage(1, {
+                collection.connect(randomUser).updateAllowlistMintStage({
+                    id: 1,
                     mintPrice: "100000000000000000", // 0.1 ETH
                     startTime: 1676043287, // 0.1 ETH
                     endTime: 1686043287, // 0.1 ETH
@@ -193,6 +195,7 @@ describe("ERC721DropImplementation", function () {
         it("emits AllowlistMintStageUpdated", async () => {
             // Update config
             const newConfigData = {
+                id: 1,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -202,7 +205,7 @@ describe("ERC721DropImplementation", function () {
             };
 
             await expect(
-                collection.updateAllowlistMintStage(1, newConfigData),
+                collection.updateAllowlistMintStage(newConfigData),
             ).to.emit(collection, "AllowlistMintStageUpdated");
         });
     });
@@ -221,16 +224,14 @@ describe("ERC721DropImplementation", function () {
 
             // Update config
             const newConfigData = {
+                nftContract: randomAddress,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
                 mintLimitPerWallet: 5,
                 maxSupplyForStage: 4000,
             };
-            await collection.updateTokenGatedMintStage(
-                randomAddress,
-                newConfigData,
-            );
+            await collection.updateTokenGatedMintStage(newConfigData);
 
             // Check updated config
             const updatedConfig = await collection.tokenGatedMintStages(
@@ -248,15 +249,14 @@ describe("ERC721DropImplementation", function () {
             const randomAddress = randomUser.address;
 
             await expect(
-                collection
-                    .connect(randomUser)
-                    .updateTokenGatedMintStage(randomAddress, {
-                        mintPrice: "100000000000000000", // 0.1 ETH
-                        startTime: 1676043287, // 0.1 ETH
-                        endTime: 1686043287, // 0.1 ETH
-                        mintLimitPerWallet: 5,
-                        maxSupplyForStage: 4000,
-                    }),
+                collection.connect(randomUser).updateTokenGatedMintStage({
+                    nftContract: randomAddress,
+                    mintPrice: "100000000000000000", // 0.1 ETH
+                    startTime: 1676043287, // 0.1 ETH
+                    endTime: 1686043287, // 0.1 ETH
+                    mintLimitPerWallet: 5,
+                    maxSupplyForStage: 4000,
+                }),
             ).to.be.revertedWithCustomError(
                 collection,
                 "OnlyOwnerOrAdministrator",
@@ -267,6 +267,7 @@ describe("ERC721DropImplementation", function () {
             // Update config
             const randomAddress = randomUser.address;
             const newConfigData = {
+                nftContract: randomAddress,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -275,10 +276,7 @@ describe("ERC721DropImplementation", function () {
             };
 
             await expect(
-                collection.updateTokenGatedMintStage(
-                    randomAddress,
-                    newConfigData,
-                ),
+                collection.updateTokenGatedMintStage(newConfigData),
             ).to.emit(collection, "TokenGatedMintStageUpdated");
         });
     });
@@ -335,9 +333,9 @@ describe("ERC721DropImplementation", function () {
                     endTime: 1686043287,
                     mintLimitPerWallet: 5,
                 },
-                allowlistMintStageIds: [1, 2],
                 allowlistMintStages: [
                     {
+                        id: 1,
                         mintPrice: "100000000000000000",
                         startTime: 1676043287,
                         endTime: 1686043287,
@@ -346,6 +344,7 @@ describe("ERC721DropImplementation", function () {
                         merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
                     },
                     {
+                        id: 2,
                         mintPrice: "200000000000000000",
                         startTime: 1676043286,
                         endTime: 1686043286,
@@ -356,9 +355,9 @@ describe("ERC721DropImplementation", function () {
                         ])}`,
                     },
                 ],
-                nftContracts: [randomUser.address, owner.address],
                 tokenGatedMintStages: [
                     {
+                        nftContract: randomUser.address,
                         mintPrice: "100000000000000000",
                         startTime: 1676043287,
                         endTime: 1686043287,
@@ -366,6 +365,7 @@ describe("ERC721DropImplementation", function () {
                         maxSupplyForStage: 4000,
                     },
                     {
+                        nftContract: owner.address,
                         mintPrice: "200000000000000000",
                         startTime: 1676043286,
                         endTime: 1686043286,

@@ -15,11 +15,9 @@ interface IERC1155EditionsImplementation {
         PublicMintStage publicMintStage;
 
         // Allowlist stages
-        uint256[] allowlistMintStageIds;
         AllowlistMintStage[] allowlistMintStages;
 
         // Token gated stages
-        address[] nftContracts;
         TokenGatedMintStage[] tokenGatedMintStages;
     }
     /**
@@ -41,16 +39,6 @@ interface IERC1155EditionsImplementation {
      * @dev Revert if NFT contract is zero address when updating token gated mint stage.
      */
     error TokenGatedNftContractCannotBeZeroAddress();
-
-    /**
-     * @dev Revert if token gated multi config part is not valid.
-    */
-    error TokenGatedPhaseConfigMismatch();
-
-    /**
-     * @dev Revert if allowlist multi config part is not valid.
-    */
-    error AllowlistPhaseConfigMismatch();
 
     /**
      * @dev Emit an event when public mint stage configuration is updated.
@@ -177,12 +165,10 @@ interface IERC1155EditionsImplementation {
      * @notice Updates configuration for allowlist mint stage.
      *
      * @param tokenId ID of the token.
-     * @param allowlistStageId ID of the allowlist mint stage to set
      * @param allowlistMintStageData The new allowlist mint stage data to set.
      */
     function updateAllowlistMintStage(
         uint256 tokenId,
-        uint256 allowlistStageId,
         AllowlistMintStage calldata allowlistMintStageData
     ) external;
 
@@ -190,12 +176,10 @@ interface IERC1155EditionsImplementation {
      * @notice Updates configuration for token gated mint stage.
      *
      * @param tokenId ID of the token.
-     * @param nftContract Gated NFT contract address to be updated.
      * @param tokenGatedMintStageData The new token gated mint stage data to set.
      */
     function updateTokenGatedMintStage(
         uint256 tokenId,
-        address nftContract,
         TokenGatedMintStage calldata tokenGatedMintStageData
     ) external;
 }

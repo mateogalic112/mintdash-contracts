@@ -303,18 +303,15 @@ describe("ERC1155EditionsImplementation", function () {
             const currentTimestamp = await time.latest();
 
             // Configure allowlist stage
-            await collection.updateAllowlistMintStage(
-                DEFAULT_TOKEN_ID,
-                PREPARED_MINT_STAGE_ID,
-                {
-                    mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp, // start right away
-                    endTime: currentTimestamp + 86400, // last 24 hours
-                    mintLimitPerWallet: 2,
-                    maxSupplyForStage: 4000,
-                    merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
-                },
-            );
+            await collection.updateAllowlistMintStage(DEFAULT_TOKEN_ID, {
+                id: PREPARED_MINT_STAGE_ID,
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp, // start right away
+                endTime: currentTimestamp + 86400, // last 24 hours
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 4000,
+                merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            });
 
             // Increase time by 1 hour
             await time.increase(3600);
@@ -495,18 +492,15 @@ describe("ERC1155EditionsImplementation", function () {
             const currentTimestamp = await time.latest();
 
             // Configure allowlist stage
-            await collection.updateAllowlistMintStage(
-                DEFAULT_TOKEN_ID,
-                PREPARED_MINT_STAGE_ID,
-                {
-                    mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp, // start right away
-                    endTime: currentTimestamp + 86400, // last 24 hours
-                    mintLimitPerWallet: 2,
-                    maxSupplyForStage: 3,
-                    merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
-                },
-            );
+            await collection.updateAllowlistMintStage(DEFAULT_TOKEN_ID, {
+                id: PREPARED_MINT_STAGE_ID,
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp, // start right away
+                endTime: currentTimestamp + 86400, // last 24 hours
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 3,
+                merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            });
 
             // Increase time by 1 hour
             await time.increase(3600);
@@ -609,18 +603,15 @@ describe("ERC1155EditionsImplementation", function () {
             const currentTimestamp = await time.latest();
 
             // Configure allowlist stage
-            await collection.updateAllowlistMintStage(
-                DEFAULT_TOKEN_ID,
-                PREPARED_MINT_STAGE_ID,
-                {
-                    mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp + 86400, // start in 24 hours
-                    endTime: currentTimestamp + 186400,
-                    mintLimitPerWallet: 2,
-                    maxSupplyForStage: 4000,
-                    merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
-                },
-            );
+            await collection.updateAllowlistMintStage(DEFAULT_TOKEN_ID, {
+                id: PREPARED_MINT_STAGE_ID,
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp + 86400, // start in 24 hours
+                endTime: currentTimestamp + 186400,
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 4000,
+                merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            });
 
             await expect(
                 collection
@@ -710,17 +701,14 @@ describe("ERC1155EditionsImplementation", function () {
 
             // Configure public stage
             const currentTimestamp = await time.latest();
-            await collection.updateTokenGatedMintStage(
-                DEFAULT_TOKEN_ID,
-                testERC721.address,
-                {
-                    mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp, // start right away
-                    endTime: currentTimestamp + 86400, // last 24 hours
-                    mintLimitPerWallet: 3,
-                    maxSupplyForStage: 100,
-                },
-            );
+            await collection.updateTokenGatedMintStage(DEFAULT_TOKEN_ID, {
+                nftContract: testERC721.address,
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp, // start right away
+                endTime: currentTimestamp + 86400, // last 24 hours
+                mintLimitPerWallet: 3,
+                maxSupplyForStage: 100,
+            });
 
             // Increase time by 1 hour
             await time.increase(3600);
@@ -961,17 +949,14 @@ describe("ERC1155EditionsImplementation", function () {
             const currentTimestamp = await time.latest();
 
             // Configure public stage
-            await collection.updateTokenGatedMintStage(
-                DEFAULT_TOKEN_ID,
-                testERC721.address,
-                {
-                    mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp + 86400, // start in 24 hours
-                    endTime: currentTimestamp + 186400,
-                    mintLimitPerWallet: 2,
-                    maxSupplyForStage: 1000,
-                },
-            );
+            await collection.updateTokenGatedMintStage(DEFAULT_TOKEN_ID, {
+                nftContract: testERC721.address,
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp + 86400, // start in 24 hours
+                endTime: currentTimestamp + 186400,
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 1000,
+            });
 
             await expect(
                 collection.mintTokenGated(
@@ -1096,6 +1081,7 @@ describe("ERC1155EditionsImplementation", function () {
 
             // Update config
             const newConfigData = {
+                id: stageId,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -1105,7 +1091,6 @@ describe("ERC1155EditionsImplementation", function () {
             };
             await collection.updateAllowlistMintStage(
                 DEFAULT_TOKEN_ID,
-                stageId,
                 newConfigData,
             );
 
@@ -1127,7 +1112,8 @@ describe("ERC1155EditionsImplementation", function () {
             await expect(
                 collection
                     .connect(randomUser)
-                    .updateAllowlistMintStage(DEFAULT_TOKEN_ID, 1, {
+                    .updateAllowlistMintStage(DEFAULT_TOKEN_ID, {
+                        id: 1,
                         mintPrice: "100000000000000000", // 0.1 ETH
                         startTime: 1676043287, // 0.1 ETH
                         endTime: 1686043287, // 0.1 ETH
@@ -1144,6 +1130,7 @@ describe("ERC1155EditionsImplementation", function () {
         it("emits AllowlistMintStageUpdated", async () => {
             // Update config
             const newConfigData = {
+                id: 1,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -1155,7 +1142,6 @@ describe("ERC1155EditionsImplementation", function () {
             await expect(
                 collection.updateAllowlistMintStage(
                     DEFAULT_TOKEN_ID,
-                    1,
                     newConfigData,
                 ),
             ).to.emit(collection, "AllowlistMintStageUpdated");
@@ -1177,6 +1163,7 @@ describe("ERC1155EditionsImplementation", function () {
 
             // Update config
             const newConfigData = {
+                nftContract: randomAddress,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -1185,7 +1172,6 @@ describe("ERC1155EditionsImplementation", function () {
             };
             await collection.updateTokenGatedMintStage(
                 DEFAULT_TOKEN_ID,
-                randomAddress,
                 newConfigData,
             );
 
@@ -1208,17 +1194,14 @@ describe("ERC1155EditionsImplementation", function () {
             await expect(
                 collection
                     .connect(randomUser)
-                    .updateTokenGatedMintStage(
-                        DEFAULT_TOKEN_ID,
-                        randomAddress,
-                        {
-                            mintPrice: "100000000000000000", // 0.1 ETH
-                            startTime: 1676043287, // 0.1 ETH
-                            endTime: 1686043287, // 0.1 ETH
-                            mintLimitPerWallet: 5,
-                            maxSupplyForStage: 4000,
-                        },
-                    ),
+                    .updateTokenGatedMintStage(DEFAULT_TOKEN_ID, {
+                        nftContract: randomAddress,
+                        mintPrice: "100000000000000000", // 0.1 ETH
+                        startTime: 1676043287, // 0.1 ETH
+                        endTime: 1686043287, // 0.1 ETH
+                        mintLimitPerWallet: 5,
+                        maxSupplyForStage: 4000,
+                    }),
             ).to.be.revertedWithCustomError(
                 collection,
                 "OnlyOwnerOrAdministrator",
@@ -1229,6 +1212,7 @@ describe("ERC1155EditionsImplementation", function () {
             // Update config
             const randomAddress = randomUser.address;
             const newConfigData = {
+                nftContract: randomAddress,
                 mintPrice: "100000000000000000", // 0.1 ETH
                 startTime: 1676043287, // 0.1 ETH
                 endTime: 1686043287, // 0.1 ETH
@@ -1239,7 +1223,6 @@ describe("ERC1155EditionsImplementation", function () {
             await expect(
                 collection.updateTokenGatedMintStage(
                     DEFAULT_TOKEN_ID,
-                    randomAddress,
                     newConfigData,
                 ),
             ).to.emit(collection, "TokenGatedMintStageUpdated");
@@ -1304,9 +1287,9 @@ describe("ERC1155EditionsImplementation", function () {
                     endTime: 1686043287,
                     mintLimitPerWallet: 5,
                 },
-                allowlistMintStageIds: [1, 2],
                 allowlistMintStages: [
                     {
+                        id: 1,
                         mintPrice: "100000000000000000",
                         startTime: 1676043287,
                         endTime: 1686043287,
@@ -1315,6 +1298,7 @@ describe("ERC1155EditionsImplementation", function () {
                         merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
                     },
                     {
+                        id: 2,
                         mintPrice: "200000000000000000",
                         startTime: 1676043286,
                         endTime: 1686043286,
@@ -1325,9 +1309,9 @@ describe("ERC1155EditionsImplementation", function () {
                         ])}`,
                     },
                 ],
-                nftContracts: [randomUser.address, owner.address],
                 tokenGatedMintStages: [
                     {
+                        nftContract: randomUser.address,
                         mintPrice: "100000000000000000",
                         startTime: 1676043287,
                         endTime: 1686043287,
@@ -1335,6 +1319,7 @@ describe("ERC1155EditionsImplementation", function () {
                         maxSupplyForStage: 4000,
                     },
                     {
+                        nftContract: owner.address,
                         mintPrice: "200000000000000000",
                         startTime: 1676043286,
                         endTime: 1686043286,
