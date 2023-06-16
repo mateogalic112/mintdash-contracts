@@ -49,8 +49,8 @@ interface IERC1155EditionsImplementation {
      * @dev Emit an event when allowlist mint stage configuration is updated.
      */
     event AllowlistMintStageUpdated(
-        uint256 indexed tokenId, 
-        uint256 indexed allowlistStageId, 
+        uint256 indexed tokenId,
+        uint256 indexed allowlistStageId,
         AllowlistMintStage data
     );
 

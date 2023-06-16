@@ -23,19 +23,19 @@ contract ERC1155EditionsImplementation is
     OperatorFilterToggle,
     IERC1155EditionsImplementation
 {
-    mapping(uint256 tokenId => 
+    mapping(uint256 tokenId =>
         PublicMintStage publicMintStage) public publicMintStages;
 
-    mapping(uint256 tokenId => 
+    mapping(uint256 tokenId =>
         mapping(uint256 allowlistStageId => AllowlistMintStage allowlistMintStage)) public allowlistMintStages;
 
-    mapping(uint256 tokenId => 
+    mapping(uint256 tokenId =>
         mapping(address nftContract => TokenGatedMintStage mintStage)) public tokenGatedMintStages;
 
-    mapping(uint256 tokenId => 
+    mapping(uint256 tokenId =>
         mapping(address nftContract => mapping(uint256 nftContractTokenId => bool redeemed))) private _tokenGatedTokenRedeems;
 
-    mapping(uint256 tokenId => 
+    mapping(uint256 tokenId =>
         mapping(address minter => mapping(address nftContract => mapping(uint256 nftContractTokenId => bool redeemed)))) private _tokenHolderRedeemed;
 
     uint256 internal constant PUBLIC_STAGE_INDEX = 0;
@@ -58,9 +58,9 @@ contract ERC1155EditionsImplementation is
     }
 
     function mintPublic(
-        address recipient, 
-        uint256 tokenId, 
-        uint256 quantity, 
+        address recipient,
+        uint256 tokenId,
+        uint256 quantity,
         bytes memory data
     ) external payable {
         // Get the minter address. Default to msg.sender.
@@ -98,7 +98,7 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         address recipient,
         uint256 quantity,
-        bytes32[] calldata merkleProof, 
+        bytes32[] calldata merkleProof,
         bytes memory data
     ) external payable {
         // Get the minter address. Default to msg.sender.
@@ -214,7 +214,7 @@ contract ERC1155EditionsImplementation is
         return publicMintStages[tokenId];
     }
     function getAllowlistMintStage(
-        uint256 tokenId, 
+        uint256 tokenId,
         uint256 allowlistStageId
     ) external view returns (AllowlistMintStage memory) {
         return allowlistMintStages[tokenId][allowlistStageId];
@@ -226,7 +226,7 @@ contract ERC1155EditionsImplementation is
     ) external view returns (TokenGatedMintStage memory) {
         return tokenGatedMintStages[tokenId][nftContract];
     }
-    
+
     function getTokenGatedIsRedeemed(
         uint256 tokenId,
         address nftContract,

@@ -183,7 +183,7 @@ abstract contract ERC1155ContractMetadata is
     ) internal {
         minted[recipient][tokenId] += uint64(quantity);
         totalSupply[tokenId] += quantity;
-        
+
         _mint(recipient, tokenId, quantity, data);
 
         emit Minted(recipient, tokenId, quantity, mintStageIndex);

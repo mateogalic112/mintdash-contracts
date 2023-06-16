@@ -87,7 +87,7 @@ abstract contract ERC721ContractMetadata is
 
         emit MaxSupplyUpdated(newMaxSupply);
     }
-    
+
 
     function _updateBaseURI(
         string calldata newUri

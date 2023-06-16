@@ -207,7 +207,7 @@ contract ERC721DropImplementation is
     ) external view returns (bool) {
         return _tokenGatedTokenRedeems[nftContract][tokenId];
     }
-    
+
     function updatePublicMintStage(
         PublicMintStage calldata publicMintStageData
     ) external onlyOwnerOrAdministrator {
@@ -279,7 +279,7 @@ contract ERC721DropImplementation is
             }
         }
     }
-    
+
     function supportsInterface(
         bytes4 interfaceId
     )

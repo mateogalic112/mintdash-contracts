@@ -138,7 +138,7 @@ contract ERC721SignatureMintImplementation is
     }
 
     function updateAllowedSigner(
-        address signer, 
+        address signer,
         bool isAllowed
     ) external onlyOwnerOrAdministrator
     {
@@ -171,7 +171,7 @@ contract ERC721SignatureMintImplementation is
             _updatePayoutAddress(config.payoutAddress);
         }
     }
-    
+
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -238,7 +238,7 @@ contract ERC721SignatureMintImplementation is
     }
 
     function _checkSigner(
-        bytes32 digest, 
+        bytes32 digest,
         bytes calldata signature
     ) internal view {
         address recoveredAddress = digest.recover(signature);
