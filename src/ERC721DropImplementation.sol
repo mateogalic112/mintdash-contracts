@@ -33,9 +33,6 @@ contract ERC721DropImplementation is
     mapping(address minter => mapping(address nftContract => mapping(uint256 tokenId => bool redeemed)))
         private _tokenHolderRedeemed;
 
-    mapping(bytes32 digest => bool used) private _usedDigests;
-    mapping(address signer => bool allowed) public allowedSigners;
-
     uint256 internal PUBLIC_STAGE_INDEX;
     uint256 internal ALLOWLIST_STAGE_INDEX;
     uint256 internal TOKEN_GATED_STAGE_INDEX;

@@ -66,28 +66,6 @@ function allowedPayers(address payer) external view returns (bool allowed)
 |---|---|---|
 | allowed | bool | undefined |
 
-### allowedSigners
-
-```solidity
-function allowedSigners(address signer) external view returns (bool allowed)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| signer | address | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| allowed | bool | undefined |
-
 ### allowlistMintStages
 
 ```solidity
