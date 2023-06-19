@@ -160,11 +160,7 @@ abstract contract ERC721ContractMetadata is
         uint256 startTime,
         uint256 endTime
     ) internal view {
-        if (
-            _toUint256(block.timestamp < startTime) |
-                _toUint256(block.timestamp > endTime) ==
-            1
-        ) {
+        if (block.timestamp < startTime || block.timestamp > endTime) {
             revert StageNotActive(block.timestamp, startTime, endTime);
         }
     }
@@ -188,11 +184,5 @@ abstract contract ERC721ContractMetadata is
 
     function _startTokenId() internal pure override returns (uint256) {
         return 1;
-    }
-
-    function _toUint256(bool b) internal pure returns (uint256 u) {
-        assembly {
-            u := b
-        }
     }
 }
