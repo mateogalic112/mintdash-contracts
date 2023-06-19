@@ -57,11 +57,11 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         uint256 platformFees = (address(this).balance * platformFeesNumerator) / _feeDenominator();
         if(platformFees > 0) {
             (bool platformFeesSuccess, ) = platformFeesAddress.call{value: platformFees}("");
-            require(platformFeesSuccess, "Platform fees transfer failed.");
+            if (!platformFeesSuccess) revert PlatformFeesTransferFailed();
         }
 
         (bool payoutSuccess, ) = payoutAddress.call{value: address(this).balance}("");
-        require(payoutSuccess, "Payout failed.");
+        if (!payoutSuccess) revert PayoutTransferFailed();
     }
 
     function _updatePayoutAddress(

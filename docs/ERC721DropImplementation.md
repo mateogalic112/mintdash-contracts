@@ -1594,6 +1594,17 @@ error PayoutAddressCannotBeZeroAddress()
 *Revert if payout address is zero address when updating payout address.*
 
 
+### PayoutTransferFailed
+
+```solidity
+error PayoutTransferFailed()
+```
+
+
+
+*Revert if the payout transfer fails.*
+
+
 ### PlatformFeesAddressCannotBeZeroAddress
 
 ```solidity
@@ -1603,6 +1614,17 @@ error PlatformFeesAddressCannotBeZeroAddress()
 
 
 *Revert if platform fees address is zero address when updating platform fees.*
+
+
+### PlatformFeesTransferFailed
+
+```solidity
+error PlatformFeesTransferFailed()
+```
+
+
+
+*Revert if the platform fees transfer fails.*
 
 
 ### ProvenanceHashCannotBeUpdatedAfterMintStarted
