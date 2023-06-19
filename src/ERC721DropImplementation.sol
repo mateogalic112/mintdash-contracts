@@ -227,22 +227,22 @@ contract ERC721DropImplementation is
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
         // Update max supply
-        if(config.maxSupply > 0) {
+        if (config.maxSupply > 0) {
             _updateMaxSupply(config.maxSupply);
         }
 
         // Update base URI
-        if(bytes(config.baseURI).length > 0){
+        if (bytes(config.baseURI).length > 0) {
             _updateBaseURI(config.baseURI);
         }
 
         // Update royalties
-        if(config.royaltiesReceiver != address(0)){
+        if (config.royaltiesReceiver != address(0)) {
             _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
         }
 
         // Update payout
-        if(config.payoutAddress != address(0)){
+        if (config.payoutAddress != address(0)) {
             _updatePayoutAddress(config.payoutAddress);
         }
 
@@ -255,7 +255,7 @@ contract ERC721DropImplementation is
         }
 
         // Update allowlist phases
-        if(config.allowlistMintStages.length > 0){
+        if (config.allowlistMintStages.length > 0) {
             for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
                 _updateAllowlistMintStage(config.allowlistMintStages[i]);
 
@@ -265,8 +265,8 @@ contract ERC721DropImplementation is
             }
         }
 
-         // Update token gated phases
-        if(config.tokenGatedMintStages.length > 0){
+        // Update token gated phases
+        if (config.tokenGatedMintStages.length > 0) {
             for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
                 _updateTokenGatedMintStage(config.tokenGatedMintStages[i]);
 
@@ -287,7 +287,7 @@ contract ERC721DropImplementation is
     {
         return
             interfaceId == type(IERC2981Upgradeable).interfaceId ||
-            ERC721AUpgradeable.supportsInterface(interfaceId)||
+            ERC721AUpgradeable.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 

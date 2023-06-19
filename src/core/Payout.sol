@@ -23,7 +23,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
     function updatePlatformFees(
         address newPlatformFeesAddress,
         uint256 newPlatformFeesNumerator
-    ) external onlyAdministrator() {
+    ) external onlyAdministrator {
         _updatePlatformFees(newPlatformFeesAddress, newPlatformFeesNumerator);
     }
 
@@ -40,7 +40,6 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         _updateRoyalties(receiver, feeNumerator);
     }
 
-
     function withdrawAllFunds() external onlyOwnerOrAdministrator {
         if (address(this).balance == 0) {
             revert NothingToWithdraw();
@@ -55,7 +54,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         }
 
         uint256 platformFees = (address(this).balance * platformFeesNumerator) / _feeDenominator();
-        if(platformFees > 0) {
+        if (platformFees > 0) {
             (bool platformFeesSuccess, ) = platformFeesAddress.call{value: platformFees}("");
             if (!platformFeesSuccess) revert PlatformFeesTransferFailed();
         }
