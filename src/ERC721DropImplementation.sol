@@ -33,11 +33,11 @@ contract ERC721DropImplementation is
     mapping(address minter => mapping(address nftContract => mapping(uint256 tokenId => bool redeemed)))
         private _tokenHolderRedeemed;
 
-    uint256 internal PUBLIC_STAGE_INDEX;
-    uint256 internal ALLOWLIST_STAGE_INDEX;
-    uint256 internal TOKEN_GATED_STAGE_INDEX;
+    uint256 internal constant PUBLIC_STAGE_INDEX = 0;
+    uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
+    uint256 internal constant TOKEN_GATED_STAGE_INDEX = 2;
 
-    uint256 internal UNLIMITED_MAX_SUPPLY_FOR_STAGE;
+    uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
 
     function initialize(
         string memory _name,
@@ -50,12 +50,6 @@ contract ERC721DropImplementation is
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();
-
-        PUBLIC_STAGE_INDEX = 0;
-        ALLOWLIST_STAGE_INDEX = 1;
-        TOKEN_GATED_STAGE_INDEX = 2;
-
-        UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
     }
 
     function mintPublic(address recipient, uint256 quantity) external payable {
