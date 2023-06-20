@@ -11,7 +11,7 @@ pragma solidity 0.8.18;
  *                                 allowed.
  */
 struct PublicMintStage {
-    uint80 mintPrice;
+    uint144 mintPrice;
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;
@@ -52,7 +52,7 @@ struct AllowlistMintStage {
  */
 struct TokenGatedMintStage {
     address nftContract;
-    uint80 mintPrice;
+    uint104 mintPrice;
     uint48 startTime;
     uint48 endTime;
     uint16 mintLimitPerWallet;

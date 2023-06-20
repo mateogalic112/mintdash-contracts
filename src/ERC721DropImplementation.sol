@@ -7,7 +7,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, SignedMintParams} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
@@ -137,7 +137,7 @@ contract ERC721DropImplementation is
         _checkPayer(minter);
 
         // Get token gated mint stage for NFT contract
-        TokenGatedMintStage memory tokenGatedMintStage = tokenGatedMintStages[
+        TokenGatedMintStage storage tokenGatedMintStage = tokenGatedMintStages[
             nftContract
         ];
 

@@ -511,7 +511,7 @@ function provenanceHash() external view returns (bytes32)
 ### publicMintStage
 
 ```solidity
-function publicMintStage() external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet)
+function publicMintStage() external view returns (uint144 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet)
 ```
 
 
@@ -523,7 +523,7 @@ function publicMintStage() external view returns (uint80 mintPrice, uint48 start
 
 | Name | Type | Description |
 |---|---|---|
-| mintPrice | uint80 | undefined |
+| mintPrice | uint144 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
@@ -670,7 +670,7 @@ function symbol() external view returns (string)
 ### tokenGatedMintStages
 
 ```solidity
-function tokenGatedMintStages(address nftContract) external view returns (address nftContract, uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
+function tokenGatedMintStages(address nftContract) external view returns (address nftContract, uint104 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
 ```
 
 
@@ -688,7 +688,7 @@ function tokenGatedMintStages(address nftContract) external view returns (addres
 | Name | Type | Description |
 |---|---|---|
 | nftContract | address | undefined |
-| mintPrice | uint80 | undefined |
+| mintPrice | uint104 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
