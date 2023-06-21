@@ -93,7 +93,7 @@ contract ERC721DropImplementation is
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
-        AllowlistMintStage storage allowlistMintStage = allowlistMintStages[allowlistStageId];
+        AllowlistMintStage memory allowlistMintStage = allowlistMintStages[allowlistStageId];
 
         // Ensure that allowlist mint stage is active
         _checkStageActive(
