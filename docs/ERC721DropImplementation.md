@@ -69,7 +69,7 @@ function allowedPayers(address payer) external view returns (bool allowed)
 ### allowlistMintStages
 
 ```solidity
-function allowlistMintStages(uint256 allowlistStageId) external view returns (uint256 id, uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
+function allowlistMintStages(uint256 allowlistStageId) external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
 ```
 
 
@@ -86,7 +86,6 @@ function allowlistMintStages(uint256 allowlistStageId) external view returns (ui
 
 | Name | Type | Description |
 |---|---|---|
-| id | uint256 | undefined |
 | mintPrice | uint80 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
@@ -670,7 +669,7 @@ function symbol() external view returns (string)
 ### tokenGatedMintStages
 
 ```solidity
-function tokenGatedMintStages(address nftContract) external view returns (address nftContract, uint104 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
+function tokenGatedMintStages(address nftContract) external view returns (uint104 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
 ```
 
 
@@ -687,7 +686,6 @@ function tokenGatedMintStages(address nftContract) external view returns (addres
 
 | Name | Type | Description |
 |---|---|---|
-| nftContract | address | undefined |
 | mintPrice | uint104 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
@@ -786,7 +784,7 @@ function transferOwnership(address newOwner) external nonpayable
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(AllowlistMintStageConfig allowlistMintStageConfig) external nonpayable
 ```
 
 
@@ -797,7 +795,7 @@ function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) ext
 
 | Name | Type | Description |
 |---|---|---|
-| allowlistMintStageData | AllowlistMintStage | undefined |
+| allowlistMintStageConfig | AllowlistMintStageConfig | undefined |
 
 ### updateBaseURI
 
@@ -965,7 +963,7 @@ Updates royalties for the collection.
 ### updateTokenGatedMintStage
 
 ```solidity
-function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) external nonpayable
+function updateTokenGatedMintStage(TokenGatedMintStageConfig tokenGatedMintStageConfig) external nonpayable
 ```
 
 
@@ -976,7 +974,7 @@ function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenGatedMintStageData | TokenGatedMintStage | undefined |
+| tokenGatedMintStageConfig | TokenGatedMintStageConfig | undefined |
 
 ### withdrawAllFunds
 

@@ -7,7 +7,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
@@ -206,15 +206,15 @@ contract ERC721DropImplementation is
     }
 
     function updateAllowlistMintStage(
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) external onlyOwnerOrAdministrator {
-        _updateAllowlistMintStage(allowlistMintStageData);
+        _updateAllowlistMintStage(allowlistMintStageConfig);
     }
 
     function updateTokenGatedMintStage(
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) external onlyOwnerOrAdministrator {
-        _updateTokenGatedMintStage(tokenGatedMintStageData);
+        _updateTokenGatedMintStage(tokenGatedMintStageConfig);
     }
 
     function updateConfiguration(
@@ -345,22 +345,22 @@ contract ERC721DropImplementation is
     }
 
     function _updateAllowlistMintStage(
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) internal {
-        allowlistMintStages[allowlistMintStageData.id] = allowlistMintStageData;
+        allowlistMintStages[allowlistMintStageConfig.id] = allowlistMintStageConfig.data;
 
-        emit AllowlistMintStageUpdated(allowlistMintStageData.id, allowlistMintStageData);
+        emit AllowlistMintStageUpdated(allowlistMintStageConfig.id, allowlistMintStageConfig.data);
     }
 
     function _updateTokenGatedMintStage(
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) internal {
-        if (tokenGatedMintStageData.nftContract == address(0)) {
+        if (tokenGatedMintStageConfig.nftContract == address(0)) {
             revert TokenGatedNftContractCannotBeZeroAddress();
         }
 
-        tokenGatedMintStages[tokenGatedMintStageData.nftContract] = tokenGatedMintStageData;
+        tokenGatedMintStages[tokenGatedMintStageConfig.nftContract] = tokenGatedMintStageConfig.data;
 
-        emit TokenGatedMintStageUpdated(tokenGatedMintStageData.nftContract, tokenGatedMintStageData);
+        emit TokenGatedMintStageUpdated(tokenGatedMintStageConfig.nftContract, tokenGatedMintStageConfig.data);
     }
 }

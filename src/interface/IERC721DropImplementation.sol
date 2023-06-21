@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "../lib/DropStructs.sol";
 
 interface IERC721DropImplementation {
     struct MultiConfig {
@@ -22,10 +22,10 @@ interface IERC721DropImplementation {
         PublicMintStage publicMintStage;
 
         // Allowlist stages
-        AllowlistMintStage[] allowlistMintStages;
+        AllowlistMintStageConfig[] allowlistMintStages;
 
         // Token gated stages
-        TokenGatedMintStage[] tokenGatedMintStages;
+        TokenGatedMintStageConfig[] tokenGatedMintStages;
     }
 
     /**
@@ -135,18 +135,18 @@ interface IERC721DropImplementation {
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
-     * @param allowlistMintStageData The new allowlist mint stage data to set.
+     * @param allowlistMintStageConfig The new allowlist mint stage config to set.
      */
     function updateAllowlistMintStage(
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) external;
 
     /**
      * @notice Updates configuration for token gated mint stage.
      *
-     * @param tokenGatedMintStageData The new token gated mint stage data to set.
+     * @param tokenGatedMintStageConfig The new token gated mint stage config to set.
      */
     function updateTokenGatedMintStage(
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) external;
 }

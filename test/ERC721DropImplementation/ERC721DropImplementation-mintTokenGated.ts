@@ -60,11 +60,13 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
         const currentTimestamp = await time.latest();
         await collection.updateTokenGatedMintStage({
             nftContract: testERC721.address,
-            mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: currentTimestamp, // start right away
-            endTime: currentTimestamp + 86400, // last 24 hours
-            mintLimitPerWallet: 3,
-            maxSupplyForStage: 100,
+            data: {
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp, // start right away
+                endTime: currentTimestamp + 86400, // last 24 hours
+                mintLimitPerWallet: 3,
+                maxSupplyForStage: 100,
+            },
         });
 
         // Increase time by 1 hour
@@ -258,11 +260,13 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
         // Configure public stage
         await collection.updateTokenGatedMintStage({
             nftContract: testERC721.address,
-            mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: currentTimestamp + 86400, // start in 24 hours
-            endTime: currentTimestamp + 186400,
-            mintLimitPerWallet: 2,
-            maxSupplyForStage: 1000,
+            data: {
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp + 86400, // start in 24 hours
+                endTime: currentTimestamp + 186400,
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 1000,
+            },
         });
 
         await expect(

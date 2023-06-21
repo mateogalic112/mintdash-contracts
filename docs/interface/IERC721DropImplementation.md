@@ -90,7 +90,7 @@ Mint a token gated stage.
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(AllowlistMintStageConfig allowlistMintStageConfig) external nonpayable
 ```
 
 
@@ -101,7 +101,7 @@ function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) ext
 
 | Name | Type | Description |
 |---|---|---|
-| allowlistMintStageData | AllowlistMintStage | undefined |
+| allowlistMintStageConfig | AllowlistMintStageConfig | undefined |
 
 ### updateConfiguration
 
@@ -138,7 +138,7 @@ function updatePublicMintStage(PublicMintStage publicMintStageData) external non
 ### updateTokenGatedMintStage
 
 ```solidity
-function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) external nonpayable
+function updateTokenGatedMintStage(TokenGatedMintStageConfig tokenGatedMintStageConfig) external nonpayable
 ```
 
 
@@ -149,7 +149,7 @@ function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenGatedMintStageData | TokenGatedMintStage | undefined |
+| tokenGatedMintStageConfig | TokenGatedMintStageConfig | undefined |
 
 
 
