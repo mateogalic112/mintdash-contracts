@@ -7,7 +7,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC1155ContractMetadata} from "./core/ERC1155ContractMetadata.sol";
@@ -42,8 +42,7 @@ contract ERC1155EditionsImplementation is
     uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
     uint256 internal constant TOKEN_GATED_STAGE_INDEX = 2;
 
-    uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE =
-        type(uint256).max;
+    uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
 
     function initialize(string memory _name, string memory _symbol, address _administrator) external initializer {
         __ERC1155_init("");
@@ -290,16 +289,16 @@ contract ERC1155EditionsImplementation is
 
     function updateAllowlistMintStage(
         uint256 tokenId,
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) external onlyOwnerOrAdministrator {
-        _updateAllowlistMintStage(tokenId, allowlistMintStageData);
+        _updateAllowlistMintStage(tokenId, allowlistMintStageConfig);
     }
 
     function updateTokenGatedMintStage(
         uint256 tokenId,
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) external onlyOwnerOrAdministrator {
-        _updateTokenGatedMintStage(tokenId, tokenGatedMintStageData);
+        _updateTokenGatedMintStage(tokenId, tokenGatedMintStageConfig);
     }
 
     function setApprovalForAll(
@@ -359,23 +358,23 @@ contract ERC1155EditionsImplementation is
 
     function _updateAllowlistMintStage(
         uint256 tokenId,
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) internal {
-        allowlistMintStages[tokenId][allowlistMintStageData.id] = allowlistMintStageData;
+        allowlistMintStages[tokenId][allowlistMintStageConfig.id] = allowlistMintStageConfig.data;
 
-        emit AllowlistMintStageUpdated(tokenId, allowlistMintStageData.id, allowlistMintStageData);
+        emit AllowlistMintStageUpdated(tokenId, allowlistMintStageConfig.id, allowlistMintStageConfig.data);
     }
 
     function _updateTokenGatedMintStage(
         uint256 tokenId,
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) internal {
-        if (tokenGatedMintStageData.nftContract == address(0)) {
+        if (tokenGatedMintStageConfig.nftContract == address(0)) {
             revert TokenGatedNftContractCannotBeZeroAddress();
         }
 
-        tokenGatedMintStages[tokenId][tokenGatedMintStageData.nftContract] = tokenGatedMintStageData;
+        tokenGatedMintStages[tokenId][tokenGatedMintStageConfig.nftContract] = tokenGatedMintStageConfig.data;
 
-        emit TokenGatedMintStageUpdated(tokenId, tokenGatedMintStageData.nftContract, tokenGatedMintStageData);
+        emit TokenGatedMintStageUpdated(tokenId, tokenGatedMintStageConfig.nftContract, tokenGatedMintStageConfig.data);
     }
 }
