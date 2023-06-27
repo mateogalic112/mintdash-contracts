@@ -177,19 +177,19 @@ contract ERC1155EditionsImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
+        // For easier and cheaper access.
+        mapping(uint256 => bool)
+            storage redeemedTokenIds = _tokenGatedTokenRedeems[tokenId][nftContract];
+
         // Iterate through each tokenIds to make sure it's not already claimed
         for (uint256 i = 0; i < quantity; ) {
             // For easier and cheaper access.
             uint256 gatedTokenId = tokenIds[i];
 
             // Check that the minter is the owner of the tokenId.
-             if (IERC721(nftContract).ownerOf(tokenId) != minter) {
+            if (IERC721(nftContract).ownerOf(tokenId) != minter) {
                 revert TokenGatedNotTokenOwner();
             }
-
-            // For easier and cheaper access.
-            mapping(uint256 => bool)
-                storage redeemedTokenIds = _tokenGatedTokenRedeems[tokenId][nftContract];
 
             // Check that the token id has not already been redeemed.
             if (redeemedTokenIds[gatedTokenId]) {
@@ -250,10 +250,10 @@ contract ERC1155EditionsImplementation is
         }
 
         // Update public phase
-        if(_toUint256(config.publicMintStage.startTime != 0) |
-                _toUint256(config.publicMintStage.endTime != 0) ==
-            1
-        ){
+        if (
+            config.publicMintStage.startTime != 0 ||
+            config.publicMintStage.endTime != 0
+        ) {
             _updatePublicMintStage(tokenId, config.publicMintStage);
         }
 

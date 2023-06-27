@@ -164,11 +164,7 @@ abstract contract ERC1155ContractMetadata is
         uint256 startTime,
         uint256 endTime
     ) internal view {
-        if (
-            _toUint256(block.timestamp < startTime) |
-                _toUint256(block.timestamp > endTime) ==
-            1
-        ) {
+        if (block.timestamp < startTime || block.timestamp > endTime) {
             revert StageNotActive(block.timestamp, startTime, endTime);
         }
     }
@@ -186,11 +182,5 @@ abstract contract ERC1155ContractMetadata is
         _mint(recipient, tokenId, quantity, data);
 
         emit Minted(recipient, tokenId, quantity, mintStageIndex);
-    }
-
-    function _toUint256(bool b) internal pure returns (uint256 u) {
-        assembly {
-            u := b
-        }
     }
 }
