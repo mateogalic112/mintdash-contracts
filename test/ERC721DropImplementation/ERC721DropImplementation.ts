@@ -170,19 +170,13 @@ describe("ERC721DropImplementation", function () {
 
             // Check updated config
             const updatedConfig = await collection.allowlistMintStages(stageId);
-            expect(updatedConfig.mintPrice).to.equal(
-                stageData.mintPrice,
-            );
-            expect(updatedConfig.startTime).to.equal(
-                stageData.startTime,
-            );
+            expect(updatedConfig.mintPrice).to.equal(stageData.mintPrice);
+            expect(updatedConfig.startTime).to.equal(stageData.startTime);
             expect(updatedConfig.endTime).to.equal(stageData.endTime);
             expect(updatedConfig.mintLimitPerWallet).to.equal(
                 stageData.mintLimitPerWallet,
             );
-            expect(updatedConfig.merkleRoot).to.equal(
-                stageData.merkleRoot,
-            );
+            expect(updatedConfig.merkleRoot).to.equal(stageData.merkleRoot);
         });
 
         it("reverts if caller is not contract owner or administrator", async () => {
@@ -255,12 +249,8 @@ describe("ERC721DropImplementation", function () {
             const updatedConfig = await collection.tokenGatedMintStages(
                 randomAddress,
             );
-            expect(updatedConfig.mintPrice).to.equal(
-                stageData.mintPrice,
-            );
-            expect(updatedConfig.startTime).to.equal(
-                stageData.startTime,
-            );
+            expect(updatedConfig.mintPrice).to.equal(stageData.mintPrice);
+            expect(updatedConfig.startTime).to.equal(stageData.startTime);
             expect(updatedConfig.endTime).to.equal(stageData.endTime);
             expect(updatedConfig.mintLimitPerWallet).to.equal(
                 stageData.mintLimitPerWallet,
