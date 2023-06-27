@@ -137,7 +137,7 @@ contract ERC721DropImplementation is
         _checkPayer(minter);
 
         // Get token gated mint stage for NFT contract
-        TokenGatedMintStage storage tokenGatedMintStage = tokenGatedMintStages[
+        TokenGatedMintStage memory tokenGatedMintStage = tokenGatedMintStages[
             nftContract
         ];
 

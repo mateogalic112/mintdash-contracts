@@ -19,7 +19,7 @@ abstract contract ERC1155ContractMetadata is
 
     bytes32 public provenanceHash;
 
-    mapping(uint256 tokenId=> uint256 maxSupply) public maxSupply;
+    mapping(uint256 tokenId => uint256 maxSupply) public maxSupply;
     mapping(uint256 tokenId => uint256 totalSupply) public totalSupply;
     mapping(uint256 tokenid => string tokenURI) public tokenURIs;
 
@@ -50,7 +50,7 @@ abstract contract ERC1155ContractMetadata is
             }
         }
 
-       for (uint64 i = 0; i < tokenId.length; ) {
+        for (uint64 i = 0; i < tokenId.length; ) {
             if (totalSupply[tokenId[i]] > maxSupply[tokenId[i]]) {
                 revert MintQuantityExceedsMaxSupply();
             }
@@ -118,6 +118,7 @@ abstract contract ERC1155ContractMetadata is
 
         emit ProvenanceHashUpdated(newProvenanceHash);
     }
+
     function _checkPayer(address minter) internal view {
         if (minter != msg.sender) {
             if (!allowedPayers[msg.sender]) {

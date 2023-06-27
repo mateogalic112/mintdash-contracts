@@ -89,7 +89,7 @@ contract ERC1155EditionsImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
-        _mintBase(minter,tokenId, quantity, data, PUBLIC_STAGE_INDEX);
+        _mintBase(minter, tokenId, quantity, data, PUBLIC_STAGE_INDEX);
     }
 
     function mintAllowlist(
@@ -212,6 +212,7 @@ contract ERC1155EditionsImplementation is
     ) external view returns (PublicMintStage memory) {
         return publicMintStages[tokenId];
     }
+
     function getAllowlistMintStage(
         uint256 tokenId,
         uint256 allowlistStageId
@@ -238,14 +239,13 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
-
         // Update max supply
-        if(config.maxSupply > 0) {
+        if (config.maxSupply > 0) {
             _updateMaxSupply(tokenId, config.maxSupply);
         }
 
         // Update base URI
-        if(bytes(config.baseURI).length > 0){
+        if (bytes(config.baseURI).length > 0) {
             _updateTokenURI(tokenId, config.baseURI);
         }
 
@@ -258,7 +258,7 @@ contract ERC1155EditionsImplementation is
         }
 
         // Update allowlist phases
-        if(config.allowlistMintStages.length > 0){
+        if (config.allowlistMintStages.length > 0) {
             for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
                 _updateAllowlistMintStage(tokenId, config.allowlistMintStages[i]);
 
@@ -268,8 +268,8 @@ contract ERC1155EditionsImplementation is
             }
         }
 
-         // Update token gated phases
-        if(config.tokenGatedMintStages.length > 0){
+        // Update token gated phases
+        if (config.tokenGatedMintStages.length > 0) {
             for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
                 _updateTokenGatedMintStage(tokenId, config.tokenGatedMintStages[i]);
 
