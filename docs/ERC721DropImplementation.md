@@ -66,32 +66,10 @@ function allowedPayers(address payer) external view returns (bool allowed)
 |---|---|---|
 | allowed | bool | undefined |
 
-### allowedSigners
-
-```solidity
-function allowedSigners(address signer) external view returns (bool allowed)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| signer | address | undefined |
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| allowed | bool | undefined |
-
 ### allowlistMintStages
 
 ```solidity
-function allowlistMintStages(uint256 allowlistStageId) external view returns (uint256 id, uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
+function allowlistMintStages(uint256 allowlistStageId) external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage, bytes32 merkleRoot)
 ```
 
 
@@ -108,7 +86,6 @@ function allowlistMintStages(uint256 allowlistStageId) external view returns (ui
 
 | Name | Type | Description |
 |---|---|---|
-| id | uint256 | undefined |
 | mintPrice | uint80 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
@@ -533,7 +510,7 @@ function provenanceHash() external view returns (bytes32)
 ### publicMintStage
 
 ```solidity
-function publicMintStage() external view returns (uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet)
+function publicMintStage() external view returns (uint144 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet)
 ```
 
 
@@ -545,7 +522,7 @@ function publicMintStage() external view returns (uint80 mintPrice, uint48 start
 
 | Name | Type | Description |
 |---|---|---|
-| mintPrice | uint80 | undefined |
+| mintPrice | uint144 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
@@ -692,7 +669,7 @@ function symbol() external view returns (string)
 ### tokenGatedMintStages
 
 ```solidity
-function tokenGatedMintStages(address nftContract) external view returns (address nftContract, uint80 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
+function tokenGatedMintStages(address nftContract) external view returns (uint104 mintPrice, uint48 startTime, uint48 endTime, uint16 mintLimitPerWallet, uint40 maxSupplyForStage)
 ```
 
 
@@ -709,8 +686,7 @@ function tokenGatedMintStages(address nftContract) external view returns (addres
 
 | Name | Type | Description |
 |---|---|---|
-| nftContract | address | undefined |
-| mintPrice | uint80 | undefined |
+| mintPrice | uint104 | undefined |
 | startTime | uint48 | undefined |
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
@@ -808,7 +784,7 @@ function transferOwnership(address newOwner) external nonpayable
 ### updateAllowlistMintStage
 
 ```solidity
-function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) external nonpayable
+function updateAllowlistMintStage(AllowlistMintStageConfig allowlistMintStageConfig) external nonpayable
 ```
 
 
@@ -819,7 +795,7 @@ function updateAllowlistMintStage(AllowlistMintStage allowlistMintStageData) ext
 
 | Name | Type | Description |
 |---|---|---|
-| allowlistMintStageData | AllowlistMintStage | undefined |
+| allowlistMintStageConfig | AllowlistMintStageConfig | undefined |
 
 ### updateBaseURI
 
@@ -987,7 +963,7 @@ Updates royalties for the collection.
 ### updateTokenGatedMintStage
 
 ```solidity
-function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) external nonpayable
+function updateTokenGatedMintStage(TokenGatedMintStageConfig tokenGatedMintStageConfig) external nonpayable
 ```
 
 
@@ -998,7 +974,7 @@ function updateTokenGatedMintStage(TokenGatedMintStage tokenGatedMintStageData) 
 
 | Name | Type | Description |
 |---|---|---|
-| tokenGatedMintStageData | TokenGatedMintStage | undefined |
+| tokenGatedMintStageConfig | TokenGatedMintStageConfig | undefined |
 
 ### withdrawAllFunds
 
@@ -1616,6 +1592,17 @@ error PayoutAddressCannotBeZeroAddress()
 *Revert if payout address is zero address when updating payout address.*
 
 
+### PayoutTransferFailed
+
+```solidity
+error PayoutTransferFailed()
+```
+
+
+
+*Revert if the payout transfer fails.*
+
+
 ### PlatformFeesAddressCannotBeZeroAddress
 
 ```solidity
@@ -1625,6 +1612,17 @@ error PlatformFeesAddressCannotBeZeroAddress()
 
 
 *Revert if platform fees address is zero address when updating platform fees.*
+
+
+### PlatformFeesTransferFailed
+
+```solidity
+error PlatformFeesTransferFailed()
+```
+
+
+
+*Revert if the platform fees transfer fails.*
 
 
 ### ProvenanceHashCannotBeUpdatedAfterMintStarted

@@ -16,7 +16,7 @@ abstract contract AdministratedUpgradeable is OwnableUpgradeable {
     error InvalidAdministratorAddress();
 
     function __Administrated_init(address _administrator)
-     internal 
+     internal
      onlyInitializing
     {
         administrator = _administrator;

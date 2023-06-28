@@ -7,7 +7,7 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage, SignedMintParams} from "./lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
@@ -33,14 +33,11 @@ contract ERC721DropImplementation is
     mapping(address minter => mapping(address nftContract => mapping(uint256 tokenId => bool redeemed)))
         private _tokenHolderRedeemed;
 
-    mapping(bytes32 digest => bool used) private _usedDigests;
-    mapping(address signer => bool allowed) public allowedSigners;
+    uint256 internal constant PUBLIC_STAGE_INDEX = 0;
+    uint256 internal constant ALLOWLIST_STAGE_INDEX = 1;
+    uint256 internal constant TOKEN_GATED_STAGE_INDEX = 2;
 
-    uint256 internal PUBLIC_STAGE_INDEX;
-    uint256 internal ALLOWLIST_STAGE_INDEX;
-    uint256 internal TOKEN_GATED_STAGE_INDEX;
-
-    uint256 internal UNLIMITED_MAX_SUPPLY_FOR_STAGE;
+    uint256 internal constant UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
 
     function initialize(
         string memory _name,
@@ -53,12 +50,6 @@ contract ERC721DropImplementation is
         __Ownable_init();
         __ERC2981_init();
         __DefaultOperatorFilterer_init();
-
-        PUBLIC_STAGE_INDEX = 0;
-        ALLOWLIST_STAGE_INDEX = 1;
-        TOKEN_GATED_STAGE_INDEX = 2;
-
-        UNLIMITED_MAX_SUPPLY_FOR_STAGE = type(uint256).max;
     }
 
     function mintPublic(address recipient, uint256 quantity) external payable {
@@ -102,7 +93,7 @@ contract ERC721DropImplementation is
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
-        AllowlistMintStage storage allowlistMintStage = allowlistMintStages[allowlistStageId];
+        AllowlistMintStage memory allowlistMintStage = allowlistMintStages[allowlistStageId];
 
         // Ensure that allowlist mint stage is active
         _checkStageActive(
@@ -170,6 +161,10 @@ contract ERC721DropImplementation is
         // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, tokenGatedMintStage.mintPrice);
 
+        // For easier and cheaper access.
+        mapping(uint256 => bool)
+            storage redeemedTokenIds = _tokenGatedTokenRedeems[nftContract];
+
         // Iterate through each tokenIds to make sure it's not already claimed
         for (uint256 i = 0; i < quantity; ) {
             // For easier and cheaper access.
@@ -179,10 +174,6 @@ contract ERC721DropImplementation is
             if (IERC721(nftContract).ownerOf(tokenId) != minter) {
                 revert TokenGatedNotTokenOwner();
             }
-
-            // For easier and cheaper access.
-            mapping(uint256 => bool)
-                storage redeemedTokenIds = _tokenGatedTokenRedeems[nftContract];
 
             // Check that the token id has not already been redeemed.
             if (redeemedTokenIds[tokenId]) {
@@ -207,7 +198,7 @@ contract ERC721DropImplementation is
     ) external view returns (bool) {
         return _tokenGatedTokenRedeems[nftContract][tokenId];
     }
-    
+
     function updatePublicMintStage(
         PublicMintStage calldata publicMintStageData
     ) external onlyOwnerOrAdministrator {
@@ -215,50 +206,50 @@ contract ERC721DropImplementation is
     }
 
     function updateAllowlistMintStage(
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) external onlyOwnerOrAdministrator {
-        _updateAllowlistMintStage(allowlistMintStageData);
+        _updateAllowlistMintStage(allowlistMintStageConfig);
     }
 
     function updateTokenGatedMintStage(
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) external onlyOwnerOrAdministrator {
-        _updateTokenGatedMintStage(tokenGatedMintStageData);
+        _updateTokenGatedMintStage(tokenGatedMintStageConfig);
     }
 
     function updateConfiguration(
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
         // Update max supply
-        if(config.maxSupply > 0) {
+        if (config.maxSupply > 0) {
             _updateMaxSupply(config.maxSupply);
         }
 
         // Update base URI
-        if(bytes(config.baseURI).length > 0){
+        if (bytes(config.baseURI).length > 0) {
             _updateBaseURI(config.baseURI);
         }
 
         // Update royalties
-        if(config.royaltiesReceiver != address(0)){
+        if (config.royaltiesReceiver != address(0)) {
             _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
         }
 
         // Update payout
-        if(config.payoutAddress != address(0)){
+        if (config.payoutAddress != address(0)) {
             _updatePayoutAddress(config.payoutAddress);
         }
 
         // Update public phase
-        if(_toUint256(config.publicMintStage.startTime != 0) |
-                _toUint256(config.publicMintStage.endTime != 0) ==
-            1
-        ){
+        if (
+            config.publicMintStage.startTime != 0 ||
+            config.publicMintStage.endTime != 0
+        ) {
             _updatePublicMintStage(config.publicMintStage);
         }
 
         // Update allowlist phases
-        if(config.allowlistMintStages.length > 0){
+        if (config.allowlistMintStages.length > 0) {
             for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
                 _updateAllowlistMintStage(config.allowlistMintStages[i]);
 
@@ -268,8 +259,8 @@ contract ERC721DropImplementation is
             }
         }
 
-         // Update token gated phases
-        if(config.tokenGatedMintStages.length > 0){
+        // Update token gated phases
+        if (config.tokenGatedMintStages.length > 0) {
             for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
                 _updateTokenGatedMintStage(config.tokenGatedMintStages[i]);
 
@@ -279,7 +270,7 @@ contract ERC721DropImplementation is
             }
         }
     }
-    
+
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -290,7 +281,7 @@ contract ERC721DropImplementation is
     {
         return
             interfaceId == type(IERC2981Upgradeable).interfaceId ||
-            ERC721AUpgradeable.supportsInterface(interfaceId)||
+            ERC721AUpgradeable.supportsInterface(interfaceId) ||
             super.supportsInterface(interfaceId);
     }
 
@@ -354,22 +345,22 @@ contract ERC721DropImplementation is
     }
 
     function _updateAllowlistMintStage(
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) internal {
-        allowlistMintStages[allowlistMintStageData.id] = allowlistMintStageData;
+        allowlistMintStages[allowlistMintStageConfig.id] = allowlistMintStageConfig.data;
 
-        emit AllowlistMintStageUpdated(allowlistMintStageData.id, allowlistMintStageData);
+        emit AllowlistMintStageUpdated(allowlistMintStageConfig.id, allowlistMintStageConfig.data);
     }
 
     function _updateTokenGatedMintStage(
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) internal {
-        if (tokenGatedMintStageData.nftContract == address(0)) {
+        if (tokenGatedMintStageConfig.nftContract == address(0)) {
             revert TokenGatedNftContractCannotBeZeroAddress();
         }
 
-        tokenGatedMintStages[tokenGatedMintStageData.nftContract] = tokenGatedMintStageData;
+        tokenGatedMintStages[tokenGatedMintStageConfig.nftContract] = tokenGatedMintStageConfig.data;
 
-        emit TokenGatedMintStageUpdated(tokenGatedMintStageData.nftContract, tokenGatedMintStageData);
+        emit TokenGatedMintStageUpdated(tokenGatedMintStageConfig.nftContract, tokenGatedMintStageConfig.data);
     }
 }

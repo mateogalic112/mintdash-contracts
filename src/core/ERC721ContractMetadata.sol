@@ -3,7 +3,6 @@ pragma solidity 0.8.18;
 
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 
 import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
 
@@ -87,7 +86,7 @@ abstract contract ERC721ContractMetadata is
 
         emit MaxSupplyUpdated(newMaxSupply);
     }
-    
+
 
     function _updateBaseURI(
         string calldata newUri
@@ -160,11 +159,7 @@ abstract contract ERC721ContractMetadata is
         uint256 startTime,
         uint256 endTime
     ) internal view {
-        if (
-            _toUint256(block.timestamp < startTime) |
-                _toUint256(block.timestamp > endTime) ==
-            1
-        ) {
+        if (block.timestamp < startTime || block.timestamp > endTime) {
             revert StageNotActive(block.timestamp, startTime, endTime);
         }
     }
@@ -188,11 +183,5 @@ abstract contract ERC721ContractMetadata is
 
     function _startTokenId() internal pure override returns (uint256) {
         return 1;
-    }
-
-    function _toUint256(bool b) internal pure returns (uint256 u) {
-        assembly {
-            u := b
-        }
     }
 }

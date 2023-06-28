@@ -12,9 +12,9 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
     address public platformFeesAddress;
     uint256 public platformFeesNumerator;
 
-    function __Payout_init() 
-        internal 
-        onlyInitializing 
+    function __Payout_init()
+        internal
+        onlyInitializing
     {
         platformFeesAddress = 0xeA6b5147C353904D5faFA801422D268772F09512;
         platformFeesNumerator = 500;
@@ -23,7 +23,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
     function updatePlatformFees(
         address newPlatformFeesAddress,
         uint256 newPlatformFeesNumerator
-    ) external onlyAdministrator() {
+    ) external onlyAdministrator {
         _updatePlatformFees(newPlatformFeesAddress, newPlatformFeesNumerator);
     }
 
@@ -40,7 +40,6 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         _updateRoyalties(receiver, feeNumerator);
     }
 
-
     function withdrawAllFunds() external onlyOwnerOrAdministrator {
         if (address(this).balance == 0) {
             revert NothingToWithdraw();
@@ -55,13 +54,13 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         }
 
         uint256 platformFees = (address(this).balance * platformFeesNumerator) / _feeDenominator();
-        if(platformFees > 0) {
+        if (platformFees > 0) {
             (bool platformFeesSuccess, ) = platformFeesAddress.call{value: platformFees}("");
-            require(platformFeesSuccess, "Platform fees transfer failed.");
+            if (!platformFeesSuccess) revert PlatformFeesTransferFailed();
         }
 
         (bool payoutSuccess, ) = payoutAddress.call{value: address(this).balance}("");
-        require(payoutSuccess, "Payout failed.");
+        if (!payoutSuccess) revert PayoutTransferFailed();
     }
 
     function _updatePayoutAddress(

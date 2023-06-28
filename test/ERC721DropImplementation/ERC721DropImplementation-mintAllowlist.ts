@@ -72,12 +72,14 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         // Configure allowlist stage
         await collection.updateAllowlistMintStage({
             id: PREPARED_MINT_STAGE_ID,
-            mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: currentTimestamp, // start right away
-            endTime: currentTimestamp + 86400, // last 24 hours
-            mintLimitPerWallet: 2,
-            maxSupplyForStage: 4000,
-            merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            data: {
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp, // start right away
+                endTime: currentTimestamp + 86400, // last 24 hours
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 4000,
+                merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            },
         });
 
         // Increase time by 1 hour
@@ -230,12 +232,14 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         // Configure allowlist stage
         await collection.updateAllowlistMintStage({
             id: PREPARED_MINT_STAGE_ID,
-            mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: currentTimestamp, // start right away
-            endTime: currentTimestamp + 86400, // last 24 hours
-            mintLimitPerWallet: 2,
-            maxSupplyForStage: 3,
-            merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            data: {
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp, // start right away
+                endTime: currentTimestamp + 86400, // last 24 hours
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 3,
+                merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            },
         });
 
         // Increase time by 1 hour
@@ -331,12 +335,14 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         // Configure allowlist stage
         await collection.updateAllowlistMintStage({
             id: PREPARED_MINT_STAGE_ID,
-            mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: currentTimestamp + 86400, // start in 24 hours
-            endTime: currentTimestamp + 186400,
-            mintLimitPerWallet: 2,
-            maxSupplyForStage: 4000,
-            merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            data: {
+                mintPrice: ethers.utils.parseUnits("0.1", "ether"),
+                startTime: currentTimestamp + 86400, // start in 24 hours
+                endTime: currentTimestamp + 186400,
+                mintLimitPerWallet: 2,
+                maxSupplyForStage: 4000,
+                merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
+            },
         });
 
         await expect(

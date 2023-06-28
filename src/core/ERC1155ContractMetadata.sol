@@ -2,7 +2,6 @@
 pragma solidity 0.8.18;
 
 import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
-import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
 import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
@@ -20,7 +19,7 @@ abstract contract ERC1155ContractMetadata is
 
     bytes32 public provenanceHash;
 
-    mapping(uint256 tokenId=> uint256 maxSupply) public maxSupply;
+    mapping(uint256 tokenId => uint256 maxSupply) public maxSupply;
     mapping(uint256 tokenId => uint256 totalSupply) public totalSupply;
     mapping(uint256 tokenid => string tokenURI) public tokenURIs;
 
@@ -51,7 +50,7 @@ abstract contract ERC1155ContractMetadata is
             }
         }
 
-       for (uint64 i = 0; i < tokenId.length; ) {
+        for (uint64 i = 0; i < tokenId.length; ) {
             if (totalSupply[tokenId[i]] > maxSupply[tokenId[i]]) {
                 revert MintQuantityExceedsMaxSupply();
             }
@@ -119,6 +118,7 @@ abstract contract ERC1155ContractMetadata is
 
         emit ProvenanceHashUpdated(newProvenanceHash);
     }
+
     function _checkPayer(address minter) internal view {
         if (minter != msg.sender) {
             if (!allowedPayers[msg.sender]) {
@@ -165,11 +165,7 @@ abstract contract ERC1155ContractMetadata is
         uint256 startTime,
         uint256 endTime
     ) internal view {
-        if (
-            _toUint256(block.timestamp < startTime) |
-                _toUint256(block.timestamp > endTime) ==
-            1
-        ) {
+        if (block.timestamp < startTime || block.timestamp > endTime) {
             revert StageNotActive(block.timestamp, startTime, endTime);
         }
     }
@@ -183,15 +179,9 @@ abstract contract ERC1155ContractMetadata is
     ) internal {
         minted[recipient][tokenId] += uint64(quantity);
         totalSupply[tokenId] += quantity;
-        
+
         _mint(recipient, tokenId, quantity, data);
 
         emit Minted(recipient, tokenId, quantity, mintStageIndex);
-    }
-
-    function _toUint256(bool b) internal pure returns (uint256 u) {
-        assembly {
-            u := b
-        }
     }
 }

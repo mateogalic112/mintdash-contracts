@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import {PublicMintStage, AllowlistMintStage, TokenGatedMintStage} from "../lib/DropStructs.sol";
+import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "../lib/DropStructs.sol";
 
 interface IERC1155EditionsImplementation {
     struct MultiConfig {
@@ -15,10 +15,10 @@ interface IERC1155EditionsImplementation {
         PublicMintStage publicMintStage;
 
         // Allowlist stages
-        AllowlistMintStage[] allowlistMintStages;
+        AllowlistMintStageConfig[] allowlistMintStages;
 
         // Token gated stages
-        TokenGatedMintStage[] tokenGatedMintStages;
+        TokenGatedMintStageConfig[] tokenGatedMintStages;
     }
     /**
      * @dev Revert if supplied merkle proof is not valid for allowlist mint stage.
@@ -49,8 +49,8 @@ interface IERC1155EditionsImplementation {
      * @dev Emit an event when allowlist mint stage configuration is updated.
      */
     event AllowlistMintStageUpdated(
-        uint256 indexed tokenId, 
-        uint256 indexed allowlistStageId, 
+        uint256 indexed tokenId,
+        uint256 indexed allowlistStageId,
         AllowlistMintStage data
     );
 
@@ -165,21 +165,21 @@ interface IERC1155EditionsImplementation {
      * @notice Updates configuration for allowlist mint stage.
      *
      * @param tokenId ID of the token.
-     * @param allowlistMintStageData The new allowlist mint stage data to set.
+     * @param allowlistMintStageConfig The new allowlist mint stage config to set.
      */
     function updateAllowlistMintStage(
         uint256 tokenId,
-        AllowlistMintStage calldata allowlistMintStageData
+        AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) external;
 
     /**
      * @notice Updates configuration for token gated mint stage.
      *
      * @param tokenId ID of the token.
-     * @param tokenGatedMintStageData The new token gated mint stage data to set.
+     * @param tokenGatedMintStageConfig The new token gated mint stage config to set.
      */
     function updateTokenGatedMintStage(
         uint256 tokenId,
-        TokenGatedMintStage calldata tokenGatedMintStageData
+        TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) external;
 }

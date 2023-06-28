@@ -28,6 +28,16 @@ interface IPayout {
     error NothingToWithdraw();
 
     /**
+     * @dev Revert if the platform fees transfer fails.
+     */
+    error PlatformFeesTransferFailed();
+
+    /**
+     * @dev Revert if the payout transfer fails.
+     */
+    error PayoutTransferFailed();
+
+    /**
      * @dev Emit an event when payout address is updated
      */
     event PayoutAddressUpdated(address indexed payoutAddress);
