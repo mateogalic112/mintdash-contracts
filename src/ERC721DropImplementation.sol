@@ -289,6 +289,9 @@ contract ERC721DropImplementation is
         address operator,
         bool approved
     ) public override {
+        if (operatorFiltererEnabled) {
+            _checkFilterOperator(operator);
+        }
         super.setApprovalForAll(operator, approved);
     }
 

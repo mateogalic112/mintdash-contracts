@@ -190,6 +190,9 @@ contract ERC721SignatureMintImplementation is
         address operator,
         bool approved
     ) public override {
+        if (operatorFiltererEnabled) {
+            _checkFilterOperator(operator);
+        }
         super.setApprovalForAll(operator, approved);
     }
 
