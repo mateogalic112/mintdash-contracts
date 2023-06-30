@@ -18,6 +18,11 @@ interface IPayout {
     error PlatformFeesAddressCannotBeZeroAddress();
 
     /**
+     * @dev Revert if the new platform fees numerator exceeds the maximum allowed value.
+     */
+    error PlatformFeesNumeratorTooHigh();
+
+    /**
      * @dev Revert if the platform fees address is zero address.
      */
     error InvalidPlatformFeesAddress();

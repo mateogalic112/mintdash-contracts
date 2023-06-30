@@ -328,6 +328,17 @@ describe("ERC721SignatureMintImplementation", function () {
                 "PlatformFeesAddressCannotBeZeroAddress",
             );
         });
+
+        it("reverts if fees numerator is too high", async () => {
+            await expect(
+                collection
+                    .connect(admin)
+                    .updatePlatformFees(owner.address, 2100),
+            ).to.be.revertedWithCustomError(
+                collection,
+                "PlatformFeesNumeratorTooHigh",
+            );
+        });
     });
 
     describe("updatePayer", () => {
