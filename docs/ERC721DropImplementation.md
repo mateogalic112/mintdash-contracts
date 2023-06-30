@@ -476,7 +476,7 @@ function platformFeesAddress() external view returns (address)
 ### platformFeesNumerator
 
 ```solidity
-function platformFeesNumerator() external view returns (uint256)
+function platformFeesNumerator() external view returns (uint96)
 ```
 
 
@@ -488,7 +488,7 @@ function platformFeesNumerator() external view returns (uint256)
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | uint256 | undefined |
+| _0 | uint96 | undefined |
 
 ### provenanceHash
 
