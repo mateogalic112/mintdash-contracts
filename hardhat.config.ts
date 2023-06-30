@@ -46,6 +46,12 @@ const config = {
     },
     etherscan: {
         apiKey: process.env.ETHERSCAN_API_KEY,
+        arbitrum: {
+            apiKey: process.env.ARBISCAN_API_KEY,
+        },
+        polygon: {
+            apiKey: process.env.POLYSCAN_API_KEY,
+        },
     },
     gasReporter: {
         enabled: true,
