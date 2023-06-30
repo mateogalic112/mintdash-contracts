@@ -10,7 +10,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
     address public payoutAddress;
 
     address public platformFeesAddress;
-    uint256 public platformFeesNumerator;
+    uint96 public platformFeesNumerator;
 
     uint256 constant MAX_PLATFORM_FEES_NUMERATOR = 2000;
 
@@ -99,7 +99,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         }
 
         platformFeesAddress = newPlatformFeesAddress;
-        platformFeesNumerator = newPlatformFeesNumerator;
+        platformFeesNumerator = uint96(newPlatformFeesNumerator);
 
         emit PlatformFeesUpdated(newPlatformFeesAddress, newPlatformFeesNumerator);
     }
