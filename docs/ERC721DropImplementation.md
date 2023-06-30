@@ -1614,6 +1614,17 @@ error PlatformFeesAddressCannotBeZeroAddress()
 *Revert if platform fees address is zero address when updating platform fees.*
 
 
+### PlatformFeesNumeratorTooHigh
+
+```solidity
+error PlatformFeesNumeratorTooHigh()
+```
+
+
+
+*Revert if the new platform fees numerator exceeds the maximum allowed value.*
+
+
 ### PlatformFeesTransferFailed
 
 ```solidity

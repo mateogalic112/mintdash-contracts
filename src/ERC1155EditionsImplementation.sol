@@ -301,13 +301,6 @@ contract ERC1155EditionsImplementation is
         _updateTokenGatedMintStage(tokenId, tokenGatedMintStageConfig);
     }
 
-    function setApprovalForAll(
-        address operator,
-        bool approved
-    ) public override {
-        super.setApprovalForAll(operator, approved);
-    }
-
     function supportsInterface(
         bytes4 interfaceId
     )
@@ -319,6 +312,16 @@ contract ERC1155EditionsImplementation is
         return
             interfaceId == type(IERC2981Upgradeable).interfaceId ||
             super.supportsInterface(interfaceId);
+    }
+
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public override {
+        if (operatorFiltererEnabled) {
+            _checkFilterOperator(operator);
+        }
+        super.setApprovalForAll(operator, approved);
     }
 
     function safeTransferFrom(
