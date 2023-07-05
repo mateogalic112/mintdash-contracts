@@ -31,6 +31,10 @@ const config = {
             url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
             accounts: [process.env.TESTNET_PRIVATE_KEY],
         },
+        goerli: {
+            url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+            accounts: [process.env.TESTNET_PRIVATE_KEY],
+        },
         arbitrum: {
             url: `https://arb-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
             accounts: [process.env.MAINNET_PRIVATE_KEY],
