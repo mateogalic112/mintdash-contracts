@@ -23,7 +23,7 @@ contract ERC721Proxy is Proxy {
                 "initialize(string,string,address)",
                 name,
                 symbol,
-                0xeA6b5147C353904D5faFA801422D268772F09512
+                0x277a62f757da515b4b190366db6c31dd3246bdce
             )
         );
     }
