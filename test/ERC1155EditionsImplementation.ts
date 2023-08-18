@@ -1466,34 +1466,6 @@ describe("ERC1155EditionsImplementation", function () {
         });
     });
 
-    describe("updateOperatorFilterer", () => {
-        it("updates", async () => {
-            // Check current state
-            expect(await collection.operatorFiltererEnabled()).to.eq(false);
-
-            // Enable operator filterer
-            await collection.updateOperatorFilterer(true);
-
-            // Check updated max supply
-            expect(await collection.operatorFiltererEnabled()).to.eq(true);
-        });
-
-        it("reverts if caller is not contract owner or administrator", async () => {
-            await expect(
-                collection.connect(randomUser).updateOperatorFilterer(true),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
-        });
-
-        it("emits OperatorFiltererEnabledUpdated", async () => {
-            await expect(collection.updateOperatorFilterer(true))
-                .to.emit(collection, "OperatorFiltererEnabledUpdated")
-                .withArgs(true);
-        });
-    });
-
     describe("updateTokenURI", () => {
         it("updates", async () => {
             // Check current base URI

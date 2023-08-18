@@ -12,7 +12,6 @@ import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGate
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC1155ContractMetadata} from "./core/ERC1155ContractMetadata.sol";
 import {Payout} from "./core/Payout.sol";
-import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 
 import {IERC1155EditionsImplementation} from "./interface/IERC1155EditionsImplementation.sol";
 
@@ -20,7 +19,6 @@ contract ERC1155EditionsImplementation is
     AdministratedUpgradeable,
     ERC1155ContractMetadata,
     Payout,
-    OperatorFilterToggle,
     IERC1155EditionsImplementation
 {
     mapping(uint256 tokenId =>
@@ -50,7 +48,6 @@ contract ERC1155EditionsImplementation is
         __Payout_init();
         __Ownable_init();
         __ERC2981_init();
-        __DefaultOperatorFilterer_init();
 
         name = _name;
         symbol = _symbol;
@@ -312,42 +309,6 @@ contract ERC1155EditionsImplementation is
         return
             interfaceId == type(IERC2981Upgradeable).interfaceId ||
             super.supportsInterface(interfaceId);
-    }
-
-    function setApprovalForAll(
-        address operator,
-        bool approved
-    ) public override {
-        if (operatorFiltererEnabled) {
-            _checkFilterOperator(operator);
-        }
-        super.setApprovalForAll(operator, approved);
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public override {
-        if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.safeTransferFrom(from, to, id, amount, data);
-    }
-
-    function safeBatchTransferFrom(
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) public virtual override {
-        if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.safeBatchTransferFrom(from, to, ids, amounts, data);
     }
 
     function _updatePublicMintStage(

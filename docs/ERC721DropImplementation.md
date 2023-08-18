@@ -96,18 +96,18 @@ function allowlistMintStages(uint256 allowlistStageId) external view returns (ui
 ### approve
 
 ```solidity
-function approve(address operator, uint256 tokenId) external payable
+function approve(address to, uint256 tokenId) external payable
 ```
 
 
 
-
+*Gives permission to `to` to transfer `tokenId` token to another account. See {ERC721A-_approve}. Requirements: - The caller must own the token or be an approved operator.*
 
 #### Parameters
 
 | Name | Type | Description |
 |---|---|---|
-| operator | address | undefined |
+| to | address | undefined |
 | tokenId | uint256 | undefined |
 
 ### balanceOf
@@ -383,23 +383,6 @@ function name() external view returns (string)
 |---|---|---|
 | _0 | string | undefined |
 
-### operatorFiltererEnabled
-
-```solidity
-function operatorFiltererEnabled() external view returns (bool)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | bool | undefined |
-
 ### owner
 
 ```solidity
@@ -594,12 +577,12 @@ function safeTransferFrom(address from, address to, uint256 tokenId) external pa
 ### safeTransferFrom
 
 ```solidity
-function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) external payable
+function safeTransferFrom(address from, address to, uint256 tokenId, bytes _data) external payable
 ```
 
 
 
-
+*Safely transfers `tokenId` token from `from` to `to`. Requirements: - `from` cannot be the zero address. - `to` cannot be the zero address. - `tokenId` token must exist and be owned by `from`. - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}. - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer. Emits a {Transfer} event.*
 
 #### Parameters
 
@@ -608,7 +591,7 @@ function safeTransferFrom(address from, address to, uint256 tokenId, bytes data)
 | from | address | undefined |
 | to | address | undefined |
 | tokenId | uint256 | undefined |
-| data | bytes | undefined |
+| _data | bytes | undefined |
 
 ### setApprovalForAll
 
@@ -844,22 +827,6 @@ Updates configuration for allowlist mint stage.
 | Name | Type | Description |
 |---|---|---|
 | newMaxSupply | uint256 | The new max supply to set. |
-
-### updateOperatorFilterer
-
-```solidity
-function updateOperatorFilterer(bool enabled) external nonpayable
-```
-
-Enabled or disables operator filter for Opensea royalties enforcement.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| enabled | bool | If operator filter is enabled. |
 
 ### updatePayer
 
@@ -1179,22 +1146,6 @@ event Minted(address indexed recipient, uint256 indexed quantity, uint256 indexe
 | recipient `indexed` | address | undefined |
 | quantity `indexed` | uint256 | undefined |
 | stageIndex `indexed` | uint256 | undefined |
-
-### OperatorFiltererEnabledUpdated
-
-```solidity
-event OperatorFiltererEnabledUpdated(bool indexed enabled)
-```
-
-
-
-*Emit an event when operator filterer is enabled or disabled.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| enabled `indexed` | bool | undefined |
 
 ### OwnershipTransferred
 
@@ -1531,22 +1482,6 @@ error OnlyOwnerOrAdministrator()
 
 
 
-
-### OperatorNotAllowed
-
-```solidity
-error OperatorNotAllowed(address operator)
-```
-
-Emitted when an operator is not allowed.
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| operator | address | undefined |
 
 ### OwnerQueryForNonexistentToken
 

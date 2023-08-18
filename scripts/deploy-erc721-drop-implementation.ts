@@ -12,11 +12,7 @@ async function main() {
     );
     const implementation = await ERC721DropImplementation.deploy();
     await implementation.deployed();
-    await implementation.initialize(
-        "Blank NFT Studio",
-        "BLANK",
-        deployer.address,
-    );
+    await implementation.initialize("Mintdash", "MINTDASH", deployer.address);
 
     console.log(
         "🚀 ERC721DropImplementation deployed to: ",

@@ -13,7 +13,6 @@ import {SignedMintParams} from "./lib/DropStructs.sol";
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC721ContractMetadata} from "./core/ERC721ContractMetadata.sol";
 import {Payout} from "./core/Payout.sol";
-import {OperatorFilterToggle} from "./core/OperatorFilterToggle.sol";
 
 import {IERC721SignatureMintImplementation} from "./interface/IERC721SignatureMintImplementation.sol";
 
@@ -21,7 +20,6 @@ contract ERC721SignatureMintImplementation is
     AdministratedUpgradeable,
     ERC721ContractMetadata,
     Payout,
-    OperatorFilterToggle,
     IERC721SignatureMintImplementation
 {
     using ECDSA for bytes32;
@@ -47,7 +45,6 @@ contract ERC721SignatureMintImplementation is
         __Payout_init();
         __Ownable_init();
         __ERC2981_init();
-        __DefaultOperatorFilterer_init();
 
         _NAME_HASH = keccak256("ERC721Drop");
         _VERSION_HASH = keccak256("1.0");
@@ -184,60 +181,6 @@ contract ERC721SignatureMintImplementation is
             interfaceId == type(IERC2981Upgradeable).interfaceId ||
             ERC721AUpgradeable.supportsInterface(interfaceId)||
             super.supportsInterface(interfaceId);
-    }
-
-    function setApprovalForAll(
-        address operator,
-        bool approved
-    ) public override {
-        if (operatorFiltererEnabled) {
-            _checkFilterOperator(operator);
-        }
-        super.setApprovalForAll(operator, approved);
-    }
-
-    function approve(
-        address operator,
-        uint256 tokenId
-    ) public payable override {
-        if (operatorFiltererEnabled) {
-            _checkFilterOperator(operator);
-        }
-        super.approve(operator, tokenId);
-    }
-
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public payable override {
-        if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.transferFrom(from, to, tokenId);
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) public payable override {
-        if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.safeTransferFrom(from, to, tokenId);
-    }
-
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 tokenId,
-        bytes memory data
-    ) public payable override {
-        if (from != msg.sender && operatorFiltererEnabled) {
-            _checkFilterOperator(msg.sender);
-        }
-        super.safeTransferFrom(from, to, tokenId, data);
     }
 
     function _checkSigner(
