@@ -6,13 +6,13 @@ import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Mu
 
 import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
 
-import {IERC721ContractMetadata} from "./interface/IERC721ContractMetadata.sol";
+import {IERC721DropContractMetadata} from "./interface/IERC721DropContractMetadata.sol";
 
-abstract contract ERC721ContractMetadata is
+abstract contract ERC721DropContractMetadata is
     AdministratedUpgradeable,
     ERC721AUpgradeable,
     MulticallUpgradeable,
-    IERC721ContractMetadata
+    IERC721DropContractMetadata
 {
     uint256 public maxSupply;
     string public baseURI;

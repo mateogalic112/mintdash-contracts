@@ -3,7 +3,7 @@ pragma solidity 0.8.18;
 
 import {SignedMintParams} from "../lib/DropStructs.sol";
 
-interface IERC721SignatureMintImplementation {
+interface IERC721DropSignatureMintImplementation {
     struct MultiConfig {
         // Max supply
         uint256 maxSupply;

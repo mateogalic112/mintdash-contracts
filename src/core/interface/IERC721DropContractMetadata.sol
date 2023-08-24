@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-interface IERC721ContractMetadata {
+interface IERC721DropContractMetadata {
     /**
      * @dev Revert if called mint stage is not currently yet.
      */

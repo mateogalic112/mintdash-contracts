@@ -6,7 +6,7 @@ import { time } from "@nomicfoundation/hardhat-network-helpers";
 
 import type { SignedMintParamsStruct } from "../../typechain-types/src/ERC721SignatureMintImplementation";
 
-describe("ERC721SignatureMintImplementation - mintSigned", function () {
+describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
     let collection: Contract;
 
     let owner: SignerWithAddress,
@@ -61,11 +61,11 @@ describe("ERC721SignatureMintImplementation - mintSigned", function () {
     beforeEach(async function () {
         [owner, randomUser, allowedSigner, admin] = await ethers.getSigners();
 
-        const ERC721SignatureMintImplementation =
+        const ERC721DropSignatureMintImplementation =
             await ethers.getContractFactory(
-                "ERC721SignatureMintImplementation",
+                "ERC721DropSignatureMintImplementation",
             );
-        collection = await ERC721SignatureMintImplementation.deploy();
+        collection = await ERC721DropSignatureMintImplementation.deploy();
         await collection.deployed();
 
         // Initialize
