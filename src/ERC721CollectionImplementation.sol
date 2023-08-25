@@ -5,12 +5,12 @@ import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC72
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
-import {ERC721CollectionContractMetadata} from "./core/ERC721CollectionContractMetadata.sol";
+import {ERC721CollectionMetadata} from "./core/ERC721CollectionMetadata.sol";
 import {IERC721CollectionImplementation} from "./interface/IERC721CollectionImplementation.sol";
 
 contract ERC721CollectionImplementation is
     AdministratedUpgradeable,
-    ERC721CollectionContractMetadata,
+    ERC721CollectionMetadata,
     ERC2981Upgradeable,
     IERC721CollectionImplementation
 {

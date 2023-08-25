@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-interface IERC721CollectionContractMetadata {
+interface IERC721CollectionMetadata {
     /**
      * @notice Emitted when token is created
      * @param creator The address of the token creator
