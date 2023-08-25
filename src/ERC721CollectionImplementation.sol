@@ -22,6 +22,7 @@ contract ERC721CollectionImplementation is
         __Administrated_init(_administrator);
         __ERC721_init_unchained(name, symbol);
         __ERC2981_init();
+        __Ownable_init();
     }
 
     function mint(
@@ -47,7 +48,7 @@ contract ERC721CollectionImplementation is
 
     function updateBaseURI(
         string calldata newUri
-    ) internal {
+    ) external onlyOwnerOrAdministrator {
         baseURI = newUri;
 
         emit BaseURIUpdated(newUri);
