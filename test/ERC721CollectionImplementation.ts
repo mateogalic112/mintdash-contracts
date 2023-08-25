@@ -75,8 +75,44 @@ describe("ERC721CollectionImplementation", function () {
             expect(await collection.totalSupply()).to.eq(1);
         });
     });
-    describe("batchMint", () => {});
-    describe("burn", () => {});
+    describe("batchMint", () => {
+        it("mints", async () => {
+            await collection.batchMint([
+                "QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5",
+                "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg6",
+                "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg7",
+            ]);
+
+            // Check account token balance
+            expect(await collection.balanceOf(owner.address)).to.eq(3);
+        });
+
+        it("emits BatchMinted event", async () => {
+            await expect(
+                collection.batchMint([
+                    "QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5",
+                    "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg6",
+                    "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg7",
+                ]),
+            )
+                .to.emit(collection, "BatchMinted")
+                .withArgs(1, 3, owner.address, [
+                    "QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5",
+                    "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg6",
+                    "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg7",
+                ]);
+        });
+
+        it("increases total supply", async () => {
+            await collection.batchMint([
+                "QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5",
+                "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg6",
+                "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg7",
+            ]);
+
+            expect(await collection.totalSupply()).to.eq(3);
+        });
+    });
 
     describe("updateRoyalties", () => {
         it("updates", async () => {
