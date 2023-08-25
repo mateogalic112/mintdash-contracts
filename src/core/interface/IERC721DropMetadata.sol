@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-interface IERC1155ContractMetadata {
+interface IERC721DropMetadata {
     /**
      * @dev Revert if called mint stage is not currently yet.
      */
@@ -47,46 +47,80 @@ interface IERC1155ContractMetadata {
     error PayerNotAllowed();
 
     /**
+     * @dev Revert if signature was already used for signed mint.
+     */
+    error SignatureAlreadyUsed();
+
+    /**
      * @dev Emit an event when provenance hash is updated.
      */
     event ProvenanceHashUpdated(bytes32 indexed provenanceHash);
 
     /**
+     * @dev Emit an event for token metadata reveals/updates,
+     *      according to EIP-4906.
+     *
+     * @param _fromTokenId The start token id.
+     * @param _toTokenId   The end token id.
+     */
+    event BatchMetadataUpdate(uint256 _fromTokenId, uint256 _toTokenId);
+
+    /**
      * @dev Emit an event when base URI of the collection is updated.
      */
 
-    event TokenURIUpdated(uint256 indexed tokenId, string indexed tokenURI);
+    event BaseURIUpdated(string indexed baseURI);
     /**
-     * @dev Emit an event when max supply of the token is updated.
+     * @dev Emit an event when max supply of the collection is updated.
      */
 
-    event MaxSupplyUpdated(uint256 indexed tokenId, uint256 indexed maxSupply);
+    event MaxSupplyUpdated(uint256 indexed maxSupply);
 
     /**
      * @dev Emit an event when token is minted.
      */
     event Minted(
         address indexed recipient,
-        uint256 indexed tokenId,
         uint256 indexed quantity,
-        uint256 stageIndex
+        uint256 indexed stageIndex
     );
+
+    /**
+     * @dev Emit an event when allowed payer is updated.
+    */
+    event AllowedPayerUpdated(address indexed payer, bool indexed allowed);
 
     /**
      * @notice Returns number of tokens minted for address.
      *
      * @param user The address of user to check minted amount for.
-     * @param tokenId The token ID to check minted amount for.
      */
-    function getAmountMinted(address user, uint256 tokenId) external view returns (uint64);
+    function getAmountMinted(address user) external view returns (uint64);
+
+    /**
+     * @notice Mints tokens to addresses.
+     *
+     * @param to List of addresses to receive tokens.
+     * @param quantity List of quantities to assign to each address.
+     */
+    function airdrop(
+        address[] calldata to,
+        uint64[] calldata quantity
+    ) external;
+
+    /**
+     * @notice Burns a token.
+     *
+     * @param tokenId Id of the token to burn.
+     */
+    function burn(uint256 tokenId) external;
 
     /**
      * @notice Updates configuration for allowlist mint stage.
      *
-     * @param tokenId The token ID to update max supply for.
      * @param newMaxSupply The new max supply to set.
      */
-    function updateMaxSupply(uint256 tokenId, uint256 newMaxSupply) external;
+    function updateMaxSupply(uint256 newMaxSupply) external;
 
     /**
      * @notice Updates provenance hash.
@@ -97,12 +131,11 @@ interface IERC1155ContractMetadata {
     function updateProvenanceHash(bytes32 newProvenanceHash) external;
 
     /**
-     * @notice Updates token URI for the token.
+     * @notice Updates base URI of the collection.
      *
-     * @param tokenId The token ID to update max supply for.
-     * @param newUri The URI to set for the token ID.
+     * @param newUri The new base URI to set.
      */
-    function updateTokenURI(uint256 tokenId, string calldata newUri) external;
+    function updateBaseURI(string calldata newUri) external;
 
     /**
      * @notice Updates allowed payers.

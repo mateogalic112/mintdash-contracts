@@ -86,7 +86,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         emit RoyaltiesUpdated(receiver, feeNumerator);
     }
 
-     function _updatePlatformFees(
+    function _updatePlatformFees(
         address newPlatformFeesAddress,
         uint256 newPlatformFeesNumerator
     ) internal {

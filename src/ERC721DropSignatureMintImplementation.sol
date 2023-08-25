@@ -11,14 +11,14 @@ import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/comm
 import {SignedMintParams} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
-import {ERC721DropContractMetadata} from "./core/ERC721DropContractMetadata.sol";
+import {ERC721DropMetadata} from "./core/ERC721DropMetadata.sol";
 import {Payout} from "./core/Payout.sol";
 
 import {IERC721DropSignatureMintImplementation} from "./interface/IERC721DropSignatureMintImplementation.sol";
 
 contract ERC721DropSignatureMintImplementation is
     AdministratedUpgradeable,
-    ERC721DropContractMetadata,
+    ERC721DropMetadata,
     Payout,
     IERC721DropSignatureMintImplementation
 {

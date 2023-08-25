@@ -9,7 +9,6 @@ describe("ERC721DropImplementation - mintPublic", function () {
 
     let owner: SignerWithAddress,
         randomUser: SignerWithAddress,
-        allowedSigner: SignerWithAddress,
         admin: SignerWithAddress;
 
     const initialMaxSupply = 4000;
@@ -21,7 +20,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
     const initialRoyaltiesFee = 1000;
 
     beforeEach(async function () {
-        [owner, randomUser, allowedSigner, admin] = await ethers.getSigners();
+        [owner, randomUser, admin] = await ethers.getSigners();
 
         const ERC721DropImplementation = await ethers.getContractFactory(
             "ERC721DropImplementation",

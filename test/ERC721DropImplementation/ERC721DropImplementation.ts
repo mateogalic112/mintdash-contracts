@@ -13,7 +13,6 @@ describe("ERC721DropImplementation", function () {
     let owner: SignerWithAddress,
         allowlistUser2: SignerWithAddress,
         randomUser: SignerWithAddress,
-        allowedSigner: SignerWithAddress,
         admin: SignerWithAddress;
 
     const initialMaxSupply = 4000;
@@ -42,8 +41,7 @@ describe("ERC721DropImplementation", function () {
     };
 
     beforeEach(async function () {
-        [owner, allowlistUser2, randomUser, allowedSigner, admin] =
-            await ethers.getSigners();
+        [owner, allowlistUser2, randomUser, admin] = await ethers.getSigners();
 
         const ERC721DropImplementation = await ethers.getContractFactory(
             "ERC721DropImplementation",

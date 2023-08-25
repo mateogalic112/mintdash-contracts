@@ -10,14 +10,14 @@ import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/comm
 import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
-import {ERC1155ContractMetadata} from "./core/ERC1155ContractMetadata.sol";
+import {ERC1155Metadata} from "./core/ERC1155Metadata.sol";
 import {Payout} from "./core/Payout.sol";
 
 import {IERC1155EditionsImplementation} from "./interface/IERC1155EditionsImplementation.sol";
 
 contract ERC1155EditionsImplementation is
     AdministratedUpgradeable,
-    ERC1155ContractMetadata,
+    ERC1155Metadata,
     Payout,
     IERC1155EditionsImplementation
 {
