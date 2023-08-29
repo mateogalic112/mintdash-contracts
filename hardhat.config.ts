@@ -43,9 +43,9 @@ const config = {
             url: `https://polygon-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
             accounts: [process.env.MAINNET_PRIVATE_KEY],
         },
-        mantleTestnet: {
-            url: "https://rpc.testnet.mantle.xyz/",
-            accounts: [process.env.TESTNET_PRIVATE_KEY],
+        base: {
+            url: `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
         },
     },
     etherscan: {
