@@ -45,12 +45,6 @@ abstract contract ERC1155Metadata is
         for (uint64 i = 0; i < recipients.length; ) {
             _mint(recipients[i], tokenId[i], quantity[i], "");
 
-            unchecked {
-                ++i;
-            }
-        }
-
-        for (uint64 i = 0; i < tokenId.length; ) {
             if (totalSupply[tokenId[i]] > maxSupply[tokenId[i]]) {
                 revert MintQuantityExceedsMaxSupply();
             }
