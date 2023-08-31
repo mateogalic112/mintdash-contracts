@@ -86,6 +86,7 @@ abstract contract ERC1155Metadata is
         bool isAllowed
     ) external onlyOwnerOrAdministrator {
         allowedPayers[payer] = isAllowed;
+        emit AllowedPayerUpdated(payer, isAllowed);
     }
 
     function _updateMaxSupply(

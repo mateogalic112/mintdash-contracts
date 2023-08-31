@@ -73,6 +73,11 @@ interface IERC1155Metadata {
     );
 
     /**
+     * @dev Emit an event when allowed payer is updated.
+    */
+    event AllowedPayerUpdated(address indexed payer, bool indexed allowed);
+
+    /**
      * @notice Returns number of tokens minted for address.
      *
      * @param user The address of user to check minted amount for.
