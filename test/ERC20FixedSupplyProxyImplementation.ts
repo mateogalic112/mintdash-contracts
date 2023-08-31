@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
-describe("ERC20Implementation", function () {
+describe("ERC20FixedSupplyProxyImplementation", function () {
     let token: Contract;
 
     let owner: SignerWithAddress;
@@ -11,7 +11,9 @@ describe("ERC20Implementation", function () {
     beforeEach(async function () {
         [owner] = await ethers.getSigners();
 
-        const Token = await ethers.getContractFactory("ERC20Implementation");
+        const Token = await ethers.getContractFactory(
+            "ERC20FixedSupplyProxyImplementation",
+        );
         token = await Token.deploy();
         await token.deployed();
 

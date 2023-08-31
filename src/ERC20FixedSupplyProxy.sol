@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/StorageSlot.sol";
 
-contract ERC20Proxy is Proxy {
+contract ERC20FixedSupplyProxy is Proxy {
     constructor(
         string memory name,
         string memory symbol,

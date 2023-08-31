@@ -6,7 +6,7 @@ import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Mu
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 
-contract ERC20Implementation is
+contract ERC20FixedSupplyProxyImplementation is
     ERC20BurnableUpgradeable,
     AdministratedUpgradeable,
     MulticallUpgradeable
