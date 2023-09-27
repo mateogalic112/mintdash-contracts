@@ -58,19 +58,22 @@ contract PaymentSplitterImplementation is Initializable {
         }
     }
 
-    function releaseEth(address payable recipient) external {
+    function releaseEth(address recipient) external {
         if (percentages[recipient] == 0) revert InvalidRecipient();
 
         uint256 amount = calculateReleasableEth(recipient);
         if (amount == 0) revert NoFundsToRelease();
 
-        _totalEthReleased += amount;
-        unchecked {
-            _ethReleased[recipient] += amount;
-        }
+        _releaseEth(recipient, amount);
+    }
 
-        (bool success, ) = recipient.call{value: amount}("");
-        if (!success) revert TransferFailed();
+    function releaseEthToAll() external {
+        for (uint256 i = 0; i < _recipients.length; ++i) {
+            uint256 amount = calculateReleasableEth(_recipients[i]);
+            if (amount == 0) continue;
+
+            _releaseEth(_recipients[i], amount);
+        }
     }
 
     function releaseErc20(IERC20 token, address recipient) external {
@@ -79,12 +82,16 @@ contract PaymentSplitterImplementation is Initializable {
         uint256 amount = calculateReleasableErc20(token, recipient);
         if (amount == 0) revert NoFundsToRelease();
 
-        _totalErc20Released[token] += amount;
-        unchecked {
-            _erc20Released[token][recipient] += amount;
-        }
+        _releaseErc20(token, recipient, amount);
+    }
 
-        token.safeTransfer(recipient, amount);
+    function releaseErc20ToAll(IERC20 token) external {
+        for (uint256 i = 0; i < _recipients.length; ++i) {
+            uint256 amount = calculateReleasableErc20(token, _recipients[i]);
+            if (amount == 0) continue;
+
+            _releaseErc20(token, _recipients[i], amount);
+        }
     }
 
     function getRecipients() external view returns (address[] memory) {
@@ -119,6 +126,29 @@ contract PaymentSplitterImplementation is Initializable {
         );
 
         return amount;
+    }
+
+    function _releaseEth(address recipient, uint256 amount) internal {
+        _totalEthReleased += amount;
+        unchecked {
+            _ethReleased[recipient] += amount;
+        }
+
+        (bool success, ) = recipient.call{value: amount}("");
+        if (!success) revert TransferFailed();
+    }
+
+    function _releaseErc20(
+        IERC20 token,
+        address recipient,
+        uint256 amount
+    ) internal {
+        _totalErc20Released[token] += amount;
+        unchecked {
+            _erc20Released[token][recipient] += amount;
+        }
+
+        token.safeTransfer(recipient, amount);
     }
 
     function _calculateReleasableAmount(
