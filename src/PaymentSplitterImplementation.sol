@@ -8,10 +8,10 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract PaymentSplitterImplementation is Initializable {
     using SafeERC20 for IERC20;
 
-    uint256 private constant PERCENTAGE_DENOMINATOR = 10_000;
+    uint256 public constant PERCENTAGE_DENOMINATOR = 10_000;
 
     address[] private _recipients;
-    mapping(address recipient => uint256 percentage) private _percentages;
+    mapping(address recipient => uint256 percentage) public percentages;
 
     uint256 private _totalEthReleased;
     mapping(address recipient => uint256 amount) private _ethReleased;
@@ -29,22 +29,24 @@ contract PaymentSplitterImplementation is Initializable {
     receive() external payable {}
 
     function initialize(
-        address[] calldata recipients,
-        uint256[] calldata percentages
+        address[] calldata recipients_,
+        uint256[] calldata percentages_
     ) external initializer {
-        if (recipients.length == 0 || recipients.length != percentages.length) {
+        if (
+            recipients_.length == 0 || recipients_.length != percentages_.length
+        ) {
             revert EmptyOrMismatchedArrays();
         }
 
         uint256 totalPercentage;
-        for (uint256 i = 0; i < percentages.length; ) {
-            if (percentages[i] == 0) revert InvalidPercentageAmount();
-            if (_percentages[recipients[i]] != 0) revert DuplicateRecipient();
+        for (uint256 i = 0; i < percentages_.length; ) {
+            if (percentages_[i] == 0) revert InvalidPercentageAmount();
+            if (percentages[recipients_[i]] != 0) revert DuplicateRecipient();
 
-            _recipients.push(recipients[i]);
-            _percentages[recipients[i]] = percentages[i];
+            _recipients.push(recipients_[i]);
+            percentages[recipients_[i]] = percentages_[i];
 
-            totalPercentage += percentages[i];
+            totalPercentage += percentages_[i];
 
             unchecked {
                 ++i;
@@ -57,7 +59,7 @@ contract PaymentSplitterImplementation is Initializable {
     }
 
     function releaseEth(address payable recipient) external {
-        if (_percentages[recipient] == 0) revert InvalidRecipient();
+        if (percentages[recipient] == 0) revert InvalidRecipient();
 
         uint256 amount = calculateReleasableEth(recipient);
         if (amount == 0) revert NoFundsToRelease();
@@ -72,7 +74,7 @@ contract PaymentSplitterImplementation is Initializable {
     }
 
     function releaseErc20(IERC20 token, address recipient) external {
-        if (_percentages[recipient] == 0) revert InvalidRecipient();
+        if (percentages[recipient] == 0) revert InvalidRecipient();
 
         uint256 amount = calculateReleasableErc20(token, recipient);
         if (amount == 0) revert NoFundsToRelease();
@@ -83,6 +85,10 @@ contract PaymentSplitterImplementation is Initializable {
         }
 
         token.safeTransfer(recipient, amount);
+    }
+
+    function getRecipients() external view returns (address[] memory) {
+        return _recipients;
     }
 
     function calculateReleasableEth(
@@ -120,7 +126,7 @@ contract PaymentSplitterImplementation is Initializable {
         uint256 totalReceived,
         uint256 alreadyReleased
     ) internal view returns (uint256) {
-        uint256 amount = (totalReceived * _percentages[recipient]) /
+        uint256 amount = (totalReceived * percentages[recipient]) /
             PERCENTAGE_DENOMINATOR -
             alreadyReleased;
 
