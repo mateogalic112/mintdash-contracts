@@ -68,11 +68,12 @@ contract PaymentSplitterImplementation is Initializable {
     }
 
     function releaseEthToAll() external {
-        for (uint256 i = 0; i < _recipients.length; ++i) {
-            uint256 amount = calculateReleasableEth(_recipients[i]);
+        address[] memory recipients = _recipients;
+        for (uint256 i = 0; i < recipients.length; ++i) {
+            uint256 amount = calculateReleasableEth(recipients[i]);
             if (amount == 0) continue;
 
-            _releaseEth(_recipients[i], amount);
+            _releaseEth(recipients[i], amount);
         }
     }
 
@@ -86,11 +87,12 @@ contract PaymentSplitterImplementation is Initializable {
     }
 
     function releaseErc20ToAll(IERC20 token) external {
-        for (uint256 i = 0; i < _recipients.length; ++i) {
-            uint256 amount = calculateReleasableErc20(token, _recipients[i]);
+        address[] memory recipients = _recipients;
+        for (uint256 i = 0; i < recipients.length; ++i) {
+            uint256 amount = calculateReleasableErc20(token, recipients[i]);
             if (amount == 0) continue;
 
-            _releaseErc20(token, _recipients[i], amount);
+            _releaseErc20(token, recipients[i], amount);
         }
     }
 
