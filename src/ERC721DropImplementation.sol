@@ -224,10 +224,14 @@ contract ERC721DropImplementation is
         _updateBaseURI(config.baseURI);
 
         // Update royalties
-       _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
+        if (config.royaltiesReceiver != address(0)) {
+            _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
+        }
 
         // Update payout
-       _updatePayoutAddress(config.payoutAddress);
+        if (config.payoutAddress != address(0)) {
+            _updatePayoutAddress(config.payoutAddress);
+        }
 
         // Update public phase
         _updatePublicMintStage(config.publicMintStage);
