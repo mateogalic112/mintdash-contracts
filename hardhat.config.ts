@@ -49,13 +49,23 @@ const config = {
         },
     },
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY,
-        arbitrum: {
-            apiKey: process.env.ARBISCAN_API_KEY,
+        apiKey: {
+            mainnet: process.env.ETHERSCAN_API_KEY,
+            sepolia: process.env.ETHERSCAN_API_KEY,
+            goerli: process.env.ETHERSCAN_API_KEY,
+            polygon: process.env.POLYSCAN_API_KEY,
+            base: process.env.BASESCAN_API_KEY,
         },
-        polygon: {
-            apiKey: process.env.POLYSCAN_API_KEY,
-        },
+        customChains: [
+            {
+                network: "base",
+                chainId: 8453,
+                urls: {
+                    apiURL: "https://api.basescan.org/api",
+                    browserURL: "https://basescan.org",
+                },
+            },
+        ],
     },
     gasReporter: {
         enabled: true,

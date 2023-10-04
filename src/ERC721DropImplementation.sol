@@ -218,52 +218,35 @@ contract ERC721DropImplementation is
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
         // Update max supply
-        if (config.maxSupply > 0) {
-            _updateMaxSupply(config.maxSupply);
-        }
+       _updateMaxSupply(config.maxSupply);
 
         // Update base URI
-        if (bytes(config.baseURI).length > 0) {
-            _updateBaseURI(config.baseURI);
-        }
+        _updateBaseURI(config.baseURI);
 
         // Update royalties
-        if (config.royaltiesReceiver != address(0)) {
-            _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
-        }
+       _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
 
         // Update payout
-        if (config.payoutAddress != address(0)) {
-            _updatePayoutAddress(config.payoutAddress);
-        }
+       _updatePayoutAddress(config.payoutAddress);
 
         // Update public phase
-        if (
-            config.publicMintStage.startTime != 0 ||
-            config.publicMintStage.endTime != 0
-        ) {
-            _updatePublicMintStage(config.publicMintStage);
-        }
+        _updatePublicMintStage(config.publicMintStage);
 
         // Update allowlist phases
-        if (config.allowlistMintStages.length > 0) {
-            for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
-                _updateAllowlistMintStage(config.allowlistMintStages[i]);
+       for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
+            _updateAllowlistMintStage(config.allowlistMintStages[i]);
 
-                unchecked {
-                    ++i;
-                }
+            unchecked {
+                ++i;
             }
         }
 
         // Update token gated phases
-        if (config.tokenGatedMintStages.length > 0) {
-            for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
-                _updateTokenGatedMintStage(config.tokenGatedMintStages[i]);
+        for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
+            _updateTokenGatedMintStage(config.tokenGatedMintStages[i]);
 
-                unchecked {
-                    ++i;
-                }
+            unchecked {
+                ++i;
             }
         }
     }
