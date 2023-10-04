@@ -100,6 +100,20 @@ contract PaymentSplitterImplementation is Initializable {
         return _recipients;
     }
 
+    function getSplitConfiguration()
+        external
+        view
+        returns (address[] memory, uint256[] memory)
+    {
+        uint256[] memory percentages_ = new uint256[](_recipients.length);
+
+        for (uint256 i = 0; i < _recipients.length; ++i) {
+            percentages_[i] = percentages[_recipients[i]];
+        }
+
+        return (_recipients, percentages_);
+    }
+
     function calculateReleasableEth(
         address recipient
     ) public view returns (uint256) {
