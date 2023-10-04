@@ -133,6 +133,17 @@ describe("PaymentSplitterImplementation", function () {
                 recipient3.address,
             ]);
 
+            expect(await paymentSplitter.getSplitConfiguration()).to.deep.equal(
+                [
+                    [
+                        recipient1.address,
+                        recipient2.address,
+                        recipient3.address,
+                    ],
+                    [4000, 1000, 5000],
+                ],
+            );
+
             expect(
                 await paymentSplitter.percentages(recipient1.address),
             ).to.equal(4000);
