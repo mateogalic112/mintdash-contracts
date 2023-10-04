@@ -4,7 +4,7 @@ import { BigNumber, Contract } from "ethers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 
-import type { SignedMintParamsStruct } from "../../typechain-types/src/ERC721SignatureMintImplementation";
+import type { SignedMintParamsStruct } from "../../typechain-types/src/ERC721DropSignatureMintImplementation";
 
 describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
     let collection: Contract;
