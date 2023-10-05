@@ -237,42 +237,29 @@ contract ERC1155EditionsImplementation is
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
         // Update max supply
-        if (config.maxSupply > 0) {
-            _updateMaxSupply(tokenId, config.maxSupply);
-        }
+        _updateMaxSupply(tokenId, config.maxSupply);
 
         // Update base URI
-        if (bytes(config.baseURI).length > 0) {
-            _updateTokenURI(tokenId, config.baseURI);
-        }
+         _updateTokenURI(tokenId, config.baseURI);
 
         // Update public phase
-        if (
-            config.publicMintStage.startTime != 0 ||
-            config.publicMintStage.endTime != 0
-        ) {
-            _updatePublicMintStage(tokenId, config.publicMintStage);
-        }
+        _updatePublicMintStage(tokenId, config.publicMintStage);
 
         // Update allowlist phases
-        if (config.allowlistMintStages.length > 0) {
-            for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
-                _updateAllowlistMintStage(tokenId, config.allowlistMintStages[i]);
+        for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
+            _updateAllowlistMintStage(tokenId, config.allowlistMintStages[i]);
 
-                unchecked {
-                    ++i;
-                }
+            unchecked {
+                ++i;
             }
         }
 
         // Update token gated phases
-        if (config.tokenGatedMintStages.length > 0) {
-            for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
-                _updateTokenGatedMintStage(tokenId, config.tokenGatedMintStages[i]);
+        for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
+            _updateTokenGatedMintStage(tokenId, config.tokenGatedMintStages[i]);
 
-                unchecked {
-                    ++i;
-                }
+            unchecked {
+                ++i;
             }
         }
     }
