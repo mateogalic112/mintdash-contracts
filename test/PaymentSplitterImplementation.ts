@@ -12,6 +12,8 @@ describe("PaymentSplitterImplementation", function () {
         recipient3: SignerWithAddress,
         randomUser: SignerWithAddress;
 
+    const splitterName = "Blank Studio Splitter";
+
     beforeEach(async function () {
         [deployer, recipient1, recipient2, recipient3, randomUser] =
             await ethers.getSigners();
@@ -30,7 +32,7 @@ describe("PaymentSplitterImplementation", function () {
     describe("initialize", () => {
         it("reverts if array of recipients or percentages are empty", async () => {
             await expect(
-                paymentSplitter.initialize([], [4000, 6000]),
+                paymentSplitter.initialize(splitterName, [], [4000, 6000]),
             ).to.be.revertedWithCustomError(
                 paymentSplitter,
                 "EmptyOrMismatchedArrays",
@@ -38,7 +40,8 @@ describe("PaymentSplitterImplementation", function () {
 
             await expect(
                 paymentSplitter.initialize(
-                    [recipient1.address, recipient2.address],
+                    splitterName,
+                    [(recipient1.address, recipient2.address)],
                     [],
                 ),
             ).to.be.revertedWithCustomError(
@@ -50,6 +53,7 @@ describe("PaymentSplitterImplementation", function () {
         it("reverts if arrays have mismatched length", async () => {
             await expect(
                 paymentSplitter.initialize(
+                    splitterName,
                     [recipient1.address, recipient2.address],
                     [4000, 5000, 1000],
                 ),
@@ -62,6 +66,7 @@ describe("PaymentSplitterImplementation", function () {
         it("reverts if percentage is zero", async () => {
             await expect(
                 paymentSplitter.initialize(
+                    splitterName,
                     [
                         recipient1.address,
                         recipient2.address,
@@ -78,6 +83,7 @@ describe("PaymentSplitterImplementation", function () {
         it("reverts if recipient is duplicate", async () => {
             await expect(
                 paymentSplitter.initialize(
+                    splitterName,
                     [
                         recipient1.address,
                         recipient2.address,
@@ -94,6 +100,7 @@ describe("PaymentSplitterImplementation", function () {
         it("reverts if sum of percentages is not equal to denominator", async () => {
             await expect(
                 paymentSplitter.initialize(
+                    splitterName,
                     [
                         recipient1.address,
                         recipient2.address,
@@ -108,6 +115,7 @@ describe("PaymentSplitterImplementation", function () {
 
             await expect(
                 paymentSplitter.initialize(
+                    splitterName,
                     [
                         recipient1.address,
                         recipient2.address,
@@ -123,9 +131,12 @@ describe("PaymentSplitterImplementation", function () {
 
         it("should initialize correctly if input is correct", async () => {
             await paymentSplitter.initialize(
+                splitterName,
                 [recipient1.address, recipient2.address, recipient3.address],
                 [4000, 1000, 5000],
             );
+
+            expect(await paymentSplitter.name()).to.equal(splitterName);
 
             expect(await paymentSplitter.getRecipients()).to.deep.equal([
                 recipient1.address,
@@ -159,6 +170,7 @@ describe("PaymentSplitterImplementation", function () {
     describe("releaseEth", () => {
         beforeEach(async function () {
             await paymentSplitter.initialize(
+                splitterName,
                 [recipient1.address, recipient2.address, recipient3.address],
                 [4000, 1000, 5000],
             );
@@ -237,6 +249,7 @@ describe("PaymentSplitterImplementation", function () {
     describe("releaseEthToAll", () => {
         beforeEach(async function () {
             await paymentSplitter.initialize(
+                splitterName,
                 [recipient1.address, recipient2.address, recipient3.address],
                 [4000, 1000, 5000],
             );
@@ -315,6 +328,7 @@ describe("PaymentSplitterImplementation", function () {
     describe("releaseErc20", () => {
         beforeEach(async function () {
             await paymentSplitter.initialize(
+                splitterName,
                 [recipient1.address, recipient2.address, recipient3.address],
                 [4000, 1000, 5000],
             );
@@ -437,6 +451,7 @@ describe("PaymentSplitterImplementation", function () {
     describe("releaseErc20ToAll", () => {
         beforeEach(async function () {
             await paymentSplitter.initialize(
+                splitterName,
                 [recipient1.address, recipient2.address, recipient3.address],
                 [4000, 1000, 5000],
             );

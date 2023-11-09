@@ -11,6 +11,7 @@ async function main() {
         "PaymentSplitterProxy",
     );
     const proxy = await PaymentSplitterProxy.deploy(
+        "Blank Studio Splitter",
         [ethers.constants.AddressZero],
         [10000],
     );
