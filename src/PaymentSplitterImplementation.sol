@@ -8,6 +8,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract PaymentSplitterImplementation is Initializable {
     using SafeERC20 for IERC20;
 
+    string public name;
+
     uint256 public constant PERCENTAGE_DENOMINATOR = 10_000;
 
     address[] private _recipients;
@@ -29,6 +31,7 @@ contract PaymentSplitterImplementation is Initializable {
     receive() external payable {}
 
     function initialize(
+        string calldata name_,
         address[] calldata recipients_,
         uint256[] calldata percentages_
     ) external initializer {
@@ -56,6 +59,8 @@ contract PaymentSplitterImplementation is Initializable {
         if (totalPercentage != PERCENTAGE_DENOMINATOR) {
             revert InvalidPercentageAmount();
         }
+
+        name = name_;
     }
 
     function releaseEth(address recipient) external {

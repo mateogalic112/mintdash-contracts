@@ -12,7 +12,11 @@ async function main() {
     );
     const implementation = await PaymentSplitterImplementation.deploy();
     await implementation.deployed();
-    await implementation.initialize([ethers.constants.AddressZero], [10000]);
+    await implementation.initialize(
+        "Blank Studio Splitter",
+        [ethers.constants.AddressZero],
+        [10000],
+    );
 
     console.log(
         "🚀 PaymentSplitterImplementation deployed to: ",

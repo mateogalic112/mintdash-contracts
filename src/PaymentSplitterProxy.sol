@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/StorageSlot.sol";
 
 contract PaymentSplitterProxy is Proxy {
     constructor(
+        string memory name,
         address[] memory recipients,
         uint256[] memory percentages
     ) {
@@ -16,11 +17,12 @@ contract PaymentSplitterProxy is Proxy {
         );
         StorageSlot
             .getAddressSlot(_IMPLEMENTATION_SLOT)
-            .value = 0xafA3348dE7D6C93E6e0142c15d520F33898F14C8;
+            .value = 0xe3BD43D454a612A3dAe95856993Aee85C2073c3E;
         Address.functionDelegateCall(
-            0xafA3348dE7D6C93E6e0142c15d520F33898F14C8,
+            0xe3BD43D454a612A3dAe95856993Aee85C2073c3E,
             abi.encodeWithSignature(
-                "initialize(address[],uint256[])",
+                "initialize(string,address[],uint256[])",
+                name,
                 recipients,
                 percentages
             )
