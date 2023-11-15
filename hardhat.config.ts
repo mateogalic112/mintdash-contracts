@@ -79,6 +79,9 @@ const config = {
             "ERC721DropImplementation",
             "ERC20Implementation",
             "ERC721StakingImplementation",
+            "ERC1155EditionsImplementation",
+            "PaymentSplitterImplementation",
+            "ERC721CollectionImplementation",
         ],
     },
 };
