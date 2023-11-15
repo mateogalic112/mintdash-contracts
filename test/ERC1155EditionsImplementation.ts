@@ -1298,6 +1298,35 @@ describe("ERC1155EditionsImplementation", function () {
         });
     });
 
+    describe("createToken", () => {
+        it("creates token", async () => {
+            expect(await collection.latestTokenId()).to.eq(1);
+
+            await collection.createToken(
+                "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/",
+            );
+            expect(await collection.latestTokenId()).to.eq(2);
+        });
+
+        it("reverts if caller is not contract owner or administrator", async () => {
+            await expect(
+                collection.connect(randomUser).createToken("ipfs://"),
+            ).to.be.revertedWithCustomError(
+                collection,
+                "OnlyOwnerOrAdministrator",
+            );
+        });
+
+        it("emits BaseURIUpdated", async () => {
+            // Update base URI
+            const newBaseURI =
+                "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/";
+
+            await expect(collection.createToken(newBaseURI))
+                .to.emit(collection, "TokenURIUpdated")
+                .withArgs(2, newBaseURI);
+        });
+    });
     describe("updateMaxSupply", () => {
         it("updates", async () => {
             // Check current max supply
