@@ -76,8 +76,8 @@ describe("ERC1155EditionsImplementation", function () {
             initialRoyaltiesFee,
         );
 
-        // Configure base URI
-        await collection.updateTokenURI(DEFAULT_TOKEN_ID, initialBaseURI);
+        // Create token
+        await collection.createToken(initialBaseURI);
 
         // Configure max supply for token ID 1
         await collection.updateMaxSupply(DEFAULT_TOKEN_ID, initialMaxSupply);
@@ -1041,6 +1041,17 @@ describe("ERC1155EditionsImplementation", function () {
             );
         });
 
+        it("reverts for invalid token ID", async () => {
+            await expect(
+                collection.updatePublicMintStage(999, {
+                    mintPrice: "100000000000000000", // 0.1 ETH
+                    startTime: 1676043287,
+                    endTime: 1686043287,
+                    mintLimitPerWallet: 5,
+                }),
+            ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
+        });
+
         it("reverts if caller is not contract owner or administrator", async () => {
             await expect(
                 collection
@@ -1145,6 +1156,21 @@ describe("ERC1155EditionsImplementation", function () {
             );
         });
 
+        it("reverts for invalid token ID", async () => {
+            await expect(
+                collection.updateAllowlistMintStage(999, {
+                    id: 1,
+                    data: {
+                        mintPrice: "100000000000000000", // 0.1 ETH
+                        startTime: 1676043287, // 0.1 ETH
+                        endTime: 1686043287, // 0.1 ETH
+                        mintLimitPerWallet: 5,
+                        maxSupplyForStage: 4000,
+                        merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
+                    },
+                }),
+            ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
+        });
         it("emits AllowlistMintStageUpdated", async () => {
             // Update config
             const newConfigData = {
@@ -1212,6 +1238,21 @@ describe("ERC1155EditionsImplementation", function () {
             );
         });
 
+        it("reverts for invalid token ID", async () => {
+            await expect(
+                collection.updateTokenGatedMintStage(999, {
+                    nftContract: randomUser.address,
+                    data: {
+                        mintPrice: "100000000000000000", // 0.1 ETH
+                        startTime: 1676043287, // 0.1 ETH
+                        endTime: 1686043287, // 0.1 ETH
+                        mintLimitPerWallet: 5,
+                        maxSupplyForStage: 4000,
+                    },
+                }),
+            ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
+        });
+
         it("reverts if caller is not contract owner or administrator", async () => {
             const randomAddress = randomUser.address;
 
@@ -1272,6 +1313,12 @@ describe("ERC1155EditionsImplementation", function () {
             expect(await collection.maxSupply(DEFAULT_TOKEN_ID)).to.eq(
                 newMaxSupply,
             );
+        });
+
+        it("reverts for invalid token ID", async () => {
+            await expect(
+                collection.updateMaxSupply(999, 1500),
+            ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
         });
 
         it("reverts if caller is not contract owner or administrator", async () => {
@@ -1480,6 +1527,15 @@ describe("ERC1155EditionsImplementation", function () {
 
             // Check updated base URI
             expect(await collection.uri(DEFAULT_TOKEN_ID)).to.eq(newBaseURI);
+        });
+
+        it("reverts for invalid token ID", async () => {
+            await expect(
+                collection.updateTokenURI(
+                    999,
+                    "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/",
+                ),
+            ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
         });
 
         it("reverts if caller is not contract owner or administrator", async () => {

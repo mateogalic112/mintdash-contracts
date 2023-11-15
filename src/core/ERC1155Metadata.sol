@@ -17,6 +17,8 @@ abstract contract ERC1155Metadata is
     string public name;
     string public symbol;
 
+    uint256 public latestTokenId;
+
     bytes32 public provenanceHash;
 
     mapping(uint256 tokenId => uint256 maxSupply) public maxSupply;
@@ -59,6 +61,7 @@ abstract contract ERC1155Metadata is
         uint256 tokenId,
         uint256 newMaxSupply
     ) external onlyOwnerOrAdministrator {
+        _checkValidTokenId(tokenId);
         _updateMaxSupply(tokenId, newMaxSupply);
     }
 
@@ -66,6 +69,7 @@ abstract contract ERC1155Metadata is
         uint256 tokenId,
         string calldata newUri
     ) external onlyOwnerOrAdministrator {
+        _checkValidTokenId(tokenId);
         _updateTokenURI(tokenId, newUri);
     }
 
@@ -119,6 +123,12 @@ abstract contract ERC1155Metadata is
             if (!allowedPayers[msg.sender]) {
                 revert PayerNotAllowed();
             }
+        }
+    }
+
+    function _checkValidTokenId(uint256 tokenId) internal view {
+        if(tokenId > latestTokenId){
+            revert InvalidTokenId(tokenId);
         }
     }
 

@@ -232,6 +232,11 @@ contract ERC1155EditionsImplementation is
         return _tokenGatedTokenRedeems[tokenId][nftContract][nftContractTokenId];
     }
 
+    function createToken(string calldata tokenUri) external onlyOwnerOrAdministrator {
+         latestTokenId = latestTokenId + 1;
+        _updateTokenURI(latestTokenId, tokenUri);
+    }
+
     function updateConfiguration(
         uint256 tokenId,
         MultiConfig calldata config
@@ -268,6 +273,7 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         PublicMintStage calldata publicMintStageData
     ) external onlyOwnerOrAdministrator {
+        _checkValidTokenId(tokenId);
         _updatePublicMintStage(tokenId, publicMintStageData);
     }
 
@@ -275,6 +281,7 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         AllowlistMintStageConfig calldata allowlistMintStageConfig
     ) external onlyOwnerOrAdministrator {
+        _checkValidTokenId(tokenId);
         _updateAllowlistMintStage(tokenId, allowlistMintStageConfig);
     }
 
@@ -282,6 +289,7 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
     ) external onlyOwnerOrAdministrator {
+        _checkValidTokenId(tokenId);
         _updateTokenGatedMintStage(tokenId, tokenGatedMintStageConfig);
     }
 

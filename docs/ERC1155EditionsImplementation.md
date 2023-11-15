@@ -177,6 +177,22 @@ function burnBatch(address account, uint256[] ids, uint256[] values) external no
 | ids | uint256[] | undefined |
 | values | uint256[] | undefined |
 
+### createToken
+
+```solidity
+function createToken(string tokenUri) external nonpayable
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenUri | string | undefined |
+
 ### getAllowlistMintStage
 
 ```solidity
@@ -332,6 +348,23 @@ function isApprovedForAll(address account, address operator) external view retur
 | Name | Type | Description |
 |---|---|---|
 | _0 | bool | undefined |
+
+### latestTokenId
+
+```solidity
+function latestTokenId() external view returns (uint256)
+```
+
+
+
+
+
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
 
 ### maxSupply
 
@@ -1437,6 +1470,22 @@ error InvalidPlatformFeesAddress()
 
 *Revert if the platform fees address is zero address.*
 
+
+### InvalidTokenId
+
+```solidity
+error InvalidTokenId(uint256 tokenId)
+```
+
+
+
+*Revert if invalid token is provided.*
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId | uint256 | undefined |
 
 ### MintQuantityExceedsMaxSupply
 

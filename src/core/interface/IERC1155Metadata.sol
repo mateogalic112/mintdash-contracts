@@ -47,6 +47,11 @@ interface IERC1155Metadata {
     error PayerNotAllowed();
 
     /**
+     * @dev Revert if invalid token is provided.
+    */
+    error InvalidTokenId(uint256 tokenId);
+
+    /**
      * @dev Emit an event when provenance hash is updated.
      */
     event ProvenanceHashUpdated(bytes32 indexed provenanceHash);
