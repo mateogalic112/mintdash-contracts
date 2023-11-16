@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
 
-async function main() {
+export async function main() {
     const [deployer] = await ethers.getSigners();
     console.log(
         "🔥 Deploying ERC721CollectionImplementation with the account: ",
