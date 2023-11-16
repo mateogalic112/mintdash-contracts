@@ -60,7 +60,7 @@ interface IERC1155Metadata {
      * @dev Emit an event when base URI of the collection is updated.
      */
 
-    event TokenURIUpdated(uint256 indexed tokenId, string indexed tokenURI);
+    event TokenURIUpdated(uint256 indexed tokenId, string tokenURI);
     /**
      * @dev Emit an event when max supply of the token is updated.
      */

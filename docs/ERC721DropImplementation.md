@@ -1048,7 +1048,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 ### BaseURIUpdated
 
 ```solidity
-event BaseURIUpdated(string indexed baseURI)
+event BaseURIUpdated(string baseURI)
 ```
 
 
@@ -1059,7 +1059,7 @@ event BaseURIUpdated(string indexed baseURI)
 
 | Name | Type | Description |
 |---|---|---|
-| baseURI `indexed` | string | undefined |
+| baseURI  | string | undefined |
 
 ### BatchMetadataUpdate
 

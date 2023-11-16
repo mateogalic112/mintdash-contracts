@@ -14,7 +14,7 @@ interface IERC721CollectionImplementation {
     /**
      * @dev Emit an event when base URI of the collection is updated.
     */
-    event BaseURIUpdated(string indexed baseURI);
+    event BaseURIUpdated(string baseURI);
 
     error CallerNotTokenOwner();
 }

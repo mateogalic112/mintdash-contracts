@@ -1330,7 +1330,7 @@ event TokenGatedMintStageUpdated(uint256 indexed tokenId, address indexed nftCon
 ### TokenURIUpdated
 
 ```solidity
-event TokenURIUpdated(uint256 indexed tokenId, string indexed tokenURI)
+event TokenURIUpdated(uint256 indexed tokenId, string tokenURI)
 ```
 
 
@@ -1342,7 +1342,7 @@ event TokenURIUpdated(uint256 indexed tokenId, string indexed tokenURI)
 | Name | Type | Description |
 |---|---|---|
 | tokenId `indexed` | uint256 | undefined |
-| tokenURI `indexed` | string | undefined |
+| tokenURI  | string | undefined |
 
 ### TransferBatch
 

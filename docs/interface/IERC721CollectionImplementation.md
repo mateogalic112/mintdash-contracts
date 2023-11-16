@@ -14,7 +14,7 @@
 ### BaseURIUpdated
 
 ```solidity
-event BaseURIUpdated(string indexed baseURI)
+event BaseURIUpdated(string baseURI)
 ```
 
 
@@ -25,7 +25,7 @@ event BaseURIUpdated(string indexed baseURI)
 
 | Name | Type | Description |
 |---|---|---|
-| baseURI `indexed` | string | undefined |
+| baseURI  | string | undefined |
 
 ### RoyaltiesUpdated
 

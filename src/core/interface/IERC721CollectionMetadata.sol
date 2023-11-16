@@ -11,7 +11,7 @@ interface IERC721CollectionMetadata {
     event Minted(
         address indexed creator,
         uint256 indexed tokenId,
-        string indexed tokenCID
+        string tokenCID
     );
 
     /**

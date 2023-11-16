@@ -588,7 +588,7 @@ event ApprovalForAll(address indexed owner, address indexed operator, bool appro
 ### BaseURIUpdated
 
 ```solidity
-event BaseURIUpdated(string indexed baseURI)
+event BaseURIUpdated(string baseURI)
 ```
 
 
@@ -599,7 +599,7 @@ event BaseURIUpdated(string indexed baseURI)
 
 | Name | Type | Description |
 |---|---|---|
-| baseURI `indexed` | string | undefined |
+| baseURI  | string | undefined |
 
 ### BatchMinted
 
@@ -639,7 +639,7 @@ event Initialized(uint8 version)
 ### Minted
 
 ```solidity
-event Minted(address indexed creator, uint256 indexed tokenId, string indexed tokenCID)
+event Minted(address indexed creator, uint256 indexed tokenId, string tokenCID)
 ```
 
 Emitted when token is created
@@ -652,7 +652,7 @@ Emitted when token is created
 |---|---|---|
 | creator `indexed` | address | The address of the token creator |
 | tokenId `indexed` | uint256 | The tokenId of the newly minted NFT. |
-| tokenCID `indexed` | string | Token CID |
+| tokenCID  | string | Token CID |
 
 ### OwnershipTransferred
 

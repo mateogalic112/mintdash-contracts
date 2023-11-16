@@ -69,7 +69,7 @@ interface IERC721DropMetadata {
      * @dev Emit an event when base URI of the collection is updated.
      */
 
-    event BaseURIUpdated(string indexed baseURI);
+    event BaseURIUpdated(string baseURI);
     /**
      * @dev Emit an event when max supply of the collection is updated.
      */
