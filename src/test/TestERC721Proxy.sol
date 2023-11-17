@@ -9,6 +9,7 @@ contract TestERC721Proxy is Proxy {
     constructor(
         string memory name,
         string memory symbol,
+        string memory baseURI,
         address implementationAddr
     ) {
         assert(
@@ -21,9 +22,10 @@ contract TestERC721Proxy is Proxy {
         Address.functionDelegateCall(
             implementationAddr,
             abi.encodeWithSignature(
-                "initialize(string,string,address)",
+                "initialize(string,string,string,address)",
                 name,
                 symbol,
+                baseURI,
                 0xeA6b5147C353904D5faFA801422D268772F09512
             )
         );

@@ -32,6 +32,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
+            initialBaseURI,
             admin.address,
         );
 
@@ -40,9 +41,6 @@ describe("ERC721DropImplementation - mintPublic", function () {
             initialRoyaltiesRecipient,
             initialRoyaltiesFee,
         );
-
-        // Configure base URI
-        await collection.updateBaseURI(initialBaseURI);
 
         // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);

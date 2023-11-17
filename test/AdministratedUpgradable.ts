@@ -23,6 +23,7 @@ describe("AdministratedUpgradeable", () => {
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
+            "https://mintdash.xyz/",
             admin.address,
         );
     });

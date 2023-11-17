@@ -20,6 +20,14 @@ abstract contract ERC721DropMetadata is
 
     mapping(address payer => bool allowed) public allowedPayers;
 
+    function __ERC721DropMetadata_init(string memory _baseURI)
+        internal
+        onlyInitializing
+    {
+        baseURI = _baseURI;
+    }
+
+
     function getAmountMinted(address user) external view returns (uint64) {
         return _getAux(user);
     }

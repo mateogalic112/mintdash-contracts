@@ -53,6 +53,7 @@ describe("ERC721DropImplementation", function () {
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
+            initialBaseURI,
             admin.address,
         );
 
@@ -62,13 +63,27 @@ describe("ERC721DropImplementation", function () {
             initialRoyaltiesFee,
         );
 
-        // Configure base URI
-        await collection.updateBaseURI(initialBaseURI);
-
         // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
     });
 
+    describe("initialization", () => {
+        it("initializes name", async () => {
+            expect(await collection.name()).to.eq("Blank Studio Collection");
+        });
+        it("initializes symbol", async () => {
+            expect(await collection.symbol()).to.eq("BSC");
+        });
+        it("initializes baseURI", async () => {
+            expect(await collection.baseURI()).to.eq(initialBaseURI);
+        });
+        it("initializes admin", async () => {
+            expect(await collection.administrator()).to.eq(admin.address);
+        });
+        it("initializes owner", async () => {
+            expect(await collection.owner()).to.eq(owner.address);
+        });
+    });
     describe("getAmountMinted", () => {
         it("returns", async () => {
             // Check current state

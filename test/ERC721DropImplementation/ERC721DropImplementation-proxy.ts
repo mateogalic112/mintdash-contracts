@@ -36,6 +36,7 @@ describe("ERC721DropImplementation-proxy", function () {
         const erc721Proxy = await ERC721Proxy.deploy(
             "Blank Studio Collection",
             "BSC",
+            "https://mintdash.xyz/",
             implementation.address,
         );
         await erc721Proxy.deployed();
