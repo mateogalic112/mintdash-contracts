@@ -183,10 +183,40 @@ abstract contract ERC1155Metadata is
         uint256 mintStageIndex
     ) internal {
         minted[recipient][tokenId] += uint64(quantity);
-        totalSupply[tokenId] += quantity;
 
         _mint(recipient, tokenId, quantity, data);
 
         emit Minted(recipient, tokenId, quantity, mintStageIndex);
+    }
+
+     function _beforeTokenTransfer(
+        address operator,
+        address from,
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    ) internal virtual override {
+        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+
+        if (from == address(0)) {
+            for (uint256 i = 0; i < ids.length; ++i) {
+                totalSupply[ids[i]] += amounts[i];
+            }
+        }
+
+        if (to == address(0)) {
+            for (uint256 i = 0; i < ids.length; ++i) {
+                uint256 id = ids[i];
+                uint256 amount = amounts[i];
+                uint256 supply = totalSupply[id];
+                if(amount > supply){
+                    revert BurnAmountExceedsTotalSupply();
+                }
+                unchecked {
+                    totalSupply[id] = supply - amount;
+                }
+            }
+        }
     }
 }

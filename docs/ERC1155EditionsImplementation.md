@@ -1416,6 +1416,17 @@ error AllowlistStageInvalidProof()
 *Revert if supplied merkle proof is not valid for allowlist mint stage.*
 
 
+### BurnAmountExceedsTotalSupply
+
+```solidity
+error BurnAmountExceedsTotalSupply()
+```
+
+
+
+*Revert if burn amount exceeds total supply.*
+
+
 ### CannotExceedMaxSupplyOfUint64
 
 ```solidity

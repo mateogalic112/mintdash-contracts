@@ -52,6 +52,11 @@ interface IERC1155Metadata {
     error InvalidTokenId(uint256 tokenId);
 
     /**
+     * @dev Revert if burn amount exceeds total supply.
+    */
+    error BurnAmountExceedsTotalSupply();
+
+    /**
      * @dev Emit an event when provenance hash is updated.
      */
     event ProvenanceHashUpdated(bytes32 indexed provenanceHash);
