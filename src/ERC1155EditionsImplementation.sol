@@ -6,19 +6,20 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
 import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC1155Metadata} from "./core/ERC1155Metadata.sol";
 import {Payout} from "./core/Payout.sol";
-
 import {IERC1155EditionsImplementation} from "./interface/IERC1155EditionsImplementation.sol";
 
 contract ERC1155EditionsImplementation is
     AdministratedUpgradeable,
     ERC1155Metadata,
     Payout,
+    ReentrancyGuardUpgradeable,
     IERC1155EditionsImplementation
 {
     mapping(uint256 tokenId =>
@@ -48,6 +49,7 @@ contract ERC1155EditionsImplementation is
         __Payout_init();
         __Ownable_init();
         __ERC2981_init();
+        __ReentrancyGuard_init_unchained();
 
         name = _name;
         symbol = _symbol;
@@ -58,16 +60,12 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         uint256 quantity,
         bytes memory data
-    ) external payable {
+    ) external payable nonReentrant {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
-
-        if (tx.origin != msg.sender) {
-            revert PayerNotAllowed();
-        }
 
         // Load public mint stage to memory
         PublicMintStage memory mintStage = publicMintStages[tokenId];
@@ -96,7 +94,7 @@ contract ERC1155EditionsImplementation is
         uint256 quantity,
         bytes32[] calldata merkleProof,
         bytes memory data
-    ) external payable {
+    ) external payable nonReentrant {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
@@ -142,7 +140,7 @@ contract ERC1155EditionsImplementation is
         address nftContract,
         uint256[] calldata tokenIds,
         bytes memory data
-    ) external payable {
+    ) external payable nonReentrant {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 

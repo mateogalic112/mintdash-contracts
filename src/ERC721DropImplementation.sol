@@ -6,6 +6,7 @@ import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProo
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
@@ -19,6 +20,7 @@ contract ERC721DropImplementation is
     AdministratedUpgradeable,
     ERC721DropMetadata,
     Payout,
+    ReentrancyGuardUpgradeable,
     IERC721DropImplementation
 {
     PublicMintStage public publicMintStage;
@@ -49,19 +51,19 @@ contract ERC721DropImplementation is
         __Payout_init();
         __Ownable_init();
         __ERC2981_init();
+        __ReentrancyGuard_init_unchained();
     }
 
-    function mintPublic(address recipient, uint256 quantity) external payable {
+    function mintPublic(
+        address recipient, 
+        uint256 quantity
+    ) external payable nonReentrant {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
         // Ensure the payer is allowed if not caller
         _checkPayer(minter);
-
-        if (tx.origin != msg.sender) {
-            revert PayerNotAllowed();
-        }
-
+        
         // Ensure that public mint stage is active
         _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
 
@@ -85,7 +87,7 @@ contract ERC721DropImplementation is
         address recipient,
         uint256 quantity,
         bytes32[] calldata merkleProof
-    ) external payable {
+    ) external payable nonReentrant {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
@@ -128,7 +130,7 @@ contract ERC721DropImplementation is
         address recipient,
         address nftContract,
         uint256[] calldata tokenIds
-    ) external payable {
+    ) external payable nonReentrant {
         // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
