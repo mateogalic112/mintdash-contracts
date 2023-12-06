@@ -1701,7 +1701,7 @@ describe("ERC1155EditionsImplementation", function () {
             );
 
             // Check platform fees
-            expect(await collection.platformFeesNumerator()).to.eq(500);
+            expect(await collection.platformFeesNumerator()).to.eq(0);
 
             // Update payout address
             await collection
@@ -1776,6 +1776,24 @@ describe("ERC1155EditionsImplementation", function () {
         it("withdraws", async () => {
             // Fund contract
             await activatePublicStageAndMaxMint();
+            // Setup payout address
+            await collection.updatePayoutAddress(allowlistUser2.address);
+            // Withdraw and check balance change
+            await expect(() =>
+                collection.withdrawAllFunds(),
+            ).to.changeEtherBalance(
+                allowlistUser2,
+                ethers.utils.parseUnits("0.3", "ether"),
+            );
+        });
+
+        it("withdraws with platform fees", async () => {
+            // Fund contract
+            await activatePublicStageAndMaxMint();
+            // Add platform fees
+            await collection
+                .connect(admin)
+                .updatePlatformFees(owner.address, 500);
             // Setup payout address
             await collection.updatePayoutAddress(allowlistUser2.address);
             // Withdraw and check balance change

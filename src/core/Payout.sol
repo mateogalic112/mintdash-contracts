@@ -19,7 +19,7 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         onlyInitializing
     {
         platformFeesAddress = 0xeA6b5147C353904D5faFA801422D268772F09512;
-        platformFeesNumerator = 500;
+        platformFeesNumerator = 0;
     }
 
     function updatePlatformFees(
