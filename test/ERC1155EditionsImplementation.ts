@@ -128,6 +128,25 @@ describe("ERC1155EditionsImplementation", function () {
             ).to.eq(3);
         });
 
+        it("updates total supply", async () => {
+            // Mint 3 tokens
+
+            expect(await collection.totalSupply(DEFAULT_TOKEN_ID)).to.eq(0);
+
+            await collection.mintPublic(
+                owner.address,
+                DEFAULT_TOKEN_ID,
+                3,
+                "0x",
+                {
+                    value: ethers.utils.parseUnits("0.3", "ether"),
+                },
+            );
+
+            // Check account token balance
+            expect(await collection.totalSupply(DEFAULT_TOKEN_ID)).to.eq(3);
+        });
+
         it("mints with allowed payer", async () => {
             // Setup payer
             await collection.updatePayer(randomUser.address, true);
