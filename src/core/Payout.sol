@@ -14,12 +14,12 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
 
     uint256 constant MAX_PLATFORM_FEES_NUMERATOR = 2000;
 
-    function __Payout_init()
+    function __Payout_init(address _platformFeesAddress, uint96 _platformFeesNumerator)
         internal
         onlyInitializing
     {
-        platformFeesAddress = 0xeA6b5147C353904D5faFA801422D268772F09512;
-        platformFeesNumerator = 0;
+        platformFeesAddress = _platformFeesAddress;
+        platformFeesNumerator = _platformFeesNumerator;
     }
 
     function updatePlatformFees(

@@ -311,7 +311,7 @@ Returns token gated mint stage for token and NFT contract address.
 ### initialize
 
 ```solidity
-function initialize(string _name, string _symbol, address _administrator) external nonpayable
+function initialize(string _name, string _symbol, address _platformFeesAddress, uint96 _platformFeesNumerator, address _administrator) external nonpayable
 ```
 
 
@@ -324,6 +324,8 @@ function initialize(string _name, string _symbol, address _administrator) extern
 |---|---|---|
 | _name | string | undefined |
 | _symbol | string | undefined |
+| _platformFeesAddress | address | undefined |
+| _platformFeesNumerator | uint96 | undefined |
 | _administrator | address | undefined |
 
 ### isApprovedForAll

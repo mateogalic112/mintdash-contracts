@@ -43,12 +43,14 @@ contract ERC721DropImplementation is
         string memory _name,
         string memory _symbol,
         string memory _baseURI,
+        address _platformFeesAddress, 
+        uint96 _platformFeesNumerator,
         address _administrator
     ) external initializerERC721A initializer {
         __ERC721A_init(_name, _symbol);
         __Administrated_init(_administrator);
         __ERC721DropMetadata_init(_baseURI);
-        __Payout_init();
+        __Payout_init(_platformFeesAddress, _platformFeesNumerator);
         __Ownable_init();
         __ERC2981_init();
         __ReentrancyGuard_init_unchained();

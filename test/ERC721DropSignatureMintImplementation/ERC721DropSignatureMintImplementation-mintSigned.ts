@@ -72,6 +72,8 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
+            "0xeA6b5147C353904D5faFA801422D268772F09512",
+            0,
             admin.address,
         );
 

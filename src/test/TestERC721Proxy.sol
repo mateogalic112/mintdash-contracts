@@ -22,10 +22,12 @@ contract TestERC721Proxy is Proxy {
         Address.functionDelegateCall(
             implementationAddr,
             abi.encodeWithSignature(
-                "initialize(string,string,string,address)",
+                "initialize(string,string,string,address,uint96,address)",
                 name,
                 symbol,
                 baseURI,
+                0xeA6b5147C353904D5faFA801422D268772F09512,
+                0,
                 0xeA6b5147C353904D5faFA801422D268772F09512
             )
         );

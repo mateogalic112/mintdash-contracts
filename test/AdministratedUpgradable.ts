@@ -24,6 +24,8 @@ describe("AdministratedUpgradeable", () => {
             "Blank Studio Collection",
             "BSC",
             "https://mintdash.xyz/",
+            "0xeA6b5147C353904D5faFA801422D268772F09512",
+            0,
             admin.address,
         );
     });

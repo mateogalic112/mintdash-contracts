@@ -54,6 +54,8 @@ describe("ERC721DropImplementation", function () {
             "Blank Studio Collection",
             "BSC",
             initialBaseURI,
+            "0xeA6b5147C353904D5faFA801422D268772F09512",
+            0,
             admin.address,
         );
 
@@ -82,6 +84,12 @@ describe("ERC721DropImplementation", function () {
         });
         it("initializes owner", async () => {
             expect(await collection.owner()).to.eq(owner.address);
+        });
+        it("initializes platform fee", async () => {
+            expect(await collection.platformFeesAddress()).to.eq(
+                "0xeA6b5147C353904D5faFA801422D268772F09512",
+            );
+            expect(await collection.platformFeesNumerator()).to.eq(0);
         });
     });
     describe("getAmountMinted", () => {
