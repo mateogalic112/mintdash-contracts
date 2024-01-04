@@ -97,6 +97,28 @@ describe("ERC721DropImplementation", function () {
         });
     });
 
+    describe("burn", () => {
+        it("burns token for owner", async () => {
+            // Mint 3 NFTs
+            await activatePublicStageAndMaxMint();
+
+            await collection.burn(1);
+
+            expect(await collection.balanceOf(owner.address)).eq(2);
+        });
+        it("reverts if caller is not token owner", async () => {
+            // Mint 3 NFTs
+            await activatePublicStageAndMaxMint();
+
+            await expect(
+                collection.connect(randomUser).burn(1),
+            ).to.been.revertedWithCustomError(
+                collection,
+                "TransferCallerNotOwnerNorApproved",
+            );
+        });
+    });
+
     describe("updatePublicMintStage", () => {
         it("updates", async () => {
             // Check current config
