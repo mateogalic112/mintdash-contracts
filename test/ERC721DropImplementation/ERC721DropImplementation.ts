@@ -24,17 +24,15 @@ describe("ERC721DropImplementation", function () {
     const initialRoyaltiesFee = 1000;
 
     const activatePublicStageAndMaxMint = async () => {
-        // Setup public mint stage
         const currentTimestamp = await time.latest();
         await collection.updatePublicMintStage({
             mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-            startTime: currentTimestamp, // start right away
-            endTime: currentTimestamp + 86400, // last 24 hours
+            startTime: currentTimestamp,
+            endTime: currentTimestamp + 86400,
             mintLimitPerWallet: 3,
         });
         await time.increase(3600);
 
-        // Mint few tokens
         await collection.mintPublic(owner.address, 3, {
             value: ethers.utils.parseUnits("0.3", "ether"),
         });
@@ -49,7 +47,6 @@ describe("ERC721DropImplementation", function () {
         collection = await ERC721DropImplementation.deploy();
         await collection.deployed();
 
-        // Initialize
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
@@ -59,13 +56,11 @@ describe("ERC721DropImplementation", function () {
             admin.address,
         );
 
-        // Configure royalties
         await collection.updateRoyalties(
             initialRoyaltiesRecipient,
             initialRoyaltiesFee,
         );
 
-        // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
     });
 
@@ -94,36 +89,50 @@ describe("ERC721DropImplementation", function () {
     });
     describe("getAmountMinted", () => {
         it("returns", async () => {
-            // Check current state
             expect(await collection.getAmountMinted(owner.address)).to.eq(0);
 
-            // Mint 3 NFTs
             await activatePublicStageAndMaxMint();
 
-            // Check updated state
             expect(await collection.getAmountMinted(owner.address)).eq(3);
+        });
+    });
+
+    describe("burn", () => {
+        it("burns token for owner", async () => {
+            await activatePublicStageAndMaxMint();
+
+            await collection.burn(1);
+
+            expect(await collection.balanceOf(owner.address)).eq(2);
+        });
+        it("reverts if caller is not token owner", async () => {
+            await activatePublicStageAndMaxMint();
+
+            await expect(
+                collection.connect(randomUser).burn(1),
+            ).to.been.revertedWithCustomError(
+                collection,
+                "TransferCallerNotOwnerNorApproved",
+            );
         });
     });
 
     describe("updatePublicMintStage", () => {
         it("updates", async () => {
-            // Check current config
             const currentConfig = await collection.publicMintStage();
             expect(currentConfig.mintPrice).to.equal(0);
             expect(currentConfig.startTime).to.equal(0);
             expect(currentConfig.endTime).to.equal(0);
             expect(currentConfig.mintLimitPerWallet).to.equal(0);
 
-            // Update config
             const newConfigData = {
-                mintPrice: "100000000000000000", // 0.1 ETH
+                mintPrice: "100000000000000000",
                 startTime: 1676043287,
                 endTime: 1686043287,
                 mintLimitPerWallet: 5,
             };
             await collection.updatePublicMintStage(newConfigData);
 
-            // Check updated config
             const updatedConfig = await collection.publicMintStage();
             expect(updatedConfig.mintPrice).to.equal(newConfigData.mintPrice);
             expect(updatedConfig.startTime).to.equal(newConfigData.startTime);
@@ -136,7 +145,7 @@ describe("ERC721DropImplementation", function () {
         it("reverts if caller is not contract owner or administrator", async () => {
             await expect(
                 collection.connect(randomUser).updatePublicMintStage({
-                    mintPrice: "100000000000000000", // 0.1 ETH
+                    mintPrice: "100000000000000000",
                     startTime: 1676043287,
                     endTime: 1686043287,
                     mintLimitPerWallet: 5,
@@ -148,9 +157,8 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("emits PublicMintStageUpdated", async () => {
-            // Update config
             const newConfigData = {
-                mintPrice: "100000000000000000", // 0.1 ETH
+                mintPrice: "100000000000000000",
                 startTime: 1676043287,
                 endTime: 1686043287,
                 mintLimitPerWallet: 5,
@@ -164,7 +172,6 @@ describe("ERC721DropImplementation", function () {
 
     describe("updateAllowlistMintStage", () => {
         it("updates", async () => {
-            // Check current config
             const stageId = 1;
             const currentConfig = await collection.allowlistMintStages(stageId);
             expect(currentConfig.mintPrice).to.equal(0);
@@ -173,13 +180,12 @@ describe("ERC721DropImplementation", function () {
             expect(currentConfig.mintLimitPerWallet).to.equal(0);
             expect(currentConfig.merkleRoot).to.equal(ZERO_BYTES32);
 
-            // Update config
             const newConfigData = {
                 id: stageId,
                 data: {
-                    mintPrice: "100000000000000000", // 0.1 ETH
-                    startTime: 1676043287, // 0.1 ETH
-                    endTime: 1686043287, // 0.1 ETH
+                    mintPrice: "100000000000000000",
+                    startTime: 1676043287,
+                    endTime: 1686043287,
                     mintLimitPerWallet: 5,
                     maxSupplyForStage: 4000,
                     merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
@@ -189,7 +195,6 @@ describe("ERC721DropImplementation", function () {
 
             const stageData = newConfigData.data;
 
-            // Check updated config
             const updatedConfig = await collection.allowlistMintStages(stageId);
             expect(updatedConfig.mintPrice).to.equal(stageData.mintPrice);
             expect(updatedConfig.startTime).to.equal(stageData.startTime);
@@ -205,9 +210,9 @@ describe("ERC721DropImplementation", function () {
                 collection.connect(randomUser).updateAllowlistMintStage({
                     id: 1,
                     data: {
-                        mintPrice: "100000000000000000", // 0.1 ETH
-                        startTime: 1676043287, // 0.1 ETH
-                        endTime: 1686043287, // 0.1 ETH
+                        mintPrice: "100000000000000000",
+                        startTime: 1676043287,
+                        endTime: 1686043287,
                         mintLimitPerWallet: 5,
                         maxSupplyForStage: 4000,
                         merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
@@ -220,13 +225,12 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("emits AllowlistMintStageUpdated", async () => {
-            // Update config
             const newConfigData = {
                 id: 1,
                 data: {
-                    mintPrice: "100000000000000000", // 0.1 ETH
-                    startTime: 1676043287, // 0.1 ETH
-                    endTime: 1686043287, // 0.1 ETH
+                    mintPrice: "100000000000000000",
+                    startTime: 1676043287,
+                    endTime: 1686043287,
                     mintLimitPerWallet: 5,
                     maxSupplyForStage: 4000,
                     merkleRoot: `0x${getMerkleTreeRoot([owner.address])}`,
@@ -241,7 +245,6 @@ describe("ERC721DropImplementation", function () {
 
     describe("updateTokenGatedMintStage", () => {
         it("updates", async () => {
-            // Check current config
             const randomAddress = randomUser.address;
             const currentConfig = await collection.tokenGatedMintStages(
                 randomAddress,
@@ -251,13 +254,12 @@ describe("ERC721DropImplementation", function () {
             expect(currentConfig.endTime).to.equal(0);
             expect(currentConfig.mintLimitPerWallet).to.equal(0);
 
-            // Update config
             const newConfigData = {
                 nftContract: randomAddress,
                 data: {
-                    mintPrice: "100000000000000000", // 0.1 ETH
-                    startTime: 1676043287, // 0.1 ETH
-                    endTime: 1686043287, // 0.1 ETH
+                    mintPrice: "100000000000000000",
+                    startTime: 1676043287,
+                    endTime: 1686043287,
                     mintLimitPerWallet: 5,
                     maxSupplyForStage: 4000,
                 },
@@ -266,7 +268,6 @@ describe("ERC721DropImplementation", function () {
 
             const stageData = newConfigData.data;
 
-            // Check updated config
             const updatedConfig = await collection.tokenGatedMintStages(
                 randomAddress,
             );
@@ -285,9 +286,9 @@ describe("ERC721DropImplementation", function () {
                 collection.connect(randomUser).updateTokenGatedMintStage({
                     nftContract: randomAddress,
                     data: {
-                        mintPrice: "100000000000000000", // 0.1 ETH
-                        startTime: 1676043287, // 0.1 ETH
-                        endTime: 1686043287, // 0.1 ETH
+                        mintPrice: "100000000000000000",
+                        startTime: 1676043287,
+                        endTime: 1686043287,
                         mintLimitPerWallet: 5,
                         maxSupplyForStage: 4000,
                     },
@@ -299,14 +300,13 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("emits TokenGatedMintStageUpdated", async () => {
-            // Update config
             const randomAddress = randomUser.address;
             const newConfigData = {
                 nftContract: randomAddress,
                 data: {
-                    mintPrice: "100000000000000000", // 0.1 ETH
-                    startTime: 1676043287, // 0.1 ETH
-                    endTime: 1686043287, // 0.1 ETH
+                    mintPrice: "100000000000000000",
+                    startTime: 1676043287,
+                    endTime: 1686043287,
                     mintLimitPerWallet: 5,
                     maxSupplyForStage: 4000,
                 },
@@ -320,14 +320,11 @@ describe("ERC721DropImplementation", function () {
 
     describe("updateMaxSupply", () => {
         it("updates", async () => {
-            // Check current max supply
             expect(await collection.maxSupply()).to.eq(initialMaxSupply);
 
-            // Update max supply
             const newMaxSupply = 10000;
             await collection.updateMaxSupply(newMaxSupply);
 
-            // Check updated max supply
             expect(await collection.maxSupply()).to.eq(newMaxSupply);
         });
 
@@ -422,10 +419,8 @@ describe("ERC721DropImplementation", function () {
                 ],
             };
 
-            // Update
             await collection.updateConfiguration(newConfig);
 
-            // Check new state
             expect(await collection.maxSupply()).to.eq(newConfig.maxSupply);
             expect(await collection.baseURI()).to.eq(newConfig.baseURI);
             expect(await collection.payoutAddress()).to.eq(
@@ -520,15 +515,12 @@ describe("ERC721DropImplementation", function () {
 
     describe("updateBaseURI", () => {
         it("updates", async () => {
-            // Check current base URI
             expect(await collection.baseURI()).to.eq(initialBaseURI);
 
-            // Update base URI
             const newBaseURI =
                 "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/";
             await collection.updateBaseURI(newBaseURI);
 
-            // Check updated base URI
             expect(await collection.baseURI()).to.eq(newBaseURI);
         });
 
@@ -546,7 +538,6 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("emits BatchMetadataUpdate if tokens exist", async () => {
-            // Mint tokens
             await activatePublicStageAndMaxMint();
 
             await expect(
@@ -559,7 +550,6 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("emits BaseURIUpdated", async () => {
-            // Update base URI
             const newBaseURI =
                 "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/";
 
@@ -571,7 +561,6 @@ describe("ERC721DropImplementation", function () {
 
     describe("updateRoyalties", () => {
         it("updates", async () => {
-            // Check royalty info for token with ID 1
             const [receiver, amount] = await collection.royaltyInfo(
                 1,
                 ethers.utils.parseUnits("1", "ether"),
@@ -580,12 +569,10 @@ describe("ERC721DropImplementation", function () {
             expect(receiver).to.eq(initialRoyaltiesRecipient);
             expect(amount).to.eq(ethers.utils.parseUnits("0.1", "ether"));
 
-            // Update base URI
             const newReceiver = randomUser.address;
             const newFeeNumerator = 5000;
             await collection.updateRoyalties(newReceiver, newFeeNumerator);
 
-            // Check new royalty info for token with ID 1
             const [updatedReceiver, updatedAmount] =
                 await collection.royaltyInfo(
                     1,
@@ -612,14 +599,11 @@ describe("ERC721DropImplementation", function () {
 
     describe("updateProvenanceHash", () => {
         it("updates", async () => {
-            // Check provenance hash
             expect(await collection.provenanceHash()).to.eq(ZERO_BYTES32);
 
-            // Update provenance hash
             const newProvenanceHash = ethers.utils.id("image data");
             await collection.updateProvenanceHash(newProvenanceHash);
 
-            // Check updated provenance hash
             expect(await collection.provenanceHash()).to.eq(newProvenanceHash);
         });
 
@@ -637,13 +621,10 @@ describe("ERC721DropImplementation", function () {
 
     describe("updatePayoutAddress", () => {
         it("updates", async () => {
-            // Check payout address
             expect(await collection.payoutAddress()).to.eq(ZERO_ADDRESS);
 
-            // Update payout address
             await collection.updatePayoutAddress(owner.address);
 
-            // Check updated provenance hash
             expect(await collection.payoutAddress()).to.eq(owner.address);
         });
 
@@ -670,23 +651,18 @@ describe("ERC721DropImplementation", function () {
 
     describe("updatePlatformFees", () => {
         it("updates", async () => {
-            // Check platform fees address
             expect(await collection.platformFeesAddress()).to.eq(
                 "0xeA6b5147C353904D5faFA801422D268772F09512",
             );
 
-            // Check platform fees
             expect(await collection.platformFeesNumerator()).to.eq(0);
 
-            // Update payout address
             await collection
                 .connect(admin)
                 .updatePlatformFees(owner.address, 400);
 
-            // Check updated state
             expect(await collection.platformFeesAddress()).to.eq(owner.address);
 
-            // Check platform fees
             expect(await collection.platformFeesNumerator()).to.eq(400);
         });
 
@@ -721,15 +697,12 @@ describe("ERC721DropImplementation", function () {
 
     describe("updatePayer", () => {
         it("updates", async () => {
-            // Check if payer is allowed
             expect(await collection.allowedPayers(randomUser.address)).to.eq(
                 false,
             );
 
-            // Update payer
             await collection.updatePayer(randomUser.address, true);
 
-            // Check updated payer
             expect(await collection.allowedPayers(randomUser.address)).to.eq(
                 true,
             );
@@ -749,13 +722,10 @@ describe("ERC721DropImplementation", function () {
 
     describe("withdrawAllFunds", () => {
         it("withdraws", async () => {
-            // Fund contract
             await activatePublicStageAndMaxMint();
 
-            // Setup payout address
             await collection.updatePayoutAddress(allowlistUser2.address);
 
-            // Withdraw and check balance change
             await expect(() =>
                 collection.withdrawAllFunds(),
             ).to.changeEtherBalance(
@@ -765,18 +735,14 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("withdraws with platform fees", async () => {
-            // Fund contract
             await activatePublicStageAndMaxMint();
 
-            // Add platform fees
             await collection
                 .connect(admin)
                 .updatePlatformFees(owner.address, 500);
 
-            // Setup payout address
             await collection.updatePayoutAddress(allowlistUser2.address);
 
-            // Withdraw and check balance change
             await expect(() =>
                 collection.withdrawAllFunds(),
             ).to.changeEtherBalance(
@@ -801,7 +767,6 @@ describe("ERC721DropImplementation", function () {
         });
 
         it("reverts if payout address is zero address", async () => {
-            // Fund contract
             await activatePublicStageAndMaxMint();
 
             await expect(

@@ -19,7 +19,6 @@ describe("ERC721CollectionImplementation", function () {
         collection = await ERC721CollectionImplementation.deploy();
         await collection.deployed();
 
-        // Initialize
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
@@ -48,7 +47,6 @@ describe("ERC721CollectionImplementation", function () {
                 "QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5",
             );
 
-            // Check account token balance
             expect(await collection.balanceOf(owner.address)).to.eq(1);
         });
 
@@ -71,7 +69,6 @@ describe("ERC721CollectionImplementation", function () {
                 "QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg5",
             );
 
-            // Check account token balance
             expect(await collection.totalSupply()).to.eq(1);
         });
     });
@@ -83,7 +80,6 @@ describe("ERC721CollectionImplementation", function () {
                 "QmSBxefqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLkhHg7",
             ]);
 
-            // Check account token balance
             expect(await collection.balanceOf(owner.address)).to.eq(3);
         });
 
@@ -116,7 +112,6 @@ describe("ERC721CollectionImplementation", function () {
 
     describe("updateRoyalties", () => {
         it("updates", async () => {
-            // Check royalty info for token with ID 1
             const [receiver, amount] = await collection.royaltyInfo(
                 1,
                 ethers.utils.parseUnits("1", "ether"),
@@ -127,12 +122,10 @@ describe("ERC721CollectionImplementation", function () {
             );
             expect(amount).to.eq(ethers.utils.parseUnits("0", "ether"));
 
-            // Update base URI
             const newReceiver = randomUser.address;
             const newFeeNumerator = 5000;
             await collection.updateRoyalties(newReceiver, newFeeNumerator);
 
-            // Check new royalty info for token with ID 1
             const [updatedReceiver, updatedAmount] =
                 await collection.royaltyInfo(
                     1,
@@ -159,15 +152,12 @@ describe("ERC721CollectionImplementation", function () {
 
     describe("updateBaseURI", () => {
         it("updates", async () => {
-            // Check current base URI
             expect(await collection.baseURI()).to.eq("");
 
-            // Update base URI
             const newBaseURI =
                 "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/";
             await collection.updateBaseURI(newBaseURI);
 
-            // Check updated base URI
             expect(await collection.baseURI()).to.eq(newBaseURI);
         });
 
@@ -185,7 +175,6 @@ describe("ERC721CollectionImplementation", function () {
         });
 
         it("emits BaseURIUpdated", async () => {
-            // Update base URI
             const newBaseURI =
                 "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/";
 

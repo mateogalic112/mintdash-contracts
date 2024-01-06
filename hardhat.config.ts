@@ -23,6 +23,10 @@ const config = {
         sources: "./src",
     },
     networks: {
+        skaleChaos: {
+            url: `https://staging-v3.skalenodes.com/v1/staging-fast-active-bellatrix`,
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+        },
         mainnet: {
             url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_API_KEY}`,
             accounts: [process.env.MAINNET_PRIVATE_KEY],

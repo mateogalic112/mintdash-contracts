@@ -72,7 +72,7 @@ function balanceOf(address owner) external view returns (uint256)
 function baseURI() external view returns (string)
 ```
 
-Base URI of the collection. Defaults to ipfs://
+
 
 
 
@@ -184,7 +184,7 @@ function isApprovedForAll(address owner, address operator) external view returns
 function latestTokenId() external view returns (uint256)
 ```
 
-The tokenId of the most recently minted NFT.
+
 
 
 

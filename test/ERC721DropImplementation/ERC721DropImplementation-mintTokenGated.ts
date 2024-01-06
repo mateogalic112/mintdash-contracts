@@ -29,7 +29,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
         collection = await ERC721DropImplementation.deploy();
         await collection.deployed();
 
-        // Initialize
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
@@ -39,42 +38,35 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
             admin.address,
         );
 
-        // Configure royalties
         await collection.updateRoyalties(
             initialRoyaltiesRecipient,
             initialRoyaltiesFee,
         );
 
-        // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
 
-        // Deploy test NFT collection
         const TestERC721 = await ethers.getContractFactory("TestERC721");
         testERC721 = await TestERC721.deploy();
         await testERC721.deployed();
 
-        // Mint 5 NFTS to owner
         await testERC721.mint(owner.address, 5);
 
-        // Configure public stage
         const currentTimestamp = await time.latest();
         await collection.updateTokenGatedMintStage({
             nftContract: testERC721.address,
             data: {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                startTime: currentTimestamp, // start right away
-                endTime: currentTimestamp + 86400, // last 24 hours
+                startTime: currentTimestamp,
+                endTime: currentTimestamp + 86400,
                 mintLimitPerWallet: 3,
                 maxSupplyForStage: 100,
             },
         });
 
-        // Increase time by 1 hour
         await time.increase(3600);
     });
 
     it("mints", async () => {
-        // Mint 3 tokens
         await collection.mintTokenGated(
             owner.address,
             testERC721.address,
@@ -84,22 +76,18 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
             },
         );
 
-        // Check account token balance
         expect(await collection.balanceOf(owner.address)).to.eq(3);
     });
 
     it("mints with allowed payer", async () => {
-        // Setup payer
         await collection.updatePayer(randomUser.address, true);
 
-        // Mint 3 tokens to owner address with payer
         await collection
             .connect(randomUser)
             .mintTokenGated(owner.address, testERC721.address, [1, 2, 3], {
                 value: ethers.utils.parseUnits("0.3", "ether"),
             });
 
-        // Check account token balance
         expect(await collection.balanceOf(owner.address)).to.eq(3);
         expect(await collection.balanceOf(randomUser.address)).to.eq(0);
     });
@@ -135,7 +123,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
     });
 
     it("reverts if token is already redeemed", async () => {
-        // Redeem for 2 NFTs
         await collection.mintTokenGated(
             owner.address,
             testERC721.address,
@@ -179,7 +166,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
     });
 
     it("reverts if over mint limit per wallet", async () => {
-        // Revert if over limit in single transaction
         await expect(
             collection.mintTokenGated(
                 owner.address,
@@ -194,7 +180,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
             "MintQuantityExceedsWalletLimit",
         );
 
-        // Revert if over limit in multiple transactons
         await collection.mintTokenGated(
             owner.address,
             testERC721.address,
@@ -220,7 +205,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
     });
 
     it("reverts if over max supply", async () => {
-        // Update max supply
         await collection.updateMaxSupply(2);
 
         await expect(
@@ -239,7 +223,6 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
     });
 
     it("reverts if stage ended", async () => {
-        // Travel 30 hours in the future
         await time.increase(30 * 3600);
 
         await expect(
@@ -257,12 +240,11 @@ describe("ERC721DropImplementation - mintTokenGated", function () {
     it("reverts if stage didn't start", async () => {
         const currentTimestamp = await time.latest();
 
-        // Configure public stage
         await collection.updateTokenGatedMintStage({
             nftContract: testERC721.address,
             data: {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                startTime: currentTimestamp + 86400, // start in 24 hours
+                startTime: currentTimestamp + 86400,
                 endTime: currentTimestamp + 186400,
                 mintLimitPerWallet: 2,
                 maxSupplyForStage: 1000,

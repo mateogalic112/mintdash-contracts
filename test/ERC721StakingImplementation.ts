@@ -43,20 +43,16 @@ describe("ERC721StakingImplementation", function () {
         staking = await ERC721StakingImplementation.deploy();
         await staking.deployed();
 
-        // Initialize
         await staking.initialize(
             collection.address,
             rewardToken.address,
             initialRewardRate,
         );
 
-        // Mint reward tokens directly to staking contract
         await rewardToken.mint(staking.address, initialRewardBalance);
 
-        // Enable staking
         await staking.toggleStaking();
 
-        // Mint 5 NFTs to user and approve staking contract
         await mintNftsAndApprove(user, 5);
     });
 
@@ -99,7 +95,6 @@ describe("ERC721StakingImplementation", function () {
         });
 
         it("reverts if staking is paused", async () => {
-            // Pause staking
             await staking.toggleStaking();
 
             await expect(

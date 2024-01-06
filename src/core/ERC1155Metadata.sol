@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Unlicense
+
 pragma solidity 0.8.18;
 
 import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
@@ -91,7 +92,7 @@ abstract contract ERC1155Metadata is
         uint256 tokenId,
         uint256 newMaxSupply
     ) internal {
-        // Ensure the max supply does not exceed the maximum value of uint64.
+        
         if (newMaxSupply > 2 ** 64 - 1) {
             revert CannotExceedMaxSupplyOfUint64();
         }
@@ -137,7 +138,7 @@ abstract contract ERC1155Metadata is
         uint256 quantity,
         uint256 tokenPrice
     ) internal pure {
-        // Ensure enough ETH is sent
+        
         if (funds < tokenPrice * quantity) {
             revert IncorrectFundsProvided();
         }
@@ -149,18 +150,18 @@ abstract contract ERC1155Metadata is
         uint256 walletLimit,
         uint256 maxSupplyForStage
     ) internal view {
-        // Ensure max supply is not exceeded
+        
         if (totalSupply[tokenId] + quantity > maxSupply[tokenId]) {
             revert MintQuantityExceedsMaxSupply();
         }
 
-        // Ensure wallet limit is not exceeded
+        
         uint256 balanceAfterMint = minted[msg.sender][tokenId] + quantity;
         if (balanceAfterMint > walletLimit) {
             revert MintQuantityExceedsWalletLimit();
         }
 
-        // Ensure max supply for stage is not exceeded
+        
         if (totalSupply[tokenId] + quantity > maxSupplyForStage) {
             revert MintQuantityExceedsMaxSupplyForStage();
         }
