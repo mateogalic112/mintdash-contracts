@@ -46,7 +46,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             signedMint,
         );
 
-        // Make sure signature is ok.
         const verifiedAddress = ethers.utils.verifyTypedData(
             eip712Domain,
             eip712Types,
@@ -68,26 +67,21 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
         collection = await ERC721DropSignatureMintImplementation.deploy();
         await collection.deployed();
 
-        // Initialize
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
             admin.address,
         );
 
-        // Configure royalties
         await collection.updateRoyalties(
             initialRoyaltiesRecipient,
             initialRoyaltiesFee,
         );
 
-        // Configure base URI
         await collection.updateBaseURI(initialBaseURI);
 
-        // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
 
-        // Configure allowed signer
         await collection.updateAllowedSigner(allowedSigner.address, true);
 
         eip712Domain = {
@@ -134,7 +128,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             allowedSigner,
         );
 
-        // Mint 3 tokens
         await collection.mintSigned(
             owner.address,
             3,
@@ -146,15 +139,12 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             },
         );
 
-        // Check account token balance
         expect(await collection.balanceOf(owner.address)).to.eq(3);
     });
 
     it("mints with allowed payer", async () => {
-        // Setup payer
         await collection.updatePayer(randomUser.address, true);
 
-        // Mint 3 tokens to owner address with payer
         const signature = await signMint(
             owner,
             mintParams,
@@ -168,7 +158,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
                 value: ethers.utils.parseUnits("0.3", "ether"),
             });
 
-        // Check account token balance
         expect(await collection.balanceOf(owner.address)).to.eq(3);
         expect(await collection.balanceOf(randomUser.address)).to.eq(0);
     });
@@ -235,7 +224,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
     });
 
     it("reverts if over mint limit per wallet", async () => {
-        // Revert if over limit in single transaction
         let signature = await signMint(owner, mintParams, salt, allowedSigner);
 
         await expect(
@@ -254,7 +242,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             "MintQuantityExceedsWalletLimit",
         );
 
-        // Revert if over limit in multiple transactons
         salt = salt.add(1);
         signature = await signMint(owner, mintParams, salt, allowedSigner);
 
@@ -290,7 +277,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
     });
 
     it("reverts if over max supply", async () => {
-        // Update max supply
         await collection.updateMaxSupply(2);
 
         const signature = await signMint(
@@ -325,7 +311,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             allowedSigner,
         );
 
-        // Mint 1 token
         await collection.mintSigned(
             owner.address,
             1,
@@ -337,7 +322,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             },
         );
 
-        // Mint again with same signature
         await expect(
             collection.mintSigned(
                 owner.address,
@@ -373,7 +357,7 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
         const currentTimestamp = await time.latest();
         const inactiveStageMintParams = {
             ...mintParams,
-            startTime: currentTimestamp + 86400, // start in 24 hours
+            startTime: currentTimestamp + 86400,
             endTime: currentTimestamp + 186400,
         };
 
@@ -406,7 +390,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             allowedSigner,
         );
 
-        // Travel 30 hours in the future
         await time.increase(30 * 3600);
 
         await expect(

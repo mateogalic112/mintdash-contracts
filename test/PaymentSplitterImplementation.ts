@@ -222,7 +222,6 @@ describe("PaymentSplitterImplementation", function () {
                 paymentSplitter.releaseEth(recipient2.address),
             ).to.changeEtherBalance(recipient2, ethers.utils.parseEther("0.1"));
 
-            // Send another 1 ETH to contract
             await deployer.sendTransaction({
                 to: paymentSplitter.address,
                 value: ethers.utils.parseEther("1"),
@@ -403,7 +402,6 @@ describe("PaymentSplitterImplementation", function () {
                 ethers.utils.parseEther("1"),
             );
 
-            // Send another 10 tokens to contract
             await erc20Token.mint(
                 paymentSplitter.address,
                 ethers.utils.parseEther("10"),

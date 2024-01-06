@@ -148,22 +148,18 @@ contract ERC721DropSignatureMintImplementation is
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
 
-        // Update max supply
         if(config.maxSupply > 0) {
             _updateMaxSupply(config.maxSupply);
         }
 
-        // Update base URI
         if(bytes(config.baseURI).length > 0){
             _updateBaseURI(config.baseURI);
         }
 
-        // Update royalties
         if(config.royaltiesReceiver != address(0)){
             _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
         }
 
-        // Update payout
         if(config.payoutAddress != address(0)){
             _updatePayoutAddress(config.payoutAddress);
         }

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Unlicense
+
 pragma solidity 0.8.18;
 
 import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
@@ -61,19 +62,16 @@ contract ERC1155EditionsImplementation is
         uint256 quantity,
         bytes memory data
     ) external payable nonReentrant {
-        // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
-        // Load public mint stage to memory
         PublicMintStage memory mintStage = publicMintStages[tokenId];
 
-        // Ensure that public mint stage is active
+        
         _checkStageActive(mintStage.startTime, mintStage.endTime);
 
-        // Ensure correct mint quantity
+        
         _checkMintQuantity(
             tokenId,
             quantity,
@@ -81,7 +79,7 @@ contract ERC1155EditionsImplementation is
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
         );
 
-        // Ensure enough ETH is provided
+        
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
         _mintBase(minter, tokenId, quantity, data, PUBLIC_STAGE_INDEX);
@@ -95,22 +93,22 @@ contract ERC1155EditionsImplementation is
         bytes32[] calldata merkleProof,
         bytes memory data
     ) external payable nonReentrant {
-        // Get the minter address. Default to msg.sender.
+        
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        // Ensure the payer is allowed if not caller
+        
         _checkPayer(minter);
 
-        // Load allowlist mint stage to memory
+        
         AllowlistMintStage memory mintStage = allowlistMintStages[tokenId][allowlistStageId];
 
-        // Ensure that allowlist mint stage is active
+        
         _checkStageActive(
             mintStage.startTime,
             mintStage.endTime
         );
 
-        // Ensure correct mint quantity
+        
         _checkMintQuantity(
             tokenId,
             quantity,
@@ -118,7 +116,7 @@ contract ERC1155EditionsImplementation is
             mintStage.maxSupplyForStage
         );
 
-        // Ensure enough ETH is provided
+        
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
         if (
@@ -141,27 +139,27 @@ contract ERC1155EditionsImplementation is
         uint256[] calldata tokenIds,
         bytes memory data
     ) external payable nonReentrant {
-        // Get the minter address. Default to msg.sender.
+        
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        // Ensure the payer is allowed if not caller
+        
         _checkPayer(minter);
 
-        // Load token gated mint stage to memory
+        
         TokenGatedMintStage memory mintStage = tokenGatedMintStages[tokenId][
             nftContract
         ];
 
-        // For easier access
+        
         uint256 quantity = tokenIds.length;
 
-        // Ensure that token holder mint stage is active
+        
         _checkStageActive(
             mintStage.startTime,
             mintStage.endTime
         );
 
-        // Ensure correct mint quantity
+        
         _checkMintQuantity(
             tokenId,
             quantity,
@@ -169,29 +167,29 @@ contract ERC1155EditionsImplementation is
             mintStage.maxSupplyForStage
         );
 
-        // Ensure enough ETH is provided
+        
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
-        // For easier and cheaper access.
+        
         mapping(uint256 => bool)
             storage redeemedTokenIds = _tokenGatedTokenRedeems[tokenId][nftContract];
 
-        // Iterate through each tokenIds to make sure it's not already claimed
+        
         for (uint256 i = 0; i < quantity; ) {
-            // For easier and cheaper access.
+            
             uint256 gatedTokenId = tokenIds[i];
 
-            // Check that the minter is the owner of the tokenId.
+            
             if (IERC721(nftContract).ownerOf(tokenId) != minter) {
                 revert TokenGatedNotTokenOwner();
             }
 
-            // Check that the token id has not already been redeemed.
+            
             if (redeemedTokenIds[gatedTokenId]) {
                 revert TokenGatedTokenAlreadyRedeemed();
             }
 
-            // Mark the token id as redeemed.
+            
             redeemedTokenIds[gatedTokenId] = true;
 
             unchecked {
@@ -239,16 +237,16 @@ contract ERC1155EditionsImplementation is
         uint256 tokenId,
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
-        // Update max supply
+        
         _updateMaxSupply(tokenId, config.maxSupply);
 
-        // Update base URI
+        
          _updateTokenURI(tokenId, config.baseURI);
 
-        // Update public phase
+        
         _updatePublicMintStage(tokenId, config.publicMintStage);
 
-        // Update allowlist phases
+        
         for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
             _updateAllowlistMintStage(tokenId, config.allowlistMintStages[i]);
 
@@ -257,7 +255,7 @@ contract ERC1155EditionsImplementation is
             }
         }
 
-        // Update token gated phases
+        
         for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
             _updateTokenGatedMintStage(tokenId, config.tokenGatedMintStages[i]);
 

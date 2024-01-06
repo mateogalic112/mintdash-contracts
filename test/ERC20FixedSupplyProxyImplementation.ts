@@ -17,22 +17,16 @@ describe("ERC20FixedSupplyProxyImplementation", function () {
         token = await Token.deploy();
         await token.deployed();
 
-        // Initialize
-        await token.initialize(
-            "Blank Studio Token",
-            "BST",
-            owner.address,
-            1000,
-        );
+        await token.initialize("Mintdash", "MINT", owner.address, 1000);
     });
 
     describe("initialization", function () {
         it("initializes name", async () => {
-            expect(await token.name()).to.equal("Blank Studio Token");
+            expect(await token.name()).to.equal("Mintdash");
         });
 
         it("initializes symbol", async () => {
-            expect(await token.symbol()).to.equal("BST");
+            expect(await token.symbol()).to.equal("MINT");
         });
 
         it("initializes supply", async () => {

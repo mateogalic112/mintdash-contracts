@@ -10,25 +10,16 @@ abstract contract ERC721CollectionMetadata is
     ERC721BurnableUpgradeable,
     IERC721CollectionMetadata
 {
-    /**
-     * @notice The tokenId of the most recently minted NFT.
-     * @dev Minting starts at tokenId 1.
-     */
+    //// @dev Minting starts at tokenId 1.
     uint256 public latestTokenId;
 
-    /**
-     * @notice Tracks how many tokens have been burned.
-     */
+    /// @dev Tracks how many tokens have been burned.
     uint256 private burnCounter;
 
-    /**
-     * @notice Base URI of the collection. Defaults to ipfs://
-     */
+    /// @dev Base URI of the collection. Defaults to ipfs://
     string public baseURI;
 
-    /**
-     * @dev Stores a CID for each NFT.
-     */
+    //// @dev Stores a CID for each NFT.
     mapping(uint256 tokenId => string tokenCID) private _tokenCIDs;
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {

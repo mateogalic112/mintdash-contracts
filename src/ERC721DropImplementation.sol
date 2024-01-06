@@ -58,16 +58,12 @@ contract ERC721DropImplementation is
         address recipient, 
         uint256 quantity
     ) external payable nonReentrant {
-        // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        // Ensure the payer is allowed if not caller
         _checkPayer(minter);
         
-        // Ensure that public mint stage is active
         _checkStageActive(publicMintStage.startTime, publicMintStage.endTime);
 
-        // Ensure correct mint quantity
         _checkMintQuantity(
             minter,
             quantity,
@@ -75,10 +71,8 @@ contract ERC721DropImplementation is
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
         );
 
-        // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, publicMintStage.mintPrice);
 
-        // Mint tokens
         _mintBase(minter, quantity, PUBLIC_STAGE_INDEX);
     }
 
@@ -88,21 +82,17 @@ contract ERC721DropImplementation is
         uint256 quantity,
         bytes32[] calldata merkleProof
     ) external payable nonReentrant {
-        // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
         AllowlistMintStage memory allowlistMintStage = allowlistMintStages[allowlistStageId];
 
-        // Ensure that allowlist mint stage is active
         _checkStageActive(
             allowlistMintStage.startTime,
             allowlistMintStage.endTime
         );
 
-        // Ensure correct mint quantity
         _checkMintQuantity(
             minter,
             quantity,
@@ -110,7 +100,6 @@ contract ERC721DropImplementation is
             allowlistMintStage.maxSupplyForStage
         );
 
-        // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, allowlistMintStage.mintPrice);
 
         if (
@@ -131,27 +120,22 @@ contract ERC721DropImplementation is
         address nftContract,
         uint256[] calldata tokenIds
     ) external payable nonReentrant {
-        // Get the minter address. Default to msg.sender.
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        // Ensure the payer is allowed if not caller
         _checkPayer(minter);
 
-        // Get token gated mint stage for NFT contract
         TokenGatedMintStage memory tokenGatedMintStage = tokenGatedMintStages[
             nftContract
         ];
 
-        // For easier access
+        
         uint256 quantity = tokenIds.length;
 
-        // Ensure that token holder mint stage is active
         _checkStageActive(
             tokenGatedMintStage.startTime,
             tokenGatedMintStage.endTime
         );
 
-        // Ensure correct mint quantity
         _checkMintQuantity(
             minter,
             quantity,
@@ -159,29 +143,23 @@ contract ERC721DropImplementation is
             tokenGatedMintStage.maxSupplyForStage
         );
 
-        // Ensure enough ETH is provided
         _checkFunds(msg.value, quantity, tokenGatedMintStage.mintPrice);
 
-        // For easier and cheaper access.
         mapping(uint256 => bool)
             storage redeemedTokenIds = _tokenGatedTokenRedeems[nftContract];
 
-        // Iterate through each tokenIds to make sure it's not already claimed
         for (uint256 i = 0; i < quantity; ) {
-            // For easier and cheaper access.
+            /// @dev For easier and cheaper access.
             uint256 tokenId = tokenIds[i];
 
-            // Check that the minter is the owner of the tokenId.
             if (IERC721(nftContract).ownerOf(tokenId) != minter) {
                 revert TokenGatedNotTokenOwner();
             }
 
-            // Check that the token id has not already been redeemed.
             if (redeemedTokenIds[tokenId]) {
                 revert TokenGatedTokenAlreadyRedeemed();
             }
 
-            // Mark the token id as redeemed.
             redeemedTokenIds[tokenId] = true;
 
             unchecked {
@@ -189,7 +167,6 @@ contract ERC721DropImplementation is
             }
         }
 
-        // Mint tokens
         _mintBase(minter, quantity, TOKEN_GATED_STAGE_INDEX);
     }
 
@@ -221,26 +198,20 @@ contract ERC721DropImplementation is
     function updateConfiguration(
         MultiConfig calldata config
     ) external onlyOwnerOrAdministrator {
-        // Update max supply
        _updateMaxSupply(config.maxSupply);
 
-        // Update base URI
         _updateBaseURI(config.baseURI);
 
-        // Update royalties
         if (config.royaltiesReceiver != address(0)) {
             _updateRoyalties(config.royaltiesReceiver, config.royaltiesFeeNumerator);
         }
 
-        // Update payout
         if (config.payoutAddress != address(0)) {
             _updatePayoutAddress(config.payoutAddress);
         }
 
-        // Update public phase
         _updatePublicMintStage(config.publicMintStage);
 
-        // Update allowlist phases
        for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
             _updateAllowlistMintStage(config.allowlistMintStages[i]);
 
@@ -249,7 +220,6 @@ contract ERC721DropImplementation is
             }
         }
 
-        // Update token gated phases
         for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
             _updateTokenGatedMintStage(config.tokenGatedMintStages[i]);
 

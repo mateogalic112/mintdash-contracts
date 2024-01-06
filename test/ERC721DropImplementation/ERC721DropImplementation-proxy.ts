@@ -46,19 +46,17 @@ describe("ERC721DropImplementation-proxy", function () {
 
     describe("mintPublic", () => {
         beforeEach(async function () {
-            // Configure max supply
             await collection.updateMaxSupply(initialMaxSupply);
 
             const currentTimestamp = await time.latest();
 
-            // Configure public stage
             await collection.updatePublicMintStage({
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                startTime: currentTimestamp, // start right away
-                endTime: currentTimestamp + 86400, // last 24 hours
+                startTime: currentTimestamp,
+                endTime: currentTimestamp + 86400,
                 mintLimitPerWallet: 3,
             });
-            // Increase time by 1 hour
+
             await time.increase(3600);
         });
 
@@ -77,25 +75,22 @@ describe("ERC721DropImplementation-proxy", function () {
         beforeEach(async function () {
             allowlist = [allowlistUser.address, allowlistUser2.address];
 
-            // Configure max supply
             await collection.updateMaxSupply(initialMaxSupply);
 
             const currentTimestamp = await time.latest();
 
-            // Configure allowlist stage
             await collection.updateAllowlistMintStage({
                 id: PREPARED_MINT_STAGE_ID,
                 data: {
                     mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp, // start right away
-                    endTime: currentTimestamp + 86400, // last 24 hours
+                    startTime: currentTimestamp,
+                    endTime: currentTimestamp + 86400,
                     mintLimitPerWallet: 2,
                     maxSupplyForStage: 4000,
                     merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
                 },
             });
 
-            // Increase time by 1 hour
             await time.increase(3600);
         });
 
@@ -120,31 +115,26 @@ describe("ERC721DropImplementation-proxy", function () {
 
     describe("mintTokenGated", () => {
         beforeEach(async function () {
-            // Configure max supply
             await collection.updateMaxSupply(initialMaxSupply);
 
-            // Deploy test NFT collection
             const TestERC721 = await ethers.getContractFactory("TestERC721");
             testERC721 = await TestERC721.deploy();
             await testERC721.deployed();
 
-            // Mint 5 NFTS to owner
             await testERC721.mint(owner.address, 5);
 
-            // Configure public stage
             const currentTimestamp = await time.latest();
             await collection.updateTokenGatedMintStage({
                 nftContract: testERC721.address,
                 data: {
                     mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                    startTime: currentTimestamp, // start right away
-                    endTime: currentTimestamp + 86400, // last 24 hours
+                    startTime: currentTimestamp,
+                    endTime: currentTimestamp + 86400,
                     mintLimitPerWallet: 3,
                     maxSupplyForStage: 100,
                 },
             });
 
-            // Increase time by 1 hour
             await time.increase(3600);
         });
 

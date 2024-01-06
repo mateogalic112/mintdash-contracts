@@ -19,7 +19,6 @@ describe("AdministratedUpgradeable", () => {
         collection = await ERC721DropImplementation.deploy();
         await collection.deployed();
 
-        // Initialize
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
@@ -30,13 +29,10 @@ describe("AdministratedUpgradeable", () => {
 
     describe("renounceAdministration", () => {
         it("renounces", async () => {
-            // Check current administrator
             expect(await collection.administrator()).to.equal(admin.address);
 
-            // Renounce administration
             await collection.connect(admin).renounceAdministration();
 
-            // Check new administrator
             expect(await collection.administrator()).to.equal(
                 ethers.constants.AddressZero,
             );
@@ -61,15 +57,12 @@ describe("AdministratedUpgradeable", () => {
 
     describe("transferAdministration", () => {
         it("transfers", async () => {
-            // Check current administrator
             expect(await collection.administrator()).to.equal(admin.address);
 
-            // Transfer administration
             await collection
                 .connect(admin)
                 .transferAdministration(randomUser.address);
 
-            // Check new administrator
             expect(await collection.administrator()).to.equal(
                 randomUser.address,
             );

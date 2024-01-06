@@ -46,7 +46,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         collection = await ERC721DropImplementation.deploy();
         await collection.deployed();
 
-        // Initialize
         await collection.initialize(
             "Blank Studio Collection",
             "BSC",
@@ -54,36 +53,31 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
             admin.address,
         );
 
-        // Configure royalties
         await collection.updateRoyalties(
             initialRoyaltiesRecipient,
             initialRoyaltiesFee,
         );
 
-        // Configure max supply
         await collection.updateMaxSupply(initialMaxSupply);
 
         const currentTimestamp = await time.latest();
 
-        // Configure allowlist stage
         await collection.updateAllowlistMintStage({
             id: PREPARED_MINT_STAGE_ID,
             data: {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                startTime: currentTimestamp, // start right away
-                endTime: currentTimestamp + 86400, // last 24 hours
+                startTime: currentTimestamp,
+                endTime: currentTimestamp + 86400,
                 mintLimitPerWallet: 2,
                 maxSupplyForStage: 4000,
                 merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
             },
         });
 
-        // Increase time by 1 hour
         await time.increase(3600);
     });
 
     it("mints", async () => {
-        // Mint 3 tokens
         await collection
             .connect(allowlistUser)
             .mintAllowlist(
@@ -96,15 +90,12 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 },
             );
 
-        // Check account token balance
         expect(await collection.balanceOf(allowlistUser.address)).to.eq(2);
     });
 
     it("mints with allowed payer", async () => {
-        // Setup payer
         await collection.updatePayer(randomUser.address, true);
 
-        // Mint 3 tokens to owner address with payer
         await collection
             .connect(randomUser)
             .mintAllowlist(
@@ -117,7 +108,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
                 },
             );
 
-        // Check account token balance
         expect(await collection.balanceOf(allowlistUser.address)).to.eq(2);
         expect(await collection.balanceOf(randomUser.address)).to.eq(0);
     });
@@ -173,7 +163,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
     });
 
     it("reverts if over mint limit per wallet", async () => {
-        // Revert if over limit in single transaction
         await expect(
             collection
                 .connect(allowlistUser)
@@ -191,7 +180,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
             "MintQuantityExceedsWalletLimit",
         );
 
-        // Revert if over limit in multiple transactons
         await collection
             .connect(allowlistUser)
             .mintAllowlist(
@@ -225,23 +213,20 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
     it("reverts if over max supply for stage", async () => {
         const currentTimestamp = await time.latest();
 
-        // Configure allowlist stage
         await collection.updateAllowlistMintStage({
             id: PREPARED_MINT_STAGE_ID,
             data: {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                startTime: currentTimestamp, // start right away
-                endTime: currentTimestamp + 86400, // last 24 hours
+                startTime: currentTimestamp,
+                endTime: currentTimestamp + 86400,
                 mintLimitPerWallet: 2,
                 maxSupplyForStage: 3,
                 merkleRoot: `0x${getMerkleTreeRoot(allowlist)}`,
             },
         });
 
-        // Increase time by 1 hour
         await time.increase(3600);
 
-        // Mint 2 items
         await collection
             .connect(allowlistUser)
             .mintAllowlist(
@@ -273,7 +258,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
     });
 
     it("reverts if over max supply", async () => {
-        // Update max supply
         await collection.updateMaxSupply(2);
 
         await collection
@@ -307,7 +291,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
     });
 
     it("reverts if stage ended", async () => {
-        // Travel 30 hours in the future
         await time.increase(30 * 3600);
 
         await expect(
@@ -328,12 +311,11 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
     it("reverts if stage didn't start", async () => {
         const currentTimestamp = await time.latest();
 
-        // Configure allowlist stage
         await collection.updateAllowlistMintStage({
             id: PREPARED_MINT_STAGE_ID,
             data: {
                 mintPrice: ethers.utils.parseUnits("0.1", "ether"),
-                startTime: currentTimestamp + 86400, // start in 24 hours
+                startTime: currentTimestamp + 86400,
                 endTime: currentTimestamp + 186400,
                 mintLimitPerWallet: 2,
                 maxSupplyForStage: 4000,
@@ -389,7 +371,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
     it("revents if invalid stage ID", async () => {
         await expect(
             collection.mintAllowlist(
-                100, // ID doesn't exist
+                100,
                 owner.address,
                 1,
                 getMerkleProof(allowlist, userWithoutAllowlist.address),
