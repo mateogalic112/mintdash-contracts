@@ -809,7 +809,7 @@ Updates allowed payers.
 function updatePayoutAddress(address newPayoutAddress) external nonpayable
 ```
 
-Updates payout address
+
 
 
 
@@ -817,7 +817,7 @@ Updates payout address
 
 | Name | Type | Description |
 |---|---|---|
-| newPayoutAddress | address | New payout address. |
+| newPayoutAddress | address | undefined |
 
 ### updateProvenanceHash
 
@@ -1103,23 +1103,6 @@ event PayoutAddressUpdated(address indexed payoutAddress)
 | Name | Type | Description |
 |---|---|---|
 | payoutAddress `indexed` | address | undefined |
-
-### PlatformFeesUpdated
-
-```solidity
-event PlatformFeesUpdated(address indexed platformFeesAddress, uint256 indexed platformFeesNumerator)
-```
-
-
-
-*Emit an event when platform fees are updated.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| platformFeesAddress `indexed` | address | undefined |
-| platformFeesNumerator `indexed` | uint256 | undefined |
 
 ### ProvenanceHashUpdated
 
@@ -1427,28 +1410,6 @@ error PayoutTransferFailed()
 
 
 *Revert if the payout transfer fails.*
-
-
-### PlatformFeesAddressCannotBeZeroAddress
-
-```solidity
-error PlatformFeesAddressCannotBeZeroAddress()
-```
-
-
-
-*Revert if platform fees address is zero address when updating platform fees.*
-
-
-### PlatformFeesNumeratorTooHigh
-
-```solidity
-error PlatformFeesNumeratorTooHigh()
-```
-
-
-
-*Revert if the new platform fees numerator exceeds the maximum allowed value.*
 
 
 ### PlatformFeesTransferFailed

@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, run } from "hardhat";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -11,7 +11,7 @@ async function main() {
         "PaymentSplitterImplementation",
     );
     const implementation = await PaymentSplitterImplementation.deploy();
-    await implementation.deployed();
+    await implementation.deployTransaction.wait(6);
     await implementation.initialize(
         "Blank Studio Splitter",
         [ethers.constants.AddressZero],
@@ -22,6 +22,11 @@ async function main() {
         "🚀 PaymentSplitterImplementation deployed to: ",
         implementation.address,
     );
+
+    await run("verify:verify", {
+        address: implementation.address,
+        constructorArguments: [],
+    });
 }
 
 main()
