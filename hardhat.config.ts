@@ -59,6 +59,7 @@ const config = {
             goerli: process.env.ETHERSCAN_API_KEY,
             polygon: process.env.POLYSCAN_API_KEY,
             base: process.env.BASESCAN_API_KEY,
+            skaleChaos: process.env.ETHERSCAN_API_KEY,
         },
         customChains: [
             {
@@ -67,6 +68,15 @@ const config = {
                 urls: {
                     apiURL: "https://api.basescan.org/api",
                     browserURL: "https://basescan.org",
+                },
+            },
+            {
+                network: "skaleChaos",
+                chainId: 1351057110,
+                urls: {
+                    apiURL: "https://staging-fast-active-bellatrix.explorer.staging-v3.skalenodes.com/api",
+                    browserURL:
+                        "https://staging-fast-active-bellatrix.explorer.staging-v3.skalenodes.com",
                 },
             },
         ],
