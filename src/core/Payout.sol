@@ -12,8 +12,6 @@ abstract contract Payout is OwnableUpgradeable, ERC2981Upgradeable, IPayout {
     address public platformFeesAddress;
     uint96 public platformFeesNumerator;
 
-    uint256 constant MAX_PLATFORM_FEES_NUMERATOR = 2000;
-
     function __Payout_init(address _platformFeesAddress, uint96 _platformFeesNumerator)
         internal
         onlyInitializing
@@ -77,23 +75,5 @@ abstract contract Payout is OwnableUpgradeable, ERC2981Upgradeable, IPayout {
         _setDefaultRoyalty(receiver, feeNumerator);
 
         emit RoyaltiesUpdated(receiver, feeNumerator);
-    }
-
-    function _updatePlatformFees(
-        address newPlatformFeesAddress,
-        uint256 newPlatformFeesNumerator
-    ) internal {
-        if (newPlatformFeesAddress == address(0)) {
-            revert PlatformFeesAddressCannotBeZeroAddress();
-        }
-
-        if (newPlatformFeesNumerator > MAX_PLATFORM_FEES_NUMERATOR) {
-            revert PlatformFeesNumeratorTooHigh();
-        }
-
-        platformFeesAddress = newPlatformFeesAddress;
-        platformFeesNumerator = uint96(newPlatformFeesNumerator);
-
-        emit PlatformFeesUpdated(newPlatformFeesAddress, newPlatformFeesNumerator);
     }
 }
