@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-
-import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {IERC721DropMetadata} from "./interface/IERC721DropMetadata.sol";
 
 abstract contract ERC721DropMetadata is
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     ERC721AUpgradeable,
     MulticallUpgradeable,
     IERC721DropMetadata
@@ -20,11 +19,11 @@ abstract contract ERC721DropMetadata is
 
     mapping(address payer => bool allowed) public allowedPayers;
 
-    function __ERC721DropMetadata_init(string memory _baseURI)
+    function __ERC721DropMetadata_init(string memory _uri)
         internal
         onlyInitializing
     {
-        baseURI = _baseURI;
+        baseURI = _uri;
     }
 
 
@@ -39,7 +38,7 @@ abstract contract ERC721DropMetadata is
     function airdrop(
         address[] calldata to,
         uint64[] calldata quantity
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         address[] memory recipients = to;
 
         for (uint64 i = 0; i < recipients.length; ) {
@@ -57,26 +56,26 @@ abstract contract ERC721DropMetadata is
 
     function updateMaxSupply(
         uint256 newMaxSupply
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateMaxSupply(newMaxSupply);
     }
 
     function updateBaseURI(
         string calldata newUri
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateBaseURI(newUri);
     }
 
     function updateProvenanceHash(
         bytes32 newProvenanceHash
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateProvenanceHash(newProvenanceHash);
     }
 
     function updatePayer(
         address payer,
         bool isAllowed
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         allowedPayers[payer] = isAllowed;
 
         emit AllowedPayerUpdated(payer, isAllowed);

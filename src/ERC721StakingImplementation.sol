@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
-import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {IERC721StakingImplementation} from "./interface/IERC721StakingImplementation.sol";
 
 contract ERC721StakingImplementation is
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     MulticallUpgradeable,
     IERC721StakingImplementation
 {
@@ -78,7 +77,7 @@ contract ERC721StakingImplementation is
         emit RewardsClaimed(msg.sender, rewards);
     }
 
-    function updateRewardRate(uint256 rewardsPerSecond) external onlyOwnerOrAdministrator {
+    function updateRewardRate(uint256 rewardsPerSecond) external onlyOwner {
         RewardPhase storage currentRewardPhase = rewardPhases[nextRewardPhaseId - 1];
 
         if (currentRewardPhase.rewardsPerSecond == rewardsPerSecond) {
@@ -92,17 +91,17 @@ contract ERC721StakingImplementation is
         emit RewardRateUpdated(rewardsPerSecond);
     }
 
-    function toggleStaking() external onlyOwnerOrAdministrator {
+    function toggleStaking() external onlyOwner {
         isStakingEnabled = !isStakingEnabled;
     }
 
-    function depositERC20Tokens(uint256 amount, address sender) external onlyOwnerOrAdministrator {
+    function depositERC20Tokens(uint256 amount, address sender) external onlyOwner {
         IERC20(rewardToken).transferFrom(sender, address(this), amount);
     }
 
     function withdrawERC20Tokens(uint256 amount, address recipient)
         external
-        onlyOwnerOrAdministrator
+        onlyOwner
     {
         IERC20(rewardToken).transfer(recipient, amount);
     }

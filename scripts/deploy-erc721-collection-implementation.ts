@@ -12,7 +12,7 @@ async function main() {
     );
     const implementation = await ERC721CollectionImplementation.deploy();
     await implementation.deployed();
-    await implementation.initialize("Mintdash", "MINTDASH", deployer.address);
+    await implementation.initialize("Mintdash", "MINTDASH");
 
     console.log(
         "🚀 ERC721CollectionImplementation deployed to: ",

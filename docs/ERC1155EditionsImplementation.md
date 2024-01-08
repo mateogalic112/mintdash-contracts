@@ -10,23 +10,6 @@
 
 ## Methods
 
-### administrator
-
-```solidity
-function administrator() external view returns (address)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
 ### airdrop
 
 ```solidity
@@ -311,7 +294,7 @@ Returns token gated mint stage for token and NFT contract address.
 ### initialize
 
 ```solidity
-function initialize(string _name, string _symbol, address _platformFeesAddress, uint96 _platformFeesNumerator, address _administrator) external nonpayable
+function initialize(string _name, string _symbol, address _platformFeesAddress, uint96 _platformFeesNumerator) external nonpayable
 ```
 
 
@@ -326,7 +309,6 @@ function initialize(string _name, string _symbol, address _platformFeesAddress, 
 | _symbol | string | undefined |
 | _platformFeesAddress | address | undefined |
 | _platformFeesNumerator | uint96 | undefined |
-| _administrator | address | undefined |
 
 ### isApprovedForAll
 
@@ -622,17 +604,6 @@ function publicMintStages(uint256 tokenId) external view returns (uint144 mintPr
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
 
-### renounceAdministration
-
-```solidity
-function renounceAdministration() external nonpayable
-```
-
-
-
-
-
-
 ### renounceOwnership
 
 ```solidity
@@ -835,22 +806,6 @@ function totalSupply(uint256 tokenId) external view returns (uint256 totalSupply
 |---|---|---|
 | totalSupply | uint256 | undefined |
 
-### transferAdministration
-
-```solidity
-function transferAdministration(address newAdmin) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newAdmin | address | undefined |
-
 ### transferOwnership
 
 ```solidity
@@ -950,23 +905,6 @@ Updates payout address
 | Name | Type | Description |
 |---|---|---|
 | newPayoutAddress | address | New payout address. |
-
-### updatePlatformFees
-
-```solidity
-function updatePlatformFees(address newPlatformFeesAddress, uint256 newPlatformFeesNumerator) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newPlatformFeesAddress | address | undefined |
-| newPlatformFeesNumerator | uint256 | undefined |
 
 ### updateProvenanceHash
 
@@ -1088,23 +1026,6 @@ Withdraws all funds from the contract. This function will revert if contract bal
 
 
 ## Events
-
-### AdministrationTransferred
-
-```solidity
-event AdministrationTransferred(address indexed previousAdmin, address indexed newAdmin)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousAdmin `indexed` | address | undefined |
-| newAdmin `indexed` | address | undefined |
 
 ### AllowedPayerUpdated
 
@@ -1451,17 +1372,6 @@ error IncorrectFundsProvided()
 *Revert if supplied ETH value is not valid for the mint.*
 
 
-### InvalidAdministratorAddress
-
-```solidity
-error InvalidAdministratorAddress()
-```
-
-
-
-
-
-
 ### InvalidPayoutAddress
 
 ```solidity
@@ -1542,28 +1452,6 @@ error NothingToWithdraw()
 
 
 *Revert if the contract balance is zero when withdrawing funds.*
-
-
-### OnlyAdministrator
-
-```solidity
-error OnlyAdministrator()
-```
-
-
-
-
-
-
-### OnlyOwnerOrAdministrator
-
-```solidity
-error OnlyOwnerOrAdministrator()
-```
-
-
-
-
 
 
 ### PayerNotAllowed

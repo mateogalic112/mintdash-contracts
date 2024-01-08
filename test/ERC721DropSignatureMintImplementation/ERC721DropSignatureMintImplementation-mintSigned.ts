@@ -72,7 +72,6 @@ describe("ERC721DropSignatureMintImplementation - mintSigned", function () {
             "BSC",
             "0xeA6b5147C353904D5faFA801422D268772F09512",
             0,
-            admin.address,
         );
 
         await collection.updateRoyalties(

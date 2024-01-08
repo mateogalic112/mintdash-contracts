@@ -12,12 +12,7 @@ async function main() {
     );
     const implementation = await ERC20Implementation.deploy();
     await implementation.deployed();
-    await implementation.initialize(
-        "Blank NFT Studio",
-        "BLANK",
-        deployer.address,
-        0,
-    );
+    await implementation.initialize("Blank NFT Studio", "BLANK", 0);
 
     console.log("🚀 ERC20Implementation deployed to: ", implementation.address);
 }

@@ -13,8 +13,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
         allowlistUser: SignerWithAddress,
         allowlistUser2: SignerWithAddress,
         userWithoutAllowlist: SignerWithAddress,
-        randomUser: SignerWithAddress,
-        admin: SignerWithAddress;
+        randomUser: SignerWithAddress;
 
     let allowlist: string[];
 
@@ -35,7 +34,6 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
             allowlistUser2,
             userWithoutAllowlist,
             randomUser,
-            admin,
         ] = await ethers.getSigners();
 
         allowlist = [allowlistUser.address, allowlistUser2.address];
@@ -51,8 +49,7 @@ describe("ERC721DropImplementation - mintAllowlist", function () {
             "BSC",
             initialBaseURI,
             "0xeA6b5147C353904D5faFA801422D268772F09512",
-            0,
-            admin.address,
+            500,
         );
 
         await collection.updateRoyalties(

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Unlicense
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {ERC1155Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -8,16 +8,16 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
-import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC1155Metadata} from "./core/ERC1155Metadata.sol";
 import {Payout} from "./core/Payout.sol";
 import {IERC1155EditionsImplementation} from "./interface/IERC1155EditionsImplementation.sol";
 
 contract ERC1155EditionsImplementation is
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     ERC1155Metadata,
     Payout,
     ReentrancyGuardUpgradeable,
@@ -48,11 +48,9 @@ contract ERC1155EditionsImplementation is
         string memory _name, 
         string memory _symbol, 
         address _platformFeesAddress, 
-        uint96 _platformFeesNumerator,
-        address _administrator
+        uint96 _platformFeesNumerator
     ) external initializer {
         __ERC1155_init("");
-        __Administrated_init(_administrator);
         __Payout_init(_platformFeesAddress, _platformFeesNumerator);
         __Ownable_init();
         __ERC2981_init();
@@ -234,7 +232,7 @@ contract ERC1155EditionsImplementation is
         return _tokenGatedTokenRedeems[tokenId][nftContract][nftContractTokenId];
     }
 
-    function createToken(string calldata tokenUri) external onlyOwnerOrAdministrator {
+    function createToken(string calldata tokenUri) external onlyOwner {
          latestTokenId = latestTokenId + 1;
         _updateTokenURI(latestTokenId, tokenUri);
     }
@@ -242,7 +240,7 @@ contract ERC1155EditionsImplementation is
     function updateConfiguration(
         uint256 tokenId,
         MultiConfig calldata config
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         
         _updateMaxSupply(tokenId, config.maxSupply);
 
@@ -274,7 +272,7 @@ contract ERC1155EditionsImplementation is
     function updatePublicMintStage(
         uint256 tokenId,
         PublicMintStage calldata publicMintStageData
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _checkValidTokenId(tokenId);
         _updatePublicMintStage(tokenId, publicMintStageData);
     }
@@ -282,7 +280,7 @@ contract ERC1155EditionsImplementation is
     function updateAllowlistMintStage(
         uint256 tokenId,
         AllowlistMintStageConfig calldata allowlistMintStageConfig
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _checkValidTokenId(tokenId);
         _updateAllowlistMintStage(tokenId, allowlistMintStageConfig);
     }
@@ -290,7 +288,7 @@ contract ERC1155EditionsImplementation is
     function updateTokenGatedMintStage(
         uint256 tokenId,
         TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _checkValidTokenId(tokenId);
         _updateTokenGatedMintStage(tokenId, tokenGatedMintStageConfig);
     }

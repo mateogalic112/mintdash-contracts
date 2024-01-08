@@ -65,8 +65,7 @@ describe("ERC1155EditionsImplementation", function () {
             "Blank Studio Collection",
             "BSC",
             "0xeA6b5147C353904D5faFA801422D268772F09512",
-            0,
-            admin.address,
+            500,
         );
 
         await collection.updateRoyalties(
@@ -86,8 +85,11 @@ describe("ERC1155EditionsImplementation", function () {
         it("initializes symbol", async () => {
             expect(await collection.symbol()).to.eq("BSC");
         });
-        it("initializes admin", async () => {
-            expect(await collection.administrator()).to.eq(admin.address);
+        it("initializes platform fee", async () => {
+            expect(await collection.platformFeesAddress()).to.eq(
+                "0xeA6b5147C353904D5faFA801422D268772F09512",
+            );
+            expect(await collection.platformFeesNumerator()).to.eq(500);
         });
     });
 
@@ -1017,7 +1019,7 @@ describe("ERC1155EditionsImplementation", function () {
             ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
@@ -1027,10 +1029,7 @@ describe("ERC1155EditionsImplementation", function () {
                         endTime: 1686043287,
                         mintLimitPerWallet: 5,
                     }),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("emits PublicMintStageUpdated", async () => {
@@ -1094,7 +1093,7 @@ describe("ERC1155EditionsImplementation", function () {
             expect(updatedConfig.merkleRoot).to.equal(stageData.merkleRoot);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
@@ -1111,10 +1110,7 @@ describe("ERC1155EditionsImplementation", function () {
                             ])}`,
                         },
                     }),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("reverts for invalid token ID", async () => {
@@ -1210,7 +1206,7 @@ describe("ERC1155EditionsImplementation", function () {
             ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             const randomAddress = randomUser.address;
 
             await expect(
@@ -1226,10 +1222,7 @@ describe("ERC1155EditionsImplementation", function () {
                             maxSupplyForStage: 4000,
                         },
                     }),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("emits TokenGatedMintStageUpdated", async () => {
@@ -1264,13 +1257,10 @@ describe("ERC1155EditionsImplementation", function () {
             expect(await collection.latestTokenId()).to.eq(2);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection.connect(randomUser).createToken("ipfs://"),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("emits BaseURIUpdated", async () => {
@@ -1302,15 +1292,12 @@ describe("ERC1155EditionsImplementation", function () {
             ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updateMaxSupply(DEFAULT_TOKEN_ID, 1500),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("reverts if max supply exceeds uint64", async () => {
@@ -1514,7 +1501,7 @@ describe("ERC1155EditionsImplementation", function () {
             ).to.be.revertedWithCustomError(collection, "InvalidTokenId");
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
@@ -1522,10 +1509,7 @@ describe("ERC1155EditionsImplementation", function () {
                         DEFAULT_TOKEN_ID,
                         "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/",
                     ),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("emits BaseURIUpdated", async () => {
@@ -1566,15 +1550,12 @@ describe("ERC1155EditionsImplementation", function () {
             );
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updateRoyalties(randomUser.address, 1000),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 
@@ -1588,15 +1569,12 @@ describe("ERC1155EditionsImplementation", function () {
             expect(await collection.provenanceHash()).to.eq(newProvenanceHash);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updateProvenanceHash(ethers.utils.id("image data")),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 
@@ -1609,15 +1587,12 @@ describe("ERC1155EditionsImplementation", function () {
             expect(await collection.payoutAddress()).to.eq(owner.address);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updatePayoutAddress(randomUser.address),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("reverts if payout address is zero address", async () => {
@@ -1626,52 +1601,6 @@ describe("ERC1155EditionsImplementation", function () {
             ).to.be.revertedWithCustomError(
                 collection,
                 "PayoutAddressCannotBeZeroAddress",
-            );
-        });
-    });
-
-    describe("updatePlatformFees", () => {
-        it("updates", async () => {
-            expect(await collection.platformFeesAddress()).to.eq(
-                "0xeA6b5147C353904D5faFA801422D268772F09512",
-            );
-
-            expect(await collection.platformFeesNumerator()).to.eq(0);
-
-            await collection
-                .connect(admin)
-                .updatePlatformFees(owner.address, 400);
-
-            expect(await collection.platformFeesAddress()).to.eq(owner.address);
-
-            expect(await collection.platformFeesNumerator()).to.eq(400);
-        });
-
-        it("reverts if caller is not contract administrator", async () => {
-            await expect(
-                collection
-                    .connect(randomUser)
-                    .updatePlatformFees(owner.address, 400),
-            ).to.be.revertedWithCustomError(collection, "OnlyAdministrator");
-        });
-
-        it("reverts if payout address is zero address", async () => {
-            await expect(
-                collection.connect(admin).updatePlatformFees(ZERO_ADDRESS, 400),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "PlatformFeesAddressCannotBeZeroAddress",
-            );
-        });
-
-        it("reverts if fees numerator is too high", async () => {
-            await expect(
-                collection
-                    .connect(admin)
-                    .updatePlatformFees(owner.address, 2100),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "PlatformFeesNumeratorTooHigh",
             );
         });
     });
@@ -1689,15 +1618,12 @@ describe("ERC1155EditionsImplementation", function () {
             );
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updatePayer(randomUser.address, true),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 
@@ -1711,33 +1637,13 @@ describe("ERC1155EditionsImplementation", function () {
                 collection.withdrawAllFunds(),
             ).to.changeEtherBalance(
                 allowlistUser2,
-                ethers.utils.parseUnits("0.3", "ether"),
-            );
-        });
-
-        it("withdraws with platform fees", async () => {
-            await activatePublicStageAndMaxMint();
-
-            await collection
-                .connect(admin)
-                .updatePlatformFees(owner.address, 500);
-
-            await collection.updatePayoutAddress(allowlistUser2.address);
-
-            await expect(() =>
-                collection.withdrawAllFunds(),
-            ).to.changeEtherBalance(
-                allowlistUser2,
                 ethers.utils.parseUnits("0.285", "ether"),
             );
         });
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection.connect(randomUser).withdrawAllFunds(),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
         it("reverts if contract balance is zero", async () => {
             await expect(

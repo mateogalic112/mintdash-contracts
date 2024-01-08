@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeable.sol";
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
@@ -7,17 +7,17 @@ import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {PublicMintStage, AllowlistMintStage, AllowlistMintStageConfig, TokenGatedMintStage, TokenGatedMintStageConfig} from "./lib/DropStructs.sol";
 
-import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
 import {ERC721DropMetadata} from "./core/ERC721DropMetadata.sol";
 import {Payout} from "./core/Payout.sol";
 
 import {IERC721DropImplementation} from "./interface/IERC721DropImplementation.sol";
 
 contract ERC721DropImplementation is
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     ERC721DropMetadata,
     Payout,
     ReentrancyGuardUpgradeable,
@@ -44,11 +44,9 @@ contract ERC721DropImplementation is
         string memory _symbol,
         string memory _baseURI,
         address _platformFeesAddress, 
-        uint96 _platformFeesNumerator,
-        address _administrator
+        uint96 _platformFeesNumerator
     ) external initializerERC721A initializer {
         __ERC721A_init(_name, _symbol);
-        __Administrated_init(_administrator);
         __ERC721DropMetadata_init(_baseURI);
         __Payout_init(_platformFeesAddress, _platformFeesNumerator);
         __Ownable_init();
@@ -181,25 +179,25 @@ contract ERC721DropImplementation is
 
     function updatePublicMintStage(
         PublicMintStage calldata publicMintStageData
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updatePublicMintStage(publicMintStageData);
     }
 
     function updateAllowlistMintStage(
         AllowlistMintStageConfig calldata allowlistMintStageConfig
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateAllowlistMintStage(allowlistMintStageConfig);
     }
 
     function updateTokenGatedMintStage(
         TokenGatedMintStageConfig calldata tokenGatedMintStageConfig
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateTokenGatedMintStage(tokenGatedMintStageConfig);
     }
 
     function updateConfiguration(
         MultiConfig calldata config
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
        _updateMaxSupply(config.maxSupply);
 
         _updateBaseURI(config.baseURI);
