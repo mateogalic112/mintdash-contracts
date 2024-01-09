@@ -11,7 +11,7 @@
 </tr>
 <tr>
 <td>Drop(ERC721)</td>
-<td><code></code></td>
+<td><code>0x1B6F40960803d9F085EE768d06867dd1CDa5b89D</code></td>
 </tr>
 <tr>
 <td>Unique Mint (ERC721)</td>
@@ -19,7 +19,7 @@
 </tr>
 <tr>
 <td>Editions (ERC1155)</td>
-<td><code></code></td>
+<td><code>0x3678ba430dc1712E67BF82164537B24234F7F0f2</code></td>
 </tr>
 <tr>
 </table>
@@ -33,15 +33,15 @@
 </tr>
 <tr>
 <td>Drop(ERC721)</td>
-<td><code></code></td>
+<td><code>0x1F594e8A4DD435660D49110051D9473D66f7A541</code></td>
 </tr>
 <tr>
 <td>Unique Mint (ERC721)</td>
-<td><code></code></td>
+<td><code>0x98f5dB44B2B8CF8F745582979d7087bd94C05ECA</code></td>
 </tr>
 <tr>
 <td>Editions (ERC1155)</td>
-<td><code></code></td>
+<td><code>0x82DECdC495fcD7815F1e5EAd7510aB2bDa3E7CA8</code></td>
 </tr>
 <tr>
 </table>

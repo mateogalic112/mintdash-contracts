@@ -72,17 +72,14 @@ contract ERC1155EditionsImplementation is
 
         PublicMintStage memory mintStage = publicMintStages[tokenId];
 
-        
         _checkStageActive(mintStage.startTime, mintStage.endTime);
 
-        
         _checkMintQuantity(
             tokenId,
             quantity,
             mintStage.mintLimitPerWallet,
             UNLIMITED_MAX_SUPPLY_FOR_STAGE
         );
-
         
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
@@ -99,27 +96,22 @@ contract ERC1155EditionsImplementation is
     ) external payable nonReentrant {
         
         address minter = recipient != address(0) ? recipient : msg.sender;
-
         
         _checkPayer(minter);
-
         
         AllowlistMintStage memory mintStage = allowlistMintStages[tokenId][allowlistStageId];
 
-        
         _checkStageActive(
             mintStage.startTime,
             mintStage.endTime
         );
 
-        
         _checkMintQuantity(
             tokenId,
             quantity,
             mintStage.mintLimitPerWallet,
             mintStage.maxSupplyForStage
         );
-
         
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
 
@@ -146,53 +138,42 @@ contract ERC1155EditionsImplementation is
         
         address minter = recipient != address(0) ? recipient : msg.sender;
 
-        
         _checkPayer(minter);
 
-        
         TokenGatedMintStage memory mintStage = tokenGatedMintStages[tokenId][
             nftContract
         ];
-
         
         uint256 quantity = tokenIds.length;
-
         
         _checkStageActive(
             mintStage.startTime,
             mintStage.endTime
         );
 
-        
         _checkMintQuantity(
             tokenId,
             quantity,
             mintStage.mintLimitPerWallet,
             mintStage.maxSupplyForStage
         );
-
         
         _checkFunds(msg.value, quantity, mintStage.mintPrice);
-
         
         mapping(uint256 => bool)
             storage redeemedTokenIds = _tokenGatedTokenRedeems[tokenId][nftContract];
-
         
         for (uint256 i = 0; i < quantity; ) {
             
             uint256 gatedTokenId = tokenIds[i];
-
             
             if (IERC721(nftContract).ownerOf(tokenId) != minter) {
                 revert TokenGatedNotTokenOwner();
             }
-
             
             if (redeemedTokenIds[gatedTokenId]) {
                 revert TokenGatedTokenAlreadyRedeemed();
             }
-
             
             redeemedTokenIds[gatedTokenId] = true;
 
@@ -243,13 +224,10 @@ contract ERC1155EditionsImplementation is
     ) external onlyOwner {
         
         _updateMaxSupply(tokenId, config.maxSupply);
-
         
-         _updateTokenURI(tokenId, config.baseURI);
-
+        _updateTokenURI(tokenId, config.baseURI);
         
         _updatePublicMintStage(tokenId, config.publicMintStage);
-
         
         for (uint256 i = 0; i < config.allowlistMintStages.length; ) {
             _updateAllowlistMintStage(tokenId, config.allowlistMintStages[i]);
@@ -258,7 +236,6 @@ contract ERC1155EditionsImplementation is
                 ++i;
             }
         }
-
         
         for (uint256 i = 0; i < config.tokenGatedMintStages.length; ) {
             _updateTokenGatedMintStage(tokenId, config.tokenGatedMintStages[i]);

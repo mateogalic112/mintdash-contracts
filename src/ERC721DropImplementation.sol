@@ -127,7 +127,6 @@ contract ERC721DropImplementation is
         TokenGatedMintStage memory tokenGatedMintStage = tokenGatedMintStages[
             nftContract
         ];
-
         
         uint256 quantity = tokenIds.length;
 
