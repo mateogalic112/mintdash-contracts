@@ -15,7 +15,7 @@
 </tr>
 <tr>
 <td>Unique Mint (ERC721)</td>
-<td><code></code></td>
+<td><code>0x66C4CA874A388792c7928355BB1ef671Fc47d03b</code></td>
 </tr>
 <tr>
 <td>Editions (ERC1155)</td>
