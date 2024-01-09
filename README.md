@@ -26,9 +26,69 @@
 
 ### Base
 
+<table>
+<tr>
+<th>Type</th>
+<th>Deployment Address</th>
+</tr>
+<tr>
+<td>Drop(ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Unique Mint (ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Editions (ERC1155)</td>
+<td><code></code></td>
+</tr>
+<tr>
+</table>
+
 ### Arbitrum
 
+<table>
+<tr>
+<th>Type</th>
+<th>Deployment Address</th>
+</tr>
+<tr>
+<td>Drop(ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Unique Mint (ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Editions (ERC1155)</td>
+<td><code></code></td>
+</tr>
+<tr>
+</table>
+
 ### Optimism
+
+<table>
+<tr>
+<th>Type</th>
+<th>Deployment Address</th>
+</tr>
+<tr>
+<td>Drop(ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Unique Mint (ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Editions (ERC1155)</td>
+<td><code></code></td>
+</tr>
+<tr>
+</table>
 
 ### Polygon
 
@@ -54,7 +114,27 @@
 
 ### Zora
 
-### Ethereum Sepolia
+<table>
+<tr>
+<th>Type</th>
+<th>Deployment Address</th>
+</tr>
+<tr>
+<td>Drop(ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Unique Mint (ERC721)</td>
+<td><code></code></td>
+</tr>
+<tr>
+<td>Editions (ERC1155)</td>
+<td><code></code></td>
+</tr>
+<tr>
+</table>
+
+### Ethereum Sepolia (Testnet)
 
 <table>
 <tr>
@@ -76,7 +156,7 @@
 <tr>
 </table>
 
-### Skale Chaos
+### Skale Chaos (Testnet)
 
 <table>
 <tr>
