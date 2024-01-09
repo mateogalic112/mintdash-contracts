@@ -51,6 +51,14 @@ const config = {
             url: `https://base-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
             accounts: [process.env.MAINNET_PRIVATE_KEY],
         },
+        zora: {
+            url: `https://rpc.zora.energy/`,
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+        },
+        optimism: {
+            url: `https://opt-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+            accounts: [process.env.MAINNET_PRIVATE_KEY],
+        },
     },
     etherscan: {
         apiKey: {
@@ -77,6 +85,14 @@ const config = {
                     apiURL: "https://staging-fast-active-bellatrix.explorer.staging-v3.skalenodes.com/api",
                     browserURL:
                         "https://staging-fast-active-bellatrix.explorer.staging-v3.skalenodes.com",
+                },
+            },
+            {
+                network: "zora",
+                chaiId: 7777777,
+                urls: {
+                    apiURL: "https://explorer.zora.energy/api/v2",
+                    browserURL: "https://explorer.zora.energy/",
                 },
             },
         ],
