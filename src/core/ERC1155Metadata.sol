@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: Unlicense
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {ERC1155BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155BurnableUpgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-
-import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {IERC1155Metadata} from "./interface/IERC1155Metadata.sol";
 
 abstract contract ERC1155Metadata is
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     ERC1155BurnableUpgradeable,
     MulticallUpgradeable,
     IERC1155Metadata
@@ -42,7 +41,7 @@ abstract contract ERC1155Metadata is
         address[] calldata to,
         uint256[] calldata tokenId,
         uint64[] calldata quantity
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         address[] memory recipients = to;
 
         for (uint64 i = 0; i < recipients.length; ) {
@@ -61,7 +60,7 @@ abstract contract ERC1155Metadata is
     function updateMaxSupply(
         uint256 tokenId,
         uint256 newMaxSupply
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _checkValidTokenId(tokenId);
         _updateMaxSupply(tokenId, newMaxSupply);
     }
@@ -69,21 +68,21 @@ abstract contract ERC1155Metadata is
     function updateTokenURI(
         uint256 tokenId,
         string calldata newUri
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _checkValidTokenId(tokenId);
         _updateTokenURI(tokenId, newUri);
     }
 
     function updateProvenanceHash(
         bytes32 newProvenanceHash
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateProvenanceHash(newProvenanceHash);
     }
 
     function updatePayer(
         address payer,
         bool isAllowed
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         allowedPayers[payer] = isAllowed;
         emit AllowedPayerUpdated(payer, isAllowed);
     }

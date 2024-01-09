@@ -19,11 +19,7 @@ describe("ERC721CollectionImplementation", function () {
         collection = await ERC721CollectionImplementation.deploy();
         await collection.deployed();
 
-        await collection.initialize(
-            "Blank Studio Collection",
-            "BSC",
-            admin.address,
-        );
+        await collection.initialize("Blank Studio Collection", "BSC");
     });
 
     describe("initialization", () => {
@@ -32,9 +28,6 @@ describe("ERC721CollectionImplementation", function () {
         });
         it("initializes symbol", async () => {
             expect(await collection.symbol()).to.eq("BSC");
-        });
-        it("initializes admin", async () => {
-            expect(await collection.administrator()).to.eq(admin.address);
         });
         it("initializes owner", async () => {
             expect(await collection.owner()).to.eq(owner.address);
@@ -138,15 +131,12 @@ describe("ERC721CollectionImplementation", function () {
             );
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updateRoyalties(randomUser.address, 1000),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 
@@ -161,17 +151,14 @@ describe("ERC721CollectionImplementation", function () {
             expect(await collection.baseURI()).to.eq(newBaseURI);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 collection
                     .connect(randomUser)
                     .updateBaseURI(
                         "ipfs://QmSBxebqcuP8GyUxaFVEDqpsmbcjNMxg5y3i1UAHLNEW/",
                     ),
-            ).to.be.revertedWithCustomError(
-                collection,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("emits BaseURIUpdated", async () => {

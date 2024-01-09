@@ -10,23 +10,6 @@
 
 ## Methods
 
-### administrator
-
-```solidity
-function administrator() external view returns (address)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
 ### claimRewards
 
 ```solidity
@@ -185,17 +168,6 @@ function owner() external view returns (address)
 |---|---|---|
 | _0 | address | undefined |
 
-### renounceAdministration
-
-```solidity
-function renounceAdministration() external nonpayable
-```
-
-
-
-
-
-
 ### renounceOwnership
 
 ```solidity
@@ -322,22 +294,6 @@ Toggle the staking state between enabled and disabled.
 
 
 
-### transferAdministration
-
-```solidity
-function transferAdministration(address newAdmin) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newAdmin | address | undefined |
-
 ### transferOwnership
 
 ```solidity
@@ -406,23 +362,6 @@ Withdraw ERC20 tokens from the contract.
 
 
 ## Events
-
-### AdministrationTransferred
-
-```solidity
-event AdministrationTransferred(address indexed previousAdmin, address indexed newAdmin)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousAdmin `indexed` | address | undefined |
-| newAdmin `indexed` | address | undefined |
 
 ### Initialized
 
@@ -528,17 +467,6 @@ Emit an event when a staker claims their rewards.
 
 ## Errors
 
-### InvalidAdministratorAddress
-
-```solidity
-error InvalidAdministratorAddress()
-```
-
-
-
-
-
-
 ### NoRewardsToClaim
 
 ```solidity
@@ -559,28 +487,6 @@ error NotStakedNftOwner()
 
 
 *Revert if caller is not the owner of the staked NFT.*
-
-
-### OnlyAdministrator
-
-```solidity
-error OnlyAdministrator()
-```
-
-
-
-
-
-
-### OnlyOwnerOrAdministrator
-
-```solidity
-error OnlyOwnerOrAdministrator()
-```
-
-
-
-
 
 
 ### SameRewardRate

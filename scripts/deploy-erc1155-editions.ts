@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, run } from "hardhat";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -11,13 +11,24 @@ async function main() {
         "ERC1155EditionsImplementation",
     );
     const implementation = await ERC1155EditionsImplementation.deploy();
-    await implementation.deployed();
-    await implementation.initialize("Mintdash", "MINTDASH", deployer.address);
+    await implementation.deployTransaction.wait(6);
+
+    await implementation.initialize(
+        "Mintdash",
+        "MINTDASH",
+        "0xeA6b5147C353904D5faFA801422D268772F09512",
+        0,
+    );
 
     console.log(
         "🚀 ERC1155EditionsImplementation deployed to: ",
         implementation.address,
     );
+
+    await run("verify:verify", {
+        address: implementation.address,
+        constructorArguments: [],
+    });
 }
 
 main()

@@ -10,23 +10,6 @@
 
 ## Methods
 
-### administrator
-
-```solidity
-function administrator() external view returns (address)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
 ### airdrop
 
 ```solidity
@@ -235,7 +218,7 @@ Returns if token is redeemed for NFT contract.
 ### initialize
 
 ```solidity
-function initialize(string _name, string _symbol, string _baseURI, address _administrator) external nonpayable
+function initialize(string _name, string _symbol, string _baseURI, address _platformFeesAddress, uint96 _platformFeesNumerator) external nonpayable
 ```
 
 
@@ -249,7 +232,8 @@ function initialize(string _name, string _symbol, string _baseURI, address _admi
 | _name | string | undefined |
 | _symbol | string | undefined |
 | _baseURI | string | undefined |
-| _administrator | address | undefined |
+| _platformFeesAddress | address | undefined |
+| _platformFeesNumerator | uint96 | undefined |
 
 ### isApprovedForAll
 
@@ -511,17 +495,6 @@ function publicMintStage() external view returns (uint144 mintPrice, uint48 star
 | endTime | uint48 | undefined |
 | mintLimitPerWallet | uint16 | undefined |
 
-### renounceAdministration
-
-```solidity
-function renounceAdministration() external nonpayable
-```
-
-
-
-
-
-
 ### renounceOwnership
 
 ```solidity
@@ -715,22 +688,6 @@ function totalSupply() external view returns (uint256)
 |---|---|---|
 | _0 | uint256 | undefined |
 
-### transferAdministration
-
-```solidity
-function transferAdministration(address newAdmin) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newAdmin | address | undefined |
-
 ### transferFrom
 
 ```solidity
@@ -852,22 +809,6 @@ Updates allowed payers.
 function updatePayoutAddress(address newPayoutAddress) external nonpayable
 ```
 
-Updates payout address
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newPayoutAddress | address | New payout address. |
-
-### updatePlatformFees
-
-```solidity
-function updatePlatformFees(address newPlatformFeesAddress, uint256 newPlatformFeesNumerator) external nonpayable
-```
-
 
 
 
@@ -876,8 +817,7 @@ function updatePlatformFees(address newPlatformFeesAddress, uint256 newPlatformF
 
 | Name | Type | Description |
 |---|---|---|
-| newPlatformFeesAddress | address | undefined |
-| newPlatformFeesNumerator | uint256 | undefined |
+| newPayoutAddress | address | undefined |
 
 ### updateProvenanceHash
 
@@ -958,23 +898,6 @@ Withdraws all funds from the contract. This function will revert if contract bal
 
 
 ## Events
-
-### AdministrationTransferred
-
-```solidity
-event AdministrationTransferred(address indexed previousAdmin, address indexed newAdmin)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousAdmin `indexed` | address | undefined |
-| newAdmin `indexed` | address | undefined |
 
 ### AllowedPayerUpdated
 
@@ -1181,23 +1104,6 @@ event PayoutAddressUpdated(address indexed payoutAddress)
 |---|---|---|
 | payoutAddress `indexed` | address | undefined |
 
-### PlatformFeesUpdated
-
-```solidity
-event PlatformFeesUpdated(address indexed platformFeesAddress, uint256 indexed platformFeesNumerator)
-```
-
-
-
-*Emit an event when platform fees are updated.*
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| platformFeesAddress `indexed` | address | undefined |
-| platformFeesNumerator `indexed` | uint256 | undefined |
-
 ### ProvenanceHashUpdated
 
 ```solidity
@@ -1352,17 +1258,6 @@ error IncorrectFundsProvided()
 *Revert if supplied ETH value is not valid for the mint.*
 
 
-### InvalidAdministratorAddress
-
-```solidity
-error InvalidAdministratorAddress()
-```
-
-
-
-
-
-
 ### InvalidPayoutAddress
 
 ```solidity
@@ -1462,28 +1357,6 @@ error NothingToWithdraw()
 *Revert if the contract balance is zero when withdrawing funds.*
 
 
-### OnlyAdministrator
-
-```solidity
-error OnlyAdministrator()
-```
-
-
-
-
-
-
-### OnlyOwnerOrAdministrator
-
-```solidity
-error OnlyOwnerOrAdministrator()
-```
-
-
-
-
-
-
 ### OwnerQueryForNonexistentToken
 
 ```solidity
@@ -1537,28 +1410,6 @@ error PayoutTransferFailed()
 
 
 *Revert if the payout transfer fails.*
-
-
-### PlatformFeesAddressCannotBeZeroAddress
-
-```solidity
-error PlatformFeesAddressCannotBeZeroAddress()
-```
-
-
-
-*Revert if platform fees address is zero address when updating platform fees.*
-
-
-### PlatformFeesNumeratorTooHigh
-
-```solidity
-error PlatformFeesNumeratorTooHigh()
-```
-
-
-
-*Revert if the new platform fees numerator exceeds the maximum allowed value.*
 
 
 ### PlatformFeesTransferFailed

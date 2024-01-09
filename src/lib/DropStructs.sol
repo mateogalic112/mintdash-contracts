@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 /**
  * @notice A struct for configuration of public mint stage.

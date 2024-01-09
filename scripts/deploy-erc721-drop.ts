@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, run } from "hardhat";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -11,18 +11,25 @@ async function main() {
         "ERC721DropImplementation",
     );
     const implementation = await ERC721DropImplementation.deploy();
-    await implementation.deployed();
+    await implementation.deployTransaction.wait(6);
+
     await implementation.initialize(
         "Mintdash",
         "MINTDASH",
         "",
-        deployer.address,
+        "0xeA6b5147C353904D5faFA801422D268772F09512",
+        0,
     );
 
     console.log(
         "🚀 ERC721DropImplementation deployed to: ",
         implementation.address,
     );
+
+    await run("verify:verify", {
+        address: implementation.address,
+        constructorArguments: [],
+    });
 }
 
 main()

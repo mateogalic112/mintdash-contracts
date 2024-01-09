@@ -1,48 +1,39 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {ERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/token/common/ERC2981Upgradeable.sol";
-import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import {IPayout} from "./interface/IPayout.sol";
 
-abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayout {
+abstract contract Payout is OwnableUpgradeable, ERC2981Upgradeable, IPayout {
     address public payoutAddress;
 
     address public platformFeesAddress;
     uint96 public platformFeesNumerator;
 
-    uint256 constant MAX_PLATFORM_FEES_NUMERATOR = 2000;
-
-    function __Payout_init()
+    function __Payout_init(address _platformFeesAddress, uint96 _platformFeesNumerator)
         internal
         onlyInitializing
     {
-        platformFeesAddress = 0xeA6b5147C353904D5faFA801422D268772F09512;
-        platformFeesNumerator = 0;
-    }
-
-    function updatePlatformFees(
-        address newPlatformFeesAddress,
-        uint256 newPlatformFeesNumerator
-    ) external onlyAdministrator {
-        _updatePlatformFees(newPlatformFeesAddress, newPlatformFeesNumerator);
+        platformFeesAddress = _platformFeesAddress;
+        platformFeesNumerator = _platformFeesNumerator;
     }
 
     function updatePayoutAddress(
         address newPayoutAddress
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updatePayoutAddress(newPayoutAddress);
     }
 
     function updateRoyalties(
         address receiver,
         uint96 feeNumerator
-    ) external onlyOwnerOrAdministrator {
+    ) external onlyOwner {
         _updateRoyalties(receiver, feeNumerator);
     }
 
-    function withdrawAllFunds() external onlyOwnerOrAdministrator {
+    function withdrawAllFunds() external onlyOwner {
         if (address(this).balance == 0) {
             revert NothingToWithdraw();
         }
@@ -84,23 +75,5 @@ abstract contract Payout is AdministratedUpgradeable, ERC2981Upgradeable, IPayou
         _setDefaultRoyalty(receiver, feeNumerator);
 
         emit RoyaltiesUpdated(receiver, feeNumerator);
-    }
-
-    function _updatePlatformFees(
-        address newPlatformFeesAddress,
-        uint256 newPlatformFeesNumerator
-    ) internal {
-        if (newPlatformFeesAddress == address(0)) {
-            revert PlatformFeesAddressCannotBeZeroAddress();
-        }
-
-        if (newPlatformFeesNumerator > MAX_PLATFORM_FEES_NUMERATOR) {
-            revert PlatformFeesNumeratorTooHigh();
-        }
-
-        platformFeesAddress = newPlatformFeesAddress;
-        platformFeesNumerator = uint96(newPlatformFeesNumerator);
-
-        emit PlatformFeesUpdated(newPlatformFeesAddress, newPlatformFeesNumerator);
     }
 }

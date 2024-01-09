@@ -7,9 +7,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 describe("ERC721DropImplementation - mintPublic", function () {
     let collection: Contract;
 
-    let owner: SignerWithAddress,
-        randomUser: SignerWithAddress,
-        admin: SignerWithAddress;
+    let owner: SignerWithAddress, randomUser: SignerWithAddress;
 
     const initialMaxSupply = 4000;
     const initialBaseURI =
@@ -20,7 +18,7 @@ describe("ERC721DropImplementation - mintPublic", function () {
     const initialRoyaltiesFee = 1000;
 
     beforeEach(async function () {
-        [owner, randomUser, admin] = await ethers.getSigners();
+        [owner, randomUser] = await ethers.getSigners();
 
         const ERC721DropImplementation = await ethers.getContractFactory(
             "ERC721DropImplementation",
@@ -32,7 +30,8 @@ describe("ERC721DropImplementation - mintPublic", function () {
             "Blank Studio Collection",
             "BSC",
             initialBaseURI,
-            admin.address,
+            "0xeA6b5147C353904D5faFA801422D268772F09512",
+            500,
         );
 
         await collection.updateRoyalties(

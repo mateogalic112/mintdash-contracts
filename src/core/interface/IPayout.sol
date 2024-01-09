@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 interface IPayout {
     /**
@@ -11,16 +11,6 @@ interface IPayout {
      * @dev Revert if the payout address is zero address.
      */
     error InvalidPayoutAddress();
-
-     /**
-     * @dev Revert if platform fees address is zero address when updating platform fees.
-     */
-    error PlatformFeesAddressCannotBeZeroAddress();
-
-    /**
-     * @dev Revert if the new platform fees numerator exceeds the maximum allowed value.
-     */
-    error PlatformFeesNumeratorTooHigh();
 
     /**
      * @dev Revert if the platform fees address is zero address.
@@ -56,14 +46,6 @@ interface IPayout {
     );
 
     /**
-     * @dev Emit an event when platform fees are updated.
-     */
-    event PlatformFeesUpdated(
-        address indexed platformFeesAddress,
-        uint256 indexed platformFeesNumerator
-    );
-
-    /**
      * @notice Updates royalties for the collection.
      *
      * @param receiver New address of the royalties receiver.
@@ -76,11 +58,4 @@ interface IPayout {
                This function will revert if contract balance is zero.
     */
     function withdrawAllFunds() external;
-
-    /**
-     * @notice Updates payout address
-     *
-     * @param newPayoutAddress New payout address.
-     */
-    function updatePayoutAddress(address newPayoutAddress) external;
 }

@@ -278,13 +278,10 @@ describe("ERC721StakingImplementation", function () {
             ).to.be.revertedWithCustomError(staking, "SameRewardRate");
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 staking.connect(user).updateRewardRate(200),
-            ).to.be.revertedWithCustomError(
-                staking,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
 
         it("emits RewardRateUpdated event", async () => {
@@ -303,13 +300,10 @@ describe("ERC721StakingImplementation", function () {
             expect(await staking.isStakingEnabled()).to.equal(true);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 staking.connect(user).toggleStaking(),
-            ).to.be.revertedWithCustomError(
-                staking,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 
@@ -323,13 +317,10 @@ describe("ERC721StakingImplementation", function () {
             expect(balanceAfter.sub(balanceBefore)).to.equal(tokenAmount);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             await expect(
                 staking.connect(user).withdrawERC20Tokens(1000, user.address),
-            ).to.be.revertedWithCustomError(
-                staking,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 
@@ -346,7 +337,7 @@ describe("ERC721StakingImplementation", function () {
             expect(balanceAfter.sub(balanceBefore)).to.equal(tokenAmount);
         });
 
-        it("reverts if caller is not contract owner or administrator", async () => {
+        it("reverts if caller is not contract owner", async () => {
             const tokenAmount = 1000;
 
             await rewardToken.mint(owner.address, tokenAmount);
@@ -356,10 +347,7 @@ describe("ERC721StakingImplementation", function () {
                 staking
                     .connect(user)
                     .depositERC20Tokens(tokenAmount, owner.address),
-            ).to.be.revertedWithCustomError(
-                staking,
-                "OnlyOwnerOrAdministrator",
-            );
+            ).to.be.revertedWith("Ownable: caller is not the owner");
         });
     });
 });

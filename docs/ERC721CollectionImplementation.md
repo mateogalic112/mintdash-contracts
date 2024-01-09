@@ -10,23 +10,6 @@
 
 ## Methods
 
-### administrator
-
-```solidity
-function administrator() external view returns (address)
-```
-
-
-
-
-
-
-#### Returns
-
-| Name | Type | Description |
-|---|---|---|
-| _0 | address | undefined |
-
 ### approve
 
 ```solidity
@@ -140,7 +123,7 @@ function getApproved(uint256 tokenId) external view returns (address)
 ### initialize
 
 ```solidity
-function initialize(string name, string symbol, address _administrator) external nonpayable
+function initialize(string name, string symbol) external nonpayable
 ```
 
 
@@ -153,7 +136,6 @@ function initialize(string name, string symbol, address _administrator) external
 |---|---|---|
 | name | string | undefined |
 | symbol | string | undefined |
-| _administrator | address | undefined |
 
 ### isApprovedForAll
 
@@ -266,17 +248,6 @@ function ownerOf(uint256 tokenId) external view returns (address)
 | Name | Type | Description |
 |---|---|---|
 | _0 | address | undefined |
-
-### renounceAdministration
-
-```solidity
-function renounceAdministration() external nonpayable
-```
-
-
-
-
-
 
 ### renounceOwnership
 
@@ -445,22 +416,6 @@ function totalSupply() external view returns (uint256 supply)
 |---|---|---|
 | supply | uint256 | undefined |
 
-### transferAdministration
-
-```solidity
-function transferAdministration(address newAdmin) external nonpayable
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| newAdmin | address | undefined |
-
 ### transferFrom
 
 ```solidity
@@ -531,23 +486,6 @@ function updateRoyalties(address receiver, uint96 feeNumerator) external nonpaya
 
 
 ## Events
-
-### AdministrationTransferred
-
-```solidity
-event AdministrationTransferred(address indexed previousAdmin, address indexed newAdmin)
-```
-
-
-
-
-
-#### Parameters
-
-| Name | Type | Description |
-|---|---|---|
-| previousAdmin `indexed` | address | undefined |
-| newAdmin `indexed` | address | undefined |
 
 ### Approval
 
@@ -714,39 +652,6 @@ event Transfer(address indexed from, address indexed to, uint256 indexed tokenId
 
 ```solidity
 error CallerNotTokenOwner()
-```
-
-
-
-
-
-
-### InvalidAdministratorAddress
-
-```solidity
-error InvalidAdministratorAddress()
-```
-
-
-
-
-
-
-### OnlyAdministrator
-
-```solidity
-error OnlyAdministrator()
-```
-
-
-
-
-
-
-### OnlyOwnerOrAdministrator
-
-```solidity
-error OnlyOwnerOrAdministrator()
 ```
 
 

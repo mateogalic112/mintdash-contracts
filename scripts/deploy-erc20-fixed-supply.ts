@@ -1,4 +1,4 @@
-import { ethers } from "hardhat";
+import { ethers, run } from "hardhat";
 
 async function main() {
     const [deployer] = await ethers.getSigners();
@@ -11,15 +11,15 @@ async function main() {
         "ERC20Implementation",
     );
     const implementation = await ERC20Implementation.deploy();
-    await implementation.deployed();
-    await implementation.initialize(
-        "Blank NFT Studio",
-        "BLANK",
-        deployer.address,
-        0,
-    );
+    await implementation.deployTransaction.wait(6);
+    await implementation.initialize("Blank NFT Studio", "BLANK", 0);
 
     console.log("🚀 ERC20Implementation deployed to: ", implementation.address);
+
+    await run("verify:verify", {
+        address: implementation.address,
+        constructorArguments: [],
+    });
 }
 
 main()

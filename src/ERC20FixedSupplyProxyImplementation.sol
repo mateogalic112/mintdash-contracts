@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import {ERC20BurnableUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
 import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
-
-import {AdministratedUpgradeable} from "./core/AdministratedUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract ERC20FixedSupplyProxyImplementation is
     ERC20BurnableUpgradeable,
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     MulticallUpgradeable
 {
     function initialize(

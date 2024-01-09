@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721BurnableUpgradeable.sol";
-import {AdministratedUpgradeable} from "./AdministratedUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IERC721CollectionMetadata} from "./interface/IERC721CollectionMetadata.sol";
 
 abstract contract ERC721CollectionMetadata is 
-    AdministratedUpgradeable,
+    OwnableUpgradeable,
     ERC721BurnableUpgradeable,
     IERC721CollectionMetadata
 {

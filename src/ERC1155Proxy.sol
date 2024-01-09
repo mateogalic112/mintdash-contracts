@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.18;
+pragma solidity 0.8.23;
 
 import "@openzeppelin/contracts/proxy/Proxy.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -20,10 +20,11 @@ contract ERC1155Proxy is Proxy {
         Address.functionDelegateCall(
             0x5b69115cA107222B6F988215dEAdaBE6229c9bbc,
             abi.encodeWithSignature(
-                "initialize(string,string,address)",
+                "initialize(string,string,address,uint96)",
                 name,
                 symbol,
-                0xeA6b5147C353904D5faFA801422D268772F09512 // default administrator
+                0xeA6b5147C353904D5faFA801422D268772F09512, 
+                500
             )
         );
     }
