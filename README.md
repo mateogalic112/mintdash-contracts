@@ -55,7 +55,7 @@
 </tr>
 <tr>
 <td>Drop(ERC721)</td>
-<td><code></code></td>
+<td><code>0x30A03361C0eecF81603e880F05F9e845C758F012</code></td>
 </tr>
 <tr>
 <td>Unique Mint (ERC721)</td>
