@@ -59,11 +59,11 @@
 </tr>
 <tr>
 <td>Unique Mint (ERC721)</td>
-<td><code></code></td>
+<td><code>0xf38D17099B733Ab1B2221373ba2254A4aa06cFEa</code></td>
 </tr>
 <tr>
 <td>Editions (ERC1155)</td>
-<td><code></code></td>
+<td><code>0xE3A964BA874611409f8c43B9DB4B0a64808c6DE9</code></td>
 </tr>
 <tr>
 </table>
