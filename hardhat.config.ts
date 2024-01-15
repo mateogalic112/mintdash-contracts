@@ -68,6 +68,7 @@ const config = {
             polygon: process.env.POLYSCAN_API_KEY,
             base: process.env.BASESCAN_API_KEY,
             skaleChaos: process.env.ETHERSCAN_API_KEY,
+            arbitrumOne: process.env.ARBISCAN_API_KEY,
         },
         customChains: [
             {
